@@ -13,22 +13,22 @@ public class BasicOrReprint {
 
     protected static boolean isReprintOrBasic(String name) {
         String[] reprints
-                = {"Battle Mastery",
-                    "Death Wind",
-                    "Dragon Fodder",
-                    "Duress",
-                    "Evolving Wilds",
-                    "Explosive Vegetation",
-                    "Gravepurge",
-                    "Kindled Fury",
-                    "Mind Rot",
-                    "Naturalize",
-                    "Negate",
-                    "Pacifism",
-                    "Spidersilk Net",
-                    "Summit Prowler",
+                = {"Ancient Crab",
+                    "Aven Mindcensor",  
+                    "Brute Strength",  
+                    "Cancel", 
+                    "Essence Scatter",  
+                    "Evolving Wilds", 
+                    "Fling",  
+                    "Giant Spider", 
+                    "Gravedigger",  
+                    "Impeccable Timing",  
+                    "Mighty Leap",  
+                    "Magma Spray",  
+                    "Renewed Faith",  
+                    "Spidery Grasp",  
                     "Tormenting Voice",
-                    "Ultimate Price"};
+                    "Unburden"};
 
         String[] basics = {"Plains", "Island", "Swamp", "Mountain", "Forest"};
 

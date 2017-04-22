@@ -224,7 +224,7 @@ public class AutoWagicLine {
         String prowess = "";
         String prowessTrigger;
         try {
-            if (oracleText.contains("Whenever you cast a ")) {
+            if (oracleText.contains("Whenever you cast a noncreature spell, this creature gets +1/+1 until end of turn")) {
                 //prowessTrigger = oracleText.substring(oracleText.indexOf("Whenever you cast a "), oracleText.indexOf(","));
                 prowessTrigger = "*[-creature]";
                 prowess = "auto=@movedTo(" + prowessTrigger + "|mystack):";
@@ -322,5 +322,32 @@ public class AutoWagicLine {
 
         }
         return weak;
+    }
+
+    protected static String processOracleTextCycling(String oracleText) {
+        String cycling = "";
+        String cyclingCost;
+        try {
+            if (oracleText.contains("Cycling")) {
+                cyclingCost = oracleText.substring(oracleText.indexOf("Cycling") + 8, oracleText.indexOf("(")-1);
+                cycling = "autohand=__CYCLING__(" + cyclingCost + ")";
+            }
+        } catch (Exception ex) {
+
+
+        }
+        return cycling;
+    }
+
+    protected static String processOracleTextAttacks(String oracleText, String name) {
+        String attacks = "";
+        try {
+            if (oracleText.contains("Whenever " + name + " attacks") || oracleText.contains("You may exert")) {
+                attacks = "auto=@combat(attacking) source(this):may";
+            }
+        } catch (Exception ex) {
+
+        }
+        return attacks;
     }
 }

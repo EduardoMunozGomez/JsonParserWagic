@@ -15,7 +15,7 @@ import org.json.simple.parser.ParseException;
 
 public class JsonParserWagic {
 
-    private static String filePath = "C:\\Temp\\test.txt";
+    private static String filePath = "C:\\Users\\Eduardo\\Downloads\\AKH.json";
 
     public static String getFilePath() {
         return filePath;
@@ -40,38 +40,42 @@ public class JsonParserWagic {
             while (i.hasNext()) {
                 JSONObject innerObj = (JSONObject) i.next();
 
-//                boolean generateID = false;
-//                if (generateID) {
-//                    CardDat.generateCardDat(innerObj.get("name"), innerObj.get("multiverseid"), innerObj.get("rarity"));
-//                    continue;
-//                }
+                boolean generateID = false;
+                if (generateID) {
+                    CardDat.generateCardDat(innerObj.get("name"), innerObj.get("multiverseid"), innerObj.get("rarity"));
+                    continue;
+                }
                 if (BasicOrReprint.isReprintOrBasic((String) innerObj.get("name"))) {
                     continue;
                 }
 
-                String name = "name=" + innerObj.get("name");
+                String nameHeader = "name=" + innerObj.get("name");
+                String cardName = innerObj.get("name").toString();
                 String oracleText = (String) innerObj.get("text");
 
                 // Evergreen mechanics                
                 String combatDamage = AutoWagicLine.processOracleTextCombatDamage(oracleText);
-                String etb = AutoWagicLine.processOracleTextETB(oracleText, (String) innerObj.get("name"));
-                String etbTapped = AutoWagicLine.processOracleTextETBTapped(oracleText, (String) innerObj.get("name"));
-                String firebreating = AutoWagicLine.processOracleTextFirebreting(oracleText, (String) innerObj.get("name"));
+                String etb = AutoWagicLine.processOracleTextETB(oracleText, cardName);
+                String etbTapped = AutoWagicLine.processOracleTextETBTapped(oracleText, cardName);
+                String firebreating = AutoWagicLine.processOracleTextFirebreting(oracleText, cardName);
                 String oppCasts = AutoWagicLine.processOracleTextOppCasts(oracleText);
                 String regenerate = AutoWagicLine.processOracleTextRegenerate(oracleText);
-                String thisDies = AutoWagicLine.processOracleTextThisDies(oracleText, (String) innerObj.get("name"));
-                String targeted = AutoWagicLine.processOracleTextTargeted(oracleText, (String) innerObj.get("name"));
-                String transforms = AutoWagicLine.processOracleTextTransforms(oracleText, (String) innerObj.get("name"));
+                String thisDies = AutoWagicLine.processOracleTextThisDies(oracleText, cardName);
+                String targeted = AutoWagicLine.processOracleTextTargeted(oracleText, cardName);
+                String transforms = AutoWagicLine.processOracleTextTransforms(oracleText, cardName);
                 String upkeep = AutoWagicLine.processOracleTextUpkeep(oracleText);
                 String weak = AutoWagicLine.processOracleTextWeak(oracleText);
+                String prowess = AutoWagicLine.processOracleTextProwess(oracleText);
+                String attacks = AutoWagicLine.processOracleTextAttacks(oracleText, cardName);
+                
+                String cycling = AutoWagicLine.processOracleTextCycling(oracleText);     
 
                 // DTK
-                String bolster = AutoWagicLine.processOracleTextBolster(oracleText);
-                String dash = AutoWagicLine.processOracleTextDash(oracleText);
-                String exploit = AutoWagicLine.processOracleTextExploit(oracleText);
-                String faceUp = AutoWagicLine.processOracleTextFaceUp(oracleText);
-                String morph = AutoWagicLine.processOracleTextMorph(oracleText);
-                String prowess = AutoWagicLine.processOracleTextProwess(oracleText);
+//                String bolster = AutoWagicLine.processOracleTextBolster(oracleText);
+//                String dash = AutoWagicLine.processOracleTextDash(oracleText);
+//                String exploit = AutoWagicLine.processOracleTextExploit(oracleText);
+//                String faceUp = AutoWagicLine.processOracleTextFaceUp(oracleText);
+//                String morph = AutoWagicLine.processOracleTextMorph(oracleText);
 
                 String abilities = "";
                 String mana = "mana=" + innerObj.get("manaCost");
@@ -117,37 +121,37 @@ public class JsonParserWagic {
 
                 // CARD TAG
                 System.out.println("[card]");
-                System.out.println(name);
+                System.out.println(nameHeader);
                 if (!abilities.equals("")) {
                     System.out.println("abilities=" + abilities.trim());
                 }
-                if (!bolster.equals("")) {
-                    System.out.println(bolster);
-                }
+//                if (!bolster.equals("")) {
+//                    System.out.println(bolster);
+//                }
+//                if (!dash.equals("")) {
+//                    System.out.println(dash);
+//                }
+//                if (!exploit.equals("")) {
+//                    System.out.println(exploit);
+//                }
+//                if (!morph.equals("")) {
+//                    System.out.println(morph);
+//                }
+//                if (!faceUp.equals("")) {
+//                    System.out.println(faceUp);
+//                }
                 if (!combatDamage.equals("")) {
                     System.out.println(combatDamage);
-                }
-                if (!dash.equals("")) {
-                    System.out.println(dash);
-                }
+                }                
                 if (!etb.equals("")) {
                     System.out.println(etb);
                 }
                 if (!etbTapped.equals("")) {
                     System.out.println(etbTapped);
-                }
-                if (!exploit.equals("")) {
-                    System.out.println(exploit);
-                }
+                }                
                 if (!firebreating.equals("")) {
                     System.out.println(firebreating);
                 }                
-                if (!morph.equals("")) {
-                    System.out.println(morph);
-                }
-                if (!faceUp.equals("")) {
-                    System.out.println(faceUp);
-                }
                 if (!oppCasts.equals("")) {
                     System.out.println(oppCasts);
                 }
@@ -172,6 +176,12 @@ public class JsonParserWagic {
                 if (!weak.equals("")) {
                     System.out.println(weak);
                 }
+                if (!attacks.equals("")) {
+                    System.out.println(attacks);
+                }
+                if (!cycling.equals("")) {
+                    System.out.println(cycling);
+                }
                 if (subtype.contains("Aura")) {
                     System.out.println(AutoWagicLine.processOracleTextAura(oracleText));
                 }
@@ -182,7 +192,7 @@ public class JsonParserWagic {
                 if (oracleText != null) {
                     System.out.println("text=" + oracleText.replace("\n", " -- "));
                 }
-                if (mana != null) {
+                if (mana != null && !type.contains("Land")) {
                     System.out.println(mana);
                 }
                 System.out.println(type.trim());
@@ -197,8 +207,11 @@ public class JsonParserWagic {
             }
 
         } catch (FileNotFoundException ex) {
+                System.out.println("FileNotFoundException " + ex.getMessage());
         } catch (IOException ex) {
+                System.out.println("IOException " + ex.getMessage());
         } catch (ParseException | NullPointerException ex) {
+                System.out.println("NullPointerException " + ex.getMessage());
         }
     }
 }
