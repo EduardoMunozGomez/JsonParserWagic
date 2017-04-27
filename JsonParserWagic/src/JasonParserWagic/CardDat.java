@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package JasonParserWagic;
 
 /**
@@ -17,7 +12,7 @@ public class CardDat {
     //rarity=C
     //[/card]
     public static void generateCardDat(Object primitive, Object id, Object rare) {
-        String rarity = (String) rare;
+        String rarity = rare.toString();
 
         switch (rarity) {
             case "Common":
@@ -38,8 +33,8 @@ public class CardDat {
         }
 
         System.out.println("[card]");
-        System.out.println("primitive=" + (String) primitive);
-        System.out.println("id=" + Long.toString((Long) id));
+        System.out.println("primitive=" + primitive.toString());
+        System.out.println("id=" + id.toString());
         System.out.println("rarity=" + rarity);
         System.out.println("[/card]");
     }

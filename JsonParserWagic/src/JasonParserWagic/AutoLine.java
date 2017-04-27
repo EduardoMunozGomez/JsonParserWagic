@@ -1,29 +1,13 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package JasonParserWagic;
 
 /**
  *
  * @author Eduardo
  */
-public class AutoWagicLine {
+public class AutoLine {
 
-    //name=Azorius Keyrune
-    //auto={T}:Add{W}
-    //auto={T}:Add{U}
     //auto={W}{U}:transforms((Bird Artifact Creature,setpower=2,settoughness=2,blue,white,flying)) ueot
     //text={T}: Add {W} or {U} to your mana pool. -- {W}{U}: Azorius Keyrune becomes a 2/2 white and blue Bird artifact creature with flying until end of turn.
-    //mana={3}
-    //type=Artifact
-    //name=Atarka Monument
-    //auto=
-    //text={T}: Add {R} or {G} to your mana pool.
-    //{4}{R}{G}: Atarka Monument becomes a 4/4 red and green Dragon artifact creature with flying until end of turn.
-    //mana={3}
-    //type=Artifact
     protected static String processOracleTextTransforms(String oracleText, String name) {
         String transforms = "";
         String transformCost;
@@ -92,10 +76,11 @@ public class AutoWagicLine {
         return faceUp;
     }
 
+    //Megamorph
     //facedown={3}
     //autofacedown={3}{W}{W}:morph
     //autofaceup=counter(1/1,5)
-    protected static String processOracleTextMorph(String oracleText) {
+    protected static String processOracleTextMegaMorph(String oracleText) {
         String morph = "";
         String megamorphCost;
         try {
@@ -113,29 +98,53 @@ public class AutoWagicLine {
     }
 
     protected static String processOracleTextAura(String oracleText) {
-        String aura = "";
+        String enchant = "";
         String target;
         try {
             target = oracleText.substring(oracleText.indexOf("Enchant ") + 8);
             target = target.substring(0, target.indexOf("\n"));
-            aura = "target=" + target;
+            if (target.equals("permanent")) {
+                target = "*";
+            }
+            if (target.contains(" or ")) {
+                target = target.replace(" or ", ",");
+            }
+            if (target.contains("creature you control")) {
+                target = "creature|myBattlefield";
+            }
+            if (target.contains("creature you don't control")) {
+                target = "creature|opponentBattlefield";
+            }
+
+            enchant = "target=" + target;
 
         } catch (Exception ex) {
 
         }
-        return aura;
+        return enchant;
     }
 
-//    other={3}{B}{R} name(Dash)
-//    auto=if paid(alternative) then transforms((,newability[haste],newability[phaseaction[endofturn sourceinplay]
-//    moveto(ownerhand) all(this)])) forever
     protected static String processOracleTextEquip(String oracleText) {
         String equip = "";
+        String equipBuff;
+        String equipHas;
         String equipCost;
         try {
+            String incidence = "Equipped creature gets ";
+            if (oracleText.contains(incidence)) {
+                equipBuff = oracleText.substring(oracleText.indexOf(incidence) + incidence.length(), oracleText.indexOf("."));
+                equip += "auto=teach(creature) " + equipBuff.replace("+", "") +"\n";
+            }
+            
+            String incidenceEquipHas = "and has ";
+            if (oracleText.contains(incidenceEquipHas)) {
+                equipHas = oracleText.substring(oracleText.indexOf(incidence) + incidence.length(), oracleText.indexOf("."));
+                equip += "auto=teach(creature) " + equipHas +"\n";
+            }
+            
             equipCost = oracleText.substring(oracleText.indexOf("Equip ") + 6);
             equipCost = equipCost.substring(0, equipCost.indexOf("}") + 1);
-            equip = "auto=" + equipCost + ":equip";
+            equip += "auto=" + equipCost + ":equip";
 
         } catch (Exception ex) {
 
@@ -144,7 +153,6 @@ public class AutoWagicLine {
     }
 
     //    other={3}{B}{R} name(Dash)
-    //    auto=if paid(alternative) then transforms((,newability[haste],newability[phaseaction[endofturn sourceinplay] moveto(ownerhand) all(this)])) forever
     protected static String processOracleTextDash(String oracleText) {
         String dash = "";
         String dashCost;
@@ -153,7 +161,8 @@ public class AutoWagicLine {
                 dashCost = oracleText.substring(oracleText.indexOf("Dash") + 5);
                 dashCost = dashCost.substring(0, dashCost.indexOf("(") - 1);
                 dash = "other=" + dashCost + " name(Dash)\n"
-                        + "auto=if paid(alternative) then transforms((,newability[haste],newability[phaseaction[endofturn sourceinplay] moveto(ownerhand) all(this)])) forever";
+                        + "auto=if paid(alternative) then transforms((,newability[haste],newability[phaseaction[endofturn sourceinplay] "
+                        + "moveto(ownerhand) all(this)])) forever";
             }
 
         } catch (Exception ex) {
@@ -162,14 +171,18 @@ public class AutoWagicLine {
         return dash;
     }
 
-    //enters the battlefield,
+    //Enters the battlefield
     protected static String processOracleTextETB(String oracleText, String name) {
         String etb = "";
         try {
-            if (oracleText.contains(name + " enters the battlefield, you may ")) {
-                etb = "auto=may";
-            } else if (oracleText.contains(name + " enters the battlefield")) {
+            if (oracleText.contains(name + " enters the battlefield")) {
                 etb = "auto=";
+                if (oracleText.contains(name + " enters the battlefield, you may")) {
+                    etb += "may";
+                }
+                if (oracleText.contains(name + " enters the battlefield tapped")) {
+                    etb += "tap";
+                }
             }
         } catch (Exception ex) {
 
@@ -177,20 +190,6 @@ public class AutoWagicLine {
         return etb;
     }
 
-    //enters the battlefield tapped,
-    protected static String processOracleTextETBTapped(String oracleText, String name) {
-        String etbTapped = "";
-        try {
-            if (oracleText.contains(name + " enters the battlefield tapped")) {
-                etbTapped = "auto=tap";
-            }
-        } catch (Exception ex) {
-
-        }
-        return etbTapped;
-    }
-
-    //enters the battlefield tapped,
     protected static String processOracleTextFirebreting(String oracleText, String name) {
         String firebreating = "";
         String firebreatingCost;
@@ -219,7 +218,7 @@ public class AutoWagicLine {
         return exploit;
     }
 
-    //auto={G}:regenerate
+    //Prowess
     protected static String processOracleTextProwess(String oracleText) {
         String prowess = "";
         String prowessTrigger;
@@ -241,7 +240,7 @@ public class AutoWagicLine {
         String oppCastsTrigger;
         try {
             if (oracleText.contains("Whenever an opponent casts a ")) {
-                //prowessTrigger = oracleText.substring(oracleText.indexOf("Whenever you cast a "), oracleText.indexOf(","));
+                //oppCastsTrigger = oracleText.substring(oracleText.indexOf("Whenever an opponent casts a "), oracleText.indexOf("?"));
                 oppCastsTrigger = "*";
                 oppCasts = "auto=@movedTo(" + oppCastsTrigger + "|opponentstack):";
             }
@@ -288,7 +287,8 @@ public class AutoWagicLine {
                 thisDies = "auto=@targeted(this):";
             }
             if (oracleText.contains("becomes the target of a spell or ability an opponent controls,")) {
-                thisDies = "auto=@targeted(dragon|mybattlefield):";
+                thisDies = "auto=@targeted(this|mybattlefield) from(*|opponentbattlefield,opponenthand,"
+                        + "opponentstack,opponentgraveyard,opponentexile,opponentlibrary):";
             }
         } catch (Exception ex) {
 
@@ -329,11 +329,10 @@ public class AutoWagicLine {
         String cyclingCost;
         try {
             if (oracleText.contains("Cycling")) {
-                cyclingCost = oracleText.substring(oracleText.indexOf("Cycling") + 8, oracleText.indexOf("(")-1);
+                cyclingCost = oracleText.substring(oracleText.indexOf("Cycling") + 8, oracleText.indexOf(" ("));
                 cycling = "autohand=__CYCLING__(" + cyclingCost + ")";
             }
         } catch (Exception ex) {
-
 
         }
         return cycling;
@@ -342,12 +341,123 @@ public class AutoWagicLine {
     protected static String processOracleTextAttacks(String oracleText, String name) {
         String attacks = "";
         try {
-            if (oracleText.contains("Whenever " + name + " attacks") || oracleText.contains("You may exert")) {
-                attacks = "auto=@combat(attacking) source(this):may";
+            if (oracleText.contains("Whenever " + name + " attacks")) {
+                attacks = "auto=@combat(attacking) source(this):";
+
+                if (oracleText.contains("You may exert")) {
+                    attacks += "may";
+                }
             }
         } catch (Exception ex) {
 
         }
         return attacks;
+    }
+
+    static String processOracleTextMyTarget(String oracleText) {
+        String target = "";
+        try {
+            String incidence = "arget ";
+
+            if (oracleText.contains(incidence)) {
+                target = oracleText.substring(oracleText.indexOf(incidence) + incidence.length(), oracleText.indexOf("."));
+                if (target.equals("permanent")) {
+                    target = "*";
+                }
+                if (target.contains("player")) {
+                    target = "player";
+                }
+                if (target.contains("opponent")) {
+                    target = "opponent";
+                }
+                if (target.contains(" or ")) {
+                    target = target.replace(" or ", ",");
+                }
+                if (target.contains("nonland permanent")) {
+                    target = "*[-land]";
+                }
+                if (target.contains("creature")) {
+                    target = "creature";
+                }
+                if (target.contains("creature you control")) {
+                    target = "creature|myBattlefield";
+                }
+                if (target.contains("creature you don't control")) {
+                    target = "creature|opponentBattlefield";
+                }
+                if (target.contains("tapped creature")) {
+                    target = "creature[tapped]";
+                }
+                if (target.contains("creatures")) {
+                    incidence = "up to two";
+                    String incidence2 = "one or two";
+                    if (oracleText.contains(incidence) || oracleText.contains(incidence2)) {
+                        target = "<upto:2>creature";
+                    }
+                }
+                String creatureWith = "creature with ";
+                if (target.contains("creature with")) {
+                    String withWhat = target.substring(target.indexOf(creatureWith) + creatureWith.length(), target.indexOf(" "));
+                    target = "creature[" + withWhat + "]";
+                }
+                if (target.contains("spell")) {
+                    target = "*|stack";
+                }
+
+                target = "target=" + target;
+            }
+
+        } catch (Exception ex) {
+
+        }
+        return target;
+    }
+
+    static String processOracleTextManaAbility(String oracleText, String subtype) {
+        String manaAbility = "";
+        String manaProduced;
+        String[] basicLandTypes = {"Plains", "Island", "Swamp", "Mountain", "Forest"};
+        try {
+            String incidence = "{T}: Add {";
+            String endIncidence = " to your mana pool";
+
+            if (oracleText.contains(incidence)) {
+                manaProduced = oracleText.substring(oracleText.indexOf(incidence) + incidence.length(), oracleText.indexOf(endIncidence));
+
+                if (manaProduced.contains(",") || manaProduced.contains(" or ")) {
+                    manaProduced = manaProduced.replace(",", "\nauto={T}:Add");
+                    manaProduced = manaProduced.replace(" or ", "\nauto={T}:Add");
+                }
+
+                manaAbility = "auto={T}:Add{" + manaProduced;
+            }
+        } catch (Exception ex) {
+
+        }
+        for (String basicLandType : basicLandTypes) {
+            if (subtype.contains(basicLandType)) {
+                manaAbility = "";
+            }
+        }
+        return manaAbility;
+    }
+
+    static String processOracleTextExileDestroyDamage(String oracleText) {
+        String oppCasts = "";
+        try {
+            if (oracleText.contains("Exile ")) {                
+                oppCasts = "auto=moveto(exile)";
+            }
+            if (oracleText.contains("Destroy ")) {                
+                oppCasts = "auto=destroy";
+            }
+            if (oracleText.contains("damage ")) {                
+                oppCasts = "auto=damage:";
+            }
+        } catch (Exception ex) {
+
+        }
+        return oppCasts;
+    
     }
 }

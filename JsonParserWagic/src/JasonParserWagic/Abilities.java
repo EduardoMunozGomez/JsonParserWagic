@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package JasonParserWagic;
 
 /**
@@ -11,7 +6,7 @@ package JasonParserWagic;
  */
 public class Abilities {
 
-    protected static String processOracleText(String oracleText) {
+    protected static String processAbilities(String oracleText) {
         String abilities = "";
         try {
             oracleText = oracleText.toLowerCase();
@@ -48,6 +43,9 @@ public class Abilities {
             if (oracleText.contains("can't be blocked.")) {
                 abilities += "unblockable, ";
             }
+            if (oracleText.contains("menace")) {
+                abilities += "menace, ";
+            }
             if (oracleText.contains("indestructible")) {
                 abilities += "indestructible, ";
             }
@@ -55,6 +53,7 @@ public class Abilities {
                 abilities += "vigilance, ";
             }
             if (oracleText.contains("reach")) {
+                abilities = abilities.replace("flying, ", "");
                 abilities += "reach, ";
             }
             if (oracleText.contains("trample")) {
@@ -91,10 +90,36 @@ public class Abilities {
                 abilities += "cloud, ";
             }
         } catch (Exception ex) {
-
+            System.out.println("Abilities exception " + ex.getMessage());
         }
         if (abilities.endsWith(", ")) {
             abilities = abilities.substring(0, abilities.length() - 2);
+        }
+        return abilities;
+    }
+
+    protected static String processEnchantmentAbilities(String oracleText) {
+        String abilities = "";
+        try {
+            oracleText = oracleText.toLowerCase();
+            if (oracleText.contains("flash")) {
+                abilities += "flash";
+            }
+        } catch (Exception ex) {
+            System.out.println("Enchantment abilities exception " + ex.getMessage());
+        }
+        return abilities;
+    }
+    
+    protected static String processLandAbilities(String oracleText) {
+        String abilities = "";
+        try {
+            oracleText = oracleText.toLowerCase();
+            if (oracleText.contains("indestructible")) {
+                abilities += "indestructible";
+            }
+        } catch (Exception ex) {
+            System.out.println("Land abilities exception " + ex.getMessage());
         }
         return abilities;
     }
