@@ -15,7 +15,7 @@ import org.json.simple.parser.ParseException;
 
 public class JsonParserWagic {
 
-    private static String filePath = "C:\\Users\\Eduardo\\Downloads\\AKH.json";
+    private static String filePath = "C:\\Users\\Eduardo\\Downloads\\akh.json";
 
     public static String getFilePath() {
         return filePath;
@@ -76,15 +76,6 @@ public class JsonParserWagic {
                     type += typeStr + " ";
                 }
 
-                if (type.contains("Creature") && oracleText != null) {
-                    abilities = Abilities.processAbilities(oracleText);
-                }                
-                if (type.contains("Enchantment") && oracleText != null) {
-                    abilities = Abilities.processEnchantmentAbilities(oracleText);
-                }                
-                if (type.contains("Land") && oracleText != null) {
-                    abilities = Abilities.processLandAbilities(oracleText);
-                }
                 if (innerObj.get("subtypes") != null) {
                     subtype = "subtype=";
                     JSONArray subtypes = (JSONArray) innerObj.get("subtypes");
@@ -99,91 +90,134 @@ public class JsonParserWagic {
                     power = "power=" + innerObj.get("power");
                     toughness = "toughness=" + innerObj.get("toughness");
                 }
-                // Evergreen mechanics                
-
-                String manaAbility = AutoLine.processOracleTextManaAbility(oracleText, subtype);
-                String combatDamage = AutoLine.processOracleTextCombatDamage(oracleText);
-                String etb = AutoLine.processOracleTextETB(oracleText, cardName);
-                String firebreating = AutoLine.processOracleTextFirebreting(oracleText, cardName);
-                String oppCasts = AutoLine.processOracleTextOppCasts(oracleText);
-                String regenerate = AutoLine.processOracleTextRegenerate(oracleText);
-                String dies = AutoLine.processOracleTextThisDies(oracleText, cardName);
-                String targeted = AutoLine.processOracleTextTargeted(oracleText, cardName);
-                String transforms = AutoLine.processOracleTextTransforms(oracleText, cardName);
-                String upkeep = AutoLine.processOracleTextUpkeep(oracleText);
-                String weak = AutoLine.processOracleTextWeak(oracleText);
-                String prowess = AutoLine.processOracleTextProwess(oracleText);
-                String attacks = AutoLine.processOracleTextAttacks(oracleText, cardName);
-
-                String cycling = AutoLine.processOracleTextCycling(oracleText);
 
                 // CARD TAG
                 System.out.println("[card]");
                 System.out.println(nameHeader);
-                if (!abilities.isEmpty()) {
-                    System.out.println("abilities=" + abilities.trim());
-                }
-                if (type.contains("Instant") || type.contains("Sorcery")) {
-                    String target = AutoLine.processOracleTextMyTarget(oracleText);
-                    String exileDestroyDamage = AutoLine.processOracleTextExileDestroyDamage(oracleText);
-                    if (!target.isEmpty()) {
-                        System.out.println(target);
-                    }
-                    if (!exileDestroyDamage.isEmpty()) {
-                        System.out.println(exileDestroyDamage);
-                    } else {
-                        System.out.println("auto=");
-                    }
-                }
-                if (subtype.contains("Aura")) {
-                    System.out.println(AutoLine.processOracleTextAura(oracleText));
-                }
-                if (!etb.equals("")) {
-                    System.out.println(etb);
-                }
-                if (!manaAbility.equals("")) {
-                    System.out.println(manaAbility);
-                }
-                if (!combatDamage.equals("")) {
-                    System.out.println(combatDamage);
-                }
-                if (!firebreating.equals("")) {
-                    System.out.println(firebreating);
-                }
-                if (!oppCasts.equals("")) {
-                    System.out.println(oppCasts);
-                }
-                if (!prowess.equals("")) {
-                    System.out.println(prowess);
-                }
-                if (!regenerate.equals("")) {
-                    System.out.println(regenerate);
-                }
-                if (!dies.equals("")) {
-                    System.out.println(dies);
-                }
-                if (!targeted.equals("")) {
-                    System.out.println(targeted);
-                }
-                if (!transforms.equals("")) {
-                    System.out.println(transforms);
-                }
-                if (!upkeep.equals("")) {
-                    System.out.println(upkeep);
-                }
-                if (!weak.equals("")) {
-                    System.out.println(weak);
-                }
-                if (!attacks.equals("")) {
-                    System.out.println(attacks);
-                }
-                if (!cycling.equals("")) {
-                    System.out.println(cycling);
-                }
-                if (subtype.contains("Equipment")) {
-                    System.out.println(AutoLine.processOracleTextEquip(oracleText));
-                }
+
                 if (oracleText != null) {
+
+                    if (type.contains("Creature")) {
+                        abilities = Abilities.processAbilities(oracleText);
+                    }
+                    if (type.contains("Enchantment")) {
+                        abilities = Abilities.processEnchantmentAbilities(oracleText);
+                    }
+                    if (type.contains("Land")) {
+                        abilities = Abilities.processLandAbilities(oracleText);
+                    }
+
+                    // Evergreen mechanics
+                    String cast = AutoLine.processOracleTextCast(oracleText);
+                    String manaAbility = AutoLine.processOracleTextManaAbility(oracleText, subtype);
+                    String combatDamage = AutoLine.processOracleTextCombatDamage(oracleText);
+                    String etb = AutoLine.processOracleTextETB(oracleText, cardName);
+                    String firebreating = AutoLine.processOracleTextFirebreting(oracleText, cardName);
+                    String oppCasts = AutoLine.processOracleTextOppCasts(oracleText);
+                    String regenerate = AutoLine.processOracleTextRegenerate(oracleText);
+                    String dies = AutoLine.processOracleTextThisDies(oracleText, cardName);
+                    String targeted = AutoLine.processOracleTextTargeted(oracleText, cardName);
+                    String transforms = AutoLine.processOracleTextTransforms(oracleText, cardName);
+                    String upkeep = AutoLine.processOracleTextUpkeep(oracleText);
+                    String weak = AutoLine.processOracleTextWeak(oracleText);
+                    String prowess = AutoLine.processOracleTextProwess(oracleText);
+                    String attacks = AutoLine.processOracleTextAttacks(oracleText, cardName);
+                    String create = AutoLine.processOracleTextCreate(oracleText);
+                    String discard = AutoLine.processOracleTextDiscard(oracleText);
+                    String takeControl = AutoLine.processOracleTextTakeControl(oracleText);
+
+                    String cycling = AutoLine.processOracleTextCycling(oracleText);
+                    String embalm = AutoLine.processOracleTextEmbalm(oracleText);
+                    String exert = AutoLine.processOracleTextExert(oracleText);
+
+                    if (!abilities.isEmpty()) {
+                        System.out.println("abilities=" + abilities.trim());
+                    }
+
+                    if (type.contains("Instant") || type.contains("Sorcery")) {
+                        String target = AutoLine.processOracleTextMyTarget(oracleText, "instantOrSorcery");
+                        String exileDestroyDamage = AutoLine.processOracleTextExileDestroyDamage(oracleText);
+                        if (!target.isEmpty()) {
+                            System.out.println(target);
+                        }
+                        if (!exileDestroyDamage.isEmpty()) {
+                            System.out.println(exileDestroyDamage);
+                        } else {
+                            System.out.println("auto=");
+                        }
+                    }
+                    if (subtype.contains("Aura")) {
+                        System.out.println(AutoLine.processOracleTextMyTarget(oracleText, "aura"));
+                        String auraEquipBonus = AutoLine.processOracleTextAuraEquipBonus(oracleText);
+                        if (!auraEquipBonus.equals("")) {
+                            System.out.println(auraEquipBonus);
+                        }
+                    }
+
+                    if (!cast.equals("")) {
+                        System.out.println(cast);
+                    }
+                    if (!etb.equals("")) {
+                        System.out.println(etb);
+                    }
+                    if (!manaAbility.equals("")) {
+                        System.out.println(manaAbility);
+                    }
+                    if (!combatDamage.equals("")) {
+                        System.out.println(combatDamage);
+                    }
+                    if (!firebreating.equals("")) {
+                        System.out.println(firebreating);
+                    }
+                    if (!oppCasts.equals("")) {
+                        System.out.println(oppCasts);
+                    }
+                    if (!prowess.equals("")) {
+                        System.out.println(prowess);
+                    }
+                    if (!regenerate.equals("")) {
+                        System.out.println(regenerate);
+                    }
+                    if (!dies.equals("")) {
+                        System.out.println(dies);
+                    }
+                    if (!takeControl.equals("")) {
+                        System.out.println(takeControl);
+                    }
+                    if (!targeted.equals("")) {
+                        System.out.println(targeted);
+                    }
+                    if (!transforms.equals("")) {
+                        System.out.println(transforms);
+                    }
+                    if (!upkeep.equals("")) {
+                        System.out.println(upkeep);
+                    }
+                    if (!weak.equals("")) {
+                        System.out.println(weak);
+                    }
+                    if (!attacks.equals("")) {
+                        System.out.println(attacks);
+                    }
+                    if (!create.equals("")) {
+                        System.out.println(create);
+                    }
+                    if (!discard.equals("")) {
+                        System.out.println(discard);
+                    }
+                    if (!cycling.equals("")) {
+                        System.out.println(cycling);
+                    }
+                    if (!embalm.equals("")) {
+                        System.out.println(embalm);
+                    }
+                    if (!exert.equals("")) {
+                        System.out.println(exert);
+                    }
+                    if (subtype.contains("Equipment")) {
+                        System.out.println(AutoLine.processOracleTextAuraEquipBonus(oracleText));
+                        System.out.println(AutoLine.processOracleTextEquipCost(oracleText));
+                    }
                     System.out.println("text=" + oracleText.replace("\n", " -- "));
                 }
                 if (mana != null && !type.contains("Land")) {
@@ -206,6 +240,7 @@ public class JsonParserWagic {
             System.out.println("IOException " + ex.getMessage());
         } catch (ParseException | NullPointerException ex) {
             System.out.println("NullPointerException " + ex.getMessage());
+            ex.printStackTrace();
         }
     }
 }

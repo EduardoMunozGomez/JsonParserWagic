@@ -97,54 +97,95 @@ public class AutoLine {
         return morph;
     }
 
-    protected static String processOracleTextAura(String oracleText) {
-        String enchant = "";
-        String target;
-        try {
-            target = oracleText.substring(oracleText.indexOf("Enchant ") + 8);
-            target = target.substring(0, target.indexOf("\n"));
-            if (target.equals("permanent")) {
-                target = "*";
-            }
-            if (target.contains(" or ")) {
-                target = target.replace(" or ", ",");
-            }
-            if (target.contains("creature you control")) {
-                target = "creature|myBattlefield";
-            }
-            if (target.contains("creature you don't control")) {
-                target = "creature|opponentBattlefield";
-            }
+    static String processOracleTextMyTarget(String oracleText, String type) {
+        String target = "";
 
-            enchant = "target=" + target;
+        try {
+            String incidence = (type.equals("aura")) ? "Enchant " : "arget ";
+            String incidenceEnd = (type.equals("aura")) ? "\n" : ".";
+
+            if (oracleText.contains(incidence)) {
+                target = oracleText.substring(oracleText.indexOf(incidence) + incidence.length(), oracleText.indexOf(incidenceEnd));
+                if (target.equals("permanent")) {
+                    target = "*";
+                }
+                if (target.contains("player")) {
+                    target = "player";
+                }
+                if (target.contains("opponent")) {
+                    target = "opponent";
+                }
+                if (target.contains(" or ")) {
+                    target = target.replace(" or ", ",");
+                }
+                if (target.contains("nonland permanent")) {
+                    target = "*[-land]";
+                }
+                if (target.contains("creature you control")) {
+                    target = "creature|myBattlefield";
+                }
+                if (target.contains("creature you don't control")) {
+                    target = "creature|opponentBattlefield";
+                }
+                if (target.contains("tapped creature")) {
+                    target = "creature[tapped]";
+                }
+                if (target.contains("creatures")) {
+                    incidence = "up to two";
+                    String incidence2 = "one or two";
+                    if (oracleText.contains(incidence) || oracleText.contains(incidence2)) {
+                        target = "<upto:2>creature";
+                    }
+                }
+                String creatureWith = "creature with ";
+                if (target.contains("creature with")) {
+                    String withWhat = target.substring(target.indexOf(creatureWith) + creatureWith.length(), target.indexOf(" "));
+                    target = "creature[" + withWhat + "]";
+                }
+                if (target.contains("spell")) {
+                    target = "*|stack";
+                }
+
+                target = "target=" + target;
+            }
 
         } catch (Exception ex) {
 
         }
-        return enchant;
+        return target;
     }
 
-    protected static String processOracleTextEquip(String oracleText) {
+    protected static String processOracleTextEquipCost(String oracleText) {
+        String equip;
+        String equipCost;
+
+        equipCost = oracleText.substring(oracleText.indexOf("Equip ") + 6);
+        equipCost = equipCost.substring(0, equipCost.indexOf("}") + 1);
+        equip = "auto=" + equipCost + ":equip";
+
+        return equip;
+    }
+
+    protected static String processOracleTextAuraEquipBonus(String oracleText) {
         String equip = "";
         String equipBuff;
         String equipHas;
-        String equipCost;
         try {
-            String incidence = "Equipped creature gets ";
+            String incidence = "creature gets ";
             if (oracleText.contains(incidence)) {
-                equipBuff = oracleText.substring(oracleText.indexOf(incidence) + incidence.length(), oracleText.indexOf("."));
-                equip += "auto=teach(creature) " + equipBuff.replace("+", "") +"\n";
+                equipBuff = oracleText.substring(oracleText.indexOf(incidence) + incidence.length(), oracleText.indexOf(incidence) + incidence.length() + 5);
+                equip += "auto=teach(creature) " + equipBuff.replace("+", "") + "\n";
             }
-            
-            String incidenceEquipHas = "and has ";
+
+            String incidenceEquipHas = " has ";
             if (oracleText.contains(incidenceEquipHas)) {
-                equipHas = oracleText.substring(oracleText.indexOf(incidence) + incidence.length(), oracleText.indexOf("."));
-                equip += "auto=teach(creature) " + equipHas +"\n";
+                equipHas = oracleText.substring(oracleText.indexOf(incidenceEquipHas) + incidenceEquipHas.length(), oracleText.lastIndexOf("."));
+                equip += "auto=teach(creature) " + equipHas;
             }
-            
-            equipCost = oracleText.substring(oracleText.indexOf("Equip ") + 6);
-            equipCost = equipCost.substring(0, equipCost.indexOf("}") + 1);
-            equip += "auto=" + equipCost + ":equip";
+
+            if (oracleText.contains("nchant")) {
+                equip = equip.replace("teach(creature) ", "");
+            }
 
         } catch (Exception ex) {
 
@@ -219,17 +260,35 @@ public class AutoLine {
     }
 
     //Prowess
+    protected static String processOracleTextCast(String oracleText) {
+        String cast = "";
+        String occurrence ="Whenever you cast a";
+        String occurrenceEnd = " spell";
+        String occurrenceCondition;
+        String occurrenceSubString;
+        
+        if(oracleText.contains(occurrence)){
+            occurrenceSubString = oracleText.substring(oracleText.indexOf(occurrence)+occurrence.length(), oracleText.lastIndexOf("."));
+            occurrenceCondition = occurrenceSubString.substring(0, occurrenceSubString.indexOf(occurrenceEnd));
+            if (occurrenceCondition.equals("noncreature")){
+                occurrenceCondition="*[-creature]";
+            }
+                    
+            cast = "auto=@movedTo(" + occurrenceCondition + "|mystack):";
+        }           
+        
+        return cast;
+    }
+
+    //Prowess
     protected static String processOracleTextProwess(String oracleText) {
         String prowess = "";
         String prowessTrigger;
-        try {
-            if (oracleText.contains("Whenever you cast a noncreature spell, this creature gets +1/+1 until end of turn")) {
-                //prowessTrigger = oracleText.substring(oracleText.indexOf("Whenever you cast a "), oracleText.indexOf(","));
-                prowessTrigger = "*[-creature]";
-                prowess = "auto=@movedTo(" + prowessTrigger + "|mystack):";
-            }
-        } catch (Exception ex) {
 
+        if (oracleText.contains("Prowess")) {
+            //prowessTrigger = oracleText.substring(oracleText.indexOf("Whenever you cast a "), oracleText.indexOf(","));
+            prowessTrigger = "*[-creature]";
+            prowess = "auto=@movedTo(" + prowessTrigger + "|mystack):1/1 ueot";
         }
         return prowess;
     }
@@ -239,7 +298,7 @@ public class AutoLine {
         String oppCasts = "";
         String oppCastsTrigger;
         try {
-            if (oracleText.contains("Whenever an opponent casts a ")) {
+            if (oracleText.contains("Whenever an opponent casts a")) {
                 //oppCastsTrigger = oracleText.substring(oracleText.indexOf("Whenever an opponent casts a "), oracleText.indexOf("?"));
                 oppCastsTrigger = "*";
                 oppCasts = "auto=@movedTo(" + oppCastsTrigger + "|opponentstack):";
@@ -303,6 +362,9 @@ public class AutoLine {
             if (oracleText.contains("At the beginning of your upkeep,")) {
                 upkeep = "auto=@each my upkeep:";
             }
+            if (oracleText.contains("At the beginning of your end step")) {
+                upkeep = "auto=@each my endofturn:";
+            }
         } catch (Exception ex) {
 
         }
@@ -343,10 +405,6 @@ public class AutoLine {
         try {
             if (oracleText.contains("Whenever " + name + " attacks")) {
                 attacks = "auto=@combat(attacking) source(this):";
-
-                if (oracleText.contains("You may exert")) {
-                    attacks += "may";
-                }
             }
         } catch (Exception ex) {
 
@@ -354,63 +412,16 @@ public class AutoLine {
         return attacks;
     }
 
-    static String processOracleTextMyTarget(String oracleText) {
-        String target = "";
+    protected static String processOracleTextExert(String oracleText) {
+        String exert = "";
         try {
-            String incidence = "arget ";
-
-            if (oracleText.contains(incidence)) {
-                target = oracleText.substring(oracleText.indexOf(incidence) + incidence.length(), oracleText.indexOf("."));
-                if (target.equals("permanent")) {
-                    target = "*";
-                }
-                if (target.contains("player")) {
-                    target = "player";
-                }
-                if (target.contains("opponent")) {
-                    target = "opponent";
-                }
-                if (target.contains(" or ")) {
-                    target = target.replace(" or ", ",");
-                }
-                if (target.contains("nonland permanent")) {
-                    target = "*[-land]";
-                }
-                if (target.contains("creature")) {
-                    target = "creature";
-                }
-                if (target.contains("creature you control")) {
-                    target = "creature|myBattlefield";
-                }
-                if (target.contains("creature you don't control")) {
-                    target = "creature|opponentBattlefield";
-                }
-                if (target.contains("tapped creature")) {
-                    target = "creature[tapped]";
-                }
-                if (target.contains("creatures")) {
-                    incidence = "up to two";
-                    String incidence2 = "one or two";
-                    if (oracleText.contains(incidence) || oracleText.contains(incidence2)) {
-                        target = "<upto:2>creature";
-                    }
-                }
-                String creatureWith = "creature with ";
-                if (target.contains("creature with")) {
-                    String withWhat = target.substring(target.indexOf(creatureWith) + creatureWith.length(), target.indexOf(" "));
-                    target = "creature[" + withWhat + "]";
-                }
-                if (target.contains("spell")) {
-                    target = "*|stack";
-                }
-
-                target = "target=" + target;
+            if (oracleText.contains("ou may exert ")) {
+                exert = "auto=@combat(attacking) source(this):may freeze this";
             }
-
         } catch (Exception ex) {
 
         }
-        return target;
+        return exert;
     }
 
     static String processOracleTextManaAbility(String oracleText, String subtype) {
@@ -445,19 +456,98 @@ public class AutoLine {
     static String processOracleTextExileDestroyDamage(String oracleText) {
         String oppCasts = "";
         try {
-            if (oracleText.contains("Exile ")) {                
+            if (oracleText.contains("Exile ")) {
                 oppCasts = "auto=moveto(exile)";
             }
-            if (oracleText.contains("Destroy ")) {                
+            if (oracleText.contains("Destroy ")) {
                 oppCasts = "auto=destroy";
             }
-            if (oracleText.contains("damage ")) {                
-                oppCasts = "auto=damage:";
+            String dealsIncidence = " deals ";
+            String dmgIncidence = " damage ";
+            if (oracleText.contains(dealsIncidence) && oracleText.contains(dmgIncidence)) {
+                String dmgAmount = oracleText.substring(oracleText.indexOf(dealsIncidence) + dealsIncidence.length(), oracleText.indexOf(dmgIncidence));
+                oppCasts = "auto=damage:" + dmgAmount;
             }
         } catch (Exception ex) {
 
         }
         return oppCasts;
-    
+
+    }
+//Embalm {5}{W} ({5}{W}, Exile this card from your graveyard: Create a token that's a copy of it,
+    //except it's a white Zombie Angel with no mana cost. Embalm only as a sorcery.)
+
+    static String processOracleTextEmbalm(String oracleText) {
+        String embalm = "";
+        String embalmCost;
+        try {
+            String incidence = "Embalm ";
+
+            if (oracleText.contains(incidence)) {
+                embalmCost = oracleText.substring(oracleText.indexOf(incidence) + incidence.length());
+                embalmCost = embalmCost.substring(0, embalmCost.indexOf(" ("));
+                embalm = "autograveyard=" + embalmCost + "{E}:name(Embalm) clone this with(white) addtype(Zombie) asSorcery";
+
+            }
+        } catch (Exception ex) {
+
+        }
+        return embalm;
+    }
+
+    // create a 1/1 white Warrior creature token with vigilance.
+    // create(Servo:Artifact Creature Servo:1/1)
+    // auto=create(Thopter:Artifact Creature Thopter:1/1:flying)*2
+    static String processOracleTextCreate(String oracleText) {
+        String create = "";
+        String createToken;
+        String tokenType;
+        String tokenColor;
+        String tokenPT;
+        String tokenAbility;
+        String tokenNumber;
+        try {
+            String incidence = "reate ";
+
+            if (oracleText.contains(incidence)) {
+                createToken = oracleText.substring(oracleText.indexOf(incidence) + incidence.length());
+                createToken = createToken.substring(0, createToken.indexOf("."));
+
+                //create = "auto=create(" + tokenType + ":" + tokenColor + " Creature " + tokenType + ":" + tokenPT + ":" + tokenAbility + ")*" + tokenNumber;
+            }
+        } catch (Exception e) {
+        }
+        return create;
+    }
+
+    // Discard a card
+    static String processOracleTextDiscard(String oracleText) {
+        String discard = "";
+        try {
+            String incidence = "or discard a card,";
+
+            if (oracleText.contains(incidence)) {
+
+                discard = "auto=@discarded(*|myhand):";
+
+            }
+        } catch (Exception e) {
+        }
+        return discard;
+    }
+
+    static String processOracleTextTakeControl(String oracleText) {
+        String takeControl = "";
+        try {
+            String incidence = "You control enchanted ";
+
+            if (oracleText.contains(incidence)) {
+
+                takeControl = "alias=1194";
+
+            }
+        } catch (Exception e) {
+        }
+        return takeControl;
     }
 }
