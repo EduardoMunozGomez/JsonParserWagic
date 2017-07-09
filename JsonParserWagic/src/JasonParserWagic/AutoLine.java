@@ -105,7 +105,8 @@ public class AutoLine {
             String incidenceEnd = (type.equals("aura")) ? "\n" : ".";
 
             if (oracleText.contains(incidence)) {
-                target = oracleText.substring(oracleText.indexOf(incidence) + incidence.length(), oracleText.indexOf(incidenceEnd));
+                target = oracleText.substring(oracleText.indexOf(incidence) + incidence.length());
+                target = target.substring(0, target.indexOf(incidenceEnd));
                 if (target.equals("permanent")) {
                     target = "*";
                 }
@@ -142,7 +143,7 @@ public class AutoLine {
                     String withWhat = target.substring(target.indexOf(creatureWith) + creatureWith.length(), target.indexOf(" "));
                     target = "creature[" + withWhat + "]";
                 }
-                if (target.contains("spell")) {
+                if (target.contains("target spell")) {
                     target = "*|stack";
                 }
 
@@ -365,6 +366,9 @@ public class AutoLine {
             if (oracleText.contains("At the beginning of your end step")) {
                 upkeep = "auto=@each my endofturn:";
             }
+            if (oracleText.contains("At the beginning of each end step")) {
+                upkeep = "auto=@each endofturn:";
+            }
         } catch (Exception ex) {
 
         }
@@ -399,6 +403,22 @@ public class AutoLine {
         }
         return cycling;
     }
+    
+    
+    protected static String processOracleTextAfflict(String oracleText, String name) {
+        String afflict = "";
+        String afflictDamage = "";
+        try {
+            String incidence = "Afflict";
+            if (oracleText.contains(incidence)) {
+                afflictDamage = oracleText.substring(oracleText.indexOf(incidence) + incidence.length()+1,oracleText.indexOf(incidence) + incidence.length()+2);
+                afflict = "auto=@combat(blocked,turnlimited) source(this):life:-" + afflictDamage + " opponent";
+            }
+        } catch (Exception ex) {
+
+        }
+        return afflict;
+    }
 
     protected static String processOracleTextAttacks(String oracleText, String name) {
         String attacks = "";
@@ -424,6 +444,35 @@ public class AutoLine {
         return exert;
     }
 
+    static String processOracleTextActivatedAbility(String oracleText, String subtype) {
+        String activatedAbility = "";
+        String activatedAbilityCost;
+        try {
+            String incidence = ":";
+            String endIncidence = " to your mana pool";
+            if (oracleText.contains("Eternalize")){
+                return "";
+            }
+            if (oracleText.contains("Cycling")){
+                return "";
+            }
+//            if (oracleText.contains("")){
+//                return "";
+//            }
+            if (oracleText.contains(incidence)) {
+                activatedAbilityCost = oracleText.substring(oracleText.indexOf('{'), oracleText.indexOf(incidence)+1);
+                activatedAbilityCost=activatedAbilityCost.replace(",","");
+                activatedAbilityCost=activatedAbilityCost.replace(" ","");
+                activatedAbilityCost=activatedAbilityCost.replace(".","");
+                activatedAbilityCost=activatedAbilityCost.replace("Discardacard", "{D}");
+                activatedAbility = "auto=" + activatedAbilityCost;
+            }
+        } catch (Exception ex) {
+
+        }      
+        return activatedAbility;
+    }
+    
     static String processOracleTextManaAbility(String oracleText, String subtype) {
         String manaAbility = "";
         String manaProduced;
@@ -549,5 +598,23 @@ public class AutoLine {
         } catch (Exception e) {
         }
         return takeControl;
+    }
+    
+        static String processOracleTextEternalize(String oracleText) {
+        String eternalize = "";
+        String eternalizeCost;
+        try {
+            String incidence = "Eternalize";
+
+            if (oracleText.contains(incidence)) {
+                eternalizeCost = oracleText.substring(oracleText.indexOf(incidence) + incidence.length());
+                eternalizeCost = eternalizeCost.substring(1, eternalizeCost.indexOf("(")-1);
+                eternalizeCost = eternalizeCost.replace(", Discard a card.", "{D}");
+                eternalize = "autograveyard=" + eternalizeCost + "{E}:name(Eternalize) clone this with(black) addtype(Zombie) setpower=4 settoughness=4 asSorcery";
+            }
+        } catch (Exception ex) {
+
+        }
+        return eternalize;
     }
 }

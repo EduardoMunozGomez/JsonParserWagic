@@ -15,7 +15,7 @@ import org.json.simple.parser.ParseException;
 
 public class JsonParserWagic {
 
-    private static String filePath = "C:\\Users\\Eduardo\\Downloads\\akh.json";
+    private static String filePath = "C:\\Users\\Eduardo\\Downloads\\hou.json";
 
     public static String getFilePath() {
         return filePath;
@@ -109,6 +109,7 @@ public class JsonParserWagic {
 
                     // Evergreen mechanics
                     String cast = AutoLine.processOracleTextCast(oracleText);
+                    String activatedAbility = AutoLine.processOracleTextActivatedAbility(oracleText, subtype);
                     String manaAbility = AutoLine.processOracleTextManaAbility(oracleText, subtype);
                     String combatDamage = AutoLine.processOracleTextCombatDamage(oracleText);
                     String etb = AutoLine.processOracleTextETB(oracleText, cardName);
@@ -129,6 +130,9 @@ public class JsonParserWagic {
                     String cycling = AutoLine.processOracleTextCycling(oracleText);
                     String embalm = AutoLine.processOracleTextEmbalm(oracleText);
                     String exert = AutoLine.processOracleTextExert(oracleText);
+
+                    String afflict = AutoLine.processOracleTextAfflict(oracleText, cardName);
+                    String eternalize = AutoLine.processOracleTextEternalize(oracleText);
 
                     if (!abilities.isEmpty()) {
                         System.out.println("abilities=" + abilities.trim());
@@ -159,6 +163,9 @@ public class JsonParserWagic {
                     }
                     if (!etb.equals("")) {
                         System.out.println(etb);
+                    }
+                    if (!activatedAbility.equals("")) {
+                        System.out.println(activatedAbility);
                     }
                     if (!manaAbility.equals("")) {
                         System.out.println(manaAbility);
@@ -213,6 +220,12 @@ public class JsonParserWagic {
                     }
                     if (!exert.equals("")) {
                         System.out.println(exert);
+                    }
+                    if (!afflict.equals("")) {
+                        System.out.println(afflict);
+                    }
+                    if (!eternalize.equals("")) {
+                        System.out.println(eternalize);
                     }
                     if (subtype.contains("Equipment")) {
                         System.out.println(AutoLine.processOracleTextAuraEquipBonus(oracleText));
