@@ -121,13 +121,7 @@ public class AutoLine {
                 }
                 if (target.contains("nonland permanent")) {
                     target = "*[-land]";
-                }
-                if (target.contains("creature you control")) {
-                    target = "creature|myBattlefield";
-                }
-                if (target.contains("creature you don't control")) {
-                    target = "creature|opponentBattlefield";
-                }
+                }              
                 if (target.contains("tapped creature")) {
                     target = "creature[tapped]";
                 }
@@ -145,6 +139,15 @@ public class AutoLine {
                 }
                 if (target.contains("target spell")) {
                     target = "*|stack";
+                }
+                if (target.contains("creature you control")) {
+                    target = "creature|myBattlefield";
+                }
+                else if (target.contains("creature you don't control")) {
+                    target = "creature|opponentBattlefield";
+                }
+                else if (target.contains("creature")) {
+                    target = "creature ";
                 }
 
                 target = "target=" + target;
@@ -263,14 +266,14 @@ public class AutoLine {
     //Prowess
     protected static String processOracleTextCast(String oracleText) {
         String cast = "";
-        String occurrence ="Whenever you cast a";
-        String occurrenceEnd = " spell";
+        String occurrence ="Whenever you cast a ";
+        String occurrenceEnd = "spell";
         String occurrenceCondition;
         String occurrenceSubString;
         
         if(oracleText.contains(occurrence)){
             occurrenceSubString = oracleText.substring(oracleText.indexOf(occurrence)+occurrence.length(), oracleText.lastIndexOf("."));
-            occurrenceCondition = occurrenceSubString.substring(0, occurrenceSubString.indexOf(occurrenceEnd));
+            occurrenceCondition = occurrenceSubString.substring(0, occurrenceSubString.indexOf(occurrenceEnd)).trim();
             if (occurrenceCondition.equals("noncreature")){
                 occurrenceCondition="*[-creature]";
             }
@@ -395,7 +398,7 @@ public class AutoLine {
         String cyclingCost;
         try {
             if (oracleText.contains("Cycling")) {
-                cyclingCost = oracleText.substring(oracleText.indexOf("Cycling") + 8, oracleText.indexOf(" ("));
+                cyclingCost = oracleText.substring(oracleText.indexOf("Cycling") + 8, oracleText.indexOf(" ({"));
                 cycling = "autohand=__CYCLING__(" + cyclingCost + ")";
             }
         } catch (Exception ex) {
@@ -465,6 +468,7 @@ public class AutoLine {
                 activatedAbilityCost=activatedAbilityCost.replace(" ","");
                 activatedAbilityCost=activatedAbilityCost.replace(".","");
                 activatedAbilityCost=activatedAbilityCost.replace("Discardacard", "{D}");
+                activatedAbilityCost=activatedAbilityCost.replace("Sacrifice", "{S}");
                 activatedAbility = "auto=" + activatedAbilityCost;
             }
         } catch (Exception ex) {
