@@ -7,12 +7,13 @@ package JasonParserWagic;
 public class BasicOrReprint {
 
     protected static boolean isReprintOrBasic(String name) {
-        String[] reprints
-                = {"Sandblast",
-                    "Unsummon",
-                    "Kindled Fury",
-                    "Manalith",
-                    "Traveler's Amulet"};
+        String[] reprints = {
+            "Sandblast",
+            "Unsummon",
+            "Kindled Fury",
+            "Manalith",
+            "Traveler's Amulet"
+        };
 
         String[] basics = {"Plains", "Island", "Swamp", "Mountain", "Forest"};
 

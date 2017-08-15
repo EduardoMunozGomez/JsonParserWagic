@@ -27,41 +27,40 @@ public class JsonParserWagic {
 
     public static void main(String[] args) {
 
+        boolean generateID = false;
+
         try {
             FileReader reader = new FileReader(getFilePath());
             JSONParser jsonParser = new JSONParser();
             JSONObject jsonObject = (JSONObject) jsonParser.parse(reader);
-
             JSONArray cards = (JSONArray) jsonObject.get("cards");
 
             Iterator i = cards.iterator();
-
             // take each value from the json array separately
             // innerObj is a card
             while (i.hasNext()) {
-                JSONObject innerObj = (JSONObject) i.next();
+                JSONObject card = (JSONObject) i.next();
 
-                boolean generateID = false;
                 if (generateID) {
-                    CardDat.generateCardDat(innerObj.get("name"), innerObj.get("multiverseid"), innerObj.get("rarity"));
+                    CardDat.generateCardDat(card.get("name"), card.get("multiverseid"), card.get("rarity"));
                     continue;
                 }
-                if (BasicOrReprint.isReprintOrBasic((String) innerObj.get("name"))) {
+                if (BasicOrReprint.isReprintOrBasic((String) card.get("name"))) {
                     continue;
                 }
 
-                String nameHeader = "name=" + innerObj.get("name");
-                String cardName = innerObj.get("name").toString();
-                String oracleText = (String) innerObj.get("text");
+                String nameHeader = "name=" + card.get("name");
+                String cardName = card.get("name").toString();
+                String oracleText = (String) card.get("text");
                 String abilities = "";
-                String mana = "mana=" + innerObj.get("manaCost");
+                String mana = "mana=" + card.get("manaCost");
                 String type = "type=";
                 String subtype = "";
                 String power = "";
                 String toughness = "";
 
-                if (innerObj.get("supertypes") != null) {
-                    JSONArray supertypes = (JSONArray) innerObj.get("supertypes");
+                if (card.get("supertypes") != null) {
+                    JSONArray supertypes = (JSONArray) card.get("supertypes");
                     Iterator supertypesIter = supertypes.iterator();
                     while (supertypesIter.hasNext()) {
                         String supertype = (String) supertypesIter.next();
@@ -69,16 +68,16 @@ public class JsonParserWagic {
                     }
                 }
 
-                JSONArray types = (JSONArray) innerObj.get("types");
+                JSONArray types = (JSONArray) card.get("types");
                 Iterator typesIter = types.iterator();
                 while (typesIter.hasNext()) {
                     String typeStr = (String) typesIter.next();
                     type += typeStr + " ";
                 }
 
-                if (innerObj.get("subtypes") != null) {
+                if (card.get("subtypes") != null) {
                     subtype = "subtype=";
-                    JSONArray subtypes = (JSONArray) innerObj.get("subtypes");
+                    JSONArray subtypes = (JSONArray) card.get("subtypes");
                     Iterator subtypesIter = subtypes.iterator();
                     while (subtypesIter.hasNext()) {
                         String subtypeStr = (String) subtypesIter.next();
@@ -86,9 +85,9 @@ public class JsonParserWagic {
                     }
                 }
 
-                if (innerObj.get("power") != null) {
-                    power = "power=" + innerObj.get("power");
-                    toughness = "toughness=" + innerObj.get("toughness");
+                if (card.get("power") != null) {
+                    power = "power=" + card.get("power");
+                    toughness = "toughness=" + card.get("toughness");
                 }
 
                 // CARD TAG
@@ -153,78 +152,78 @@ public class JsonParserWagic {
                     if (subtype.contains("Aura")) {
                         System.out.println(AutoLine.processOracleTextMyTarget(oracleText, "aura"));
                         String auraEquipBonus = AutoLine.processOracleTextAuraEquipBonus(oracleText);
-                        if (!auraEquipBonus.equals("")) {
+                        if (auraEquipBonus.length() > 0) {
                             System.out.println(auraEquipBonus);
                         }
                     }
 
-                    if (!cast.equals("")) {
+                    if (cast.length() > 0) {
                         System.out.println(cast);
                     }
-                    if (!etb.equals("")) {
+                    if (etb.length() > 0) {
                         System.out.println(etb);
                     }
-                    if (!activatedAbility.equals("")) {
+                    if (activatedAbility.length() > 0) {
                         System.out.println(activatedAbility);
                     }
-                    if (!manaAbility.equals("")) {
+                    if (manaAbility.length() > 0) {
                         System.out.println(manaAbility);
                     }
-                    if (!combatDamage.equals("")) {
+                    if (combatDamage.length() > 0) {
                         System.out.println(combatDamage);
                     }
-                    if (!firebreating.equals("")) {
+                    if (firebreating.length() > 0) {
                         System.out.println(firebreating);
                     }
-                    if (!oppCasts.equals("")) {
+                    if (oppCasts.length() > 0) {
                         System.out.println(oppCasts);
                     }
-                    if (!prowess.equals("")) {
+                    if (prowess.length() > 0) {
                         System.out.println(prowess);
                     }
-                    if (!regenerate.equals("")) {
+                    if (regenerate.length() > 0) {
                         System.out.println(regenerate);
                     }
-                    if (!dies.equals("")) {
+                    if (dies.length() > 0) {
                         System.out.println(dies);
                     }
-                    if (!takeControl.equals("")) {
+                    if (takeControl.length() > 0) {
                         System.out.println(takeControl);
                     }
-                    if (!targeted.equals("")) {
+                    if (targeted.length() > 0) {
                         System.out.println(targeted);
                     }
-                    if (!transforms.equals("")) {
+                    if (transforms.length() > 0) {
                         System.out.println(transforms);
                     }
-                    if (!upkeep.equals("")) {
+                    if (upkeep.length() > 0) {
                         System.out.println(upkeep);
                     }
-                    if (!weak.equals("")) {
+                    if (weak.length() > 0) {
                         System.out.println(weak);
                     }
-                    if (!attacks.equals("")) {
+                    if (attacks.length() > 0) {
                         System.out.println(attacks);
                     }
-                    if (!create.equals("")) {
+                    if (create.length() > 0) {
                         System.out.println(create);
                     }
-                    if (!discard.equals("")) {
+                    if (discard.length() > 0) {
                         System.out.println(discard);
                     }
-                    if (!cycling.equals("")) {
+                    if (cycling.length() > 0) {
                         System.out.println(cycling);
                     }
-                    if (!embalm.equals("")) {
+                    if (embalm.length() > 0) {
                         System.out.println(embalm);
                     }
-                    if (!exert.equals("")) {
+                    if (exert.length() > 0) {
                         System.out.println(exert);
                     }
-                    if (!afflict.equals("")) {
+                    if (afflict.length() > 0) {
                         System.out.println(afflict);
                     }
-                    if (!eternalize.equals("")) {
+                    if (eternalize.length() > 0) {
                         System.out.println(eternalize);
                     }
                     if (subtype.contains("Equipment")) {
@@ -253,7 +252,6 @@ public class JsonParserWagic {
             System.out.println("IOException " + ex.getMessage());
         } catch (ParseException | NullPointerException ex) {
             System.out.println("NullPointerException " + ex.getMessage());
-            ex.printStackTrace();
         }
     }
 }

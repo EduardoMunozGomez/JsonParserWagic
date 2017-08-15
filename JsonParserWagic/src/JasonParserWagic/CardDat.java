@@ -5,7 +5,7 @@ package JasonParserWagic;
  * @author Eduardo
  */
 public class CardDat {
-
+    
     //[card]
     //primitive=Abomination of Gudul 
     //id=386463
