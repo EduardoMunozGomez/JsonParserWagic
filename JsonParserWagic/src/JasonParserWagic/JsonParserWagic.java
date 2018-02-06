@@ -15,7 +15,7 @@ import org.json.simple.parser.ParseException;
 
 public class JsonParserWagic {
 
-    private static String filePath = "C:\\Users\\Eduardo\\Downloads\\hou.json";
+    private static String filePath = "C:\\Users\\Eduardo\\Downloads\\rix.json";
 
     public static String getFilePath() {
         return filePath;
@@ -125,14 +125,18 @@ public class JsonParserWagic {
                     String create = AutoLine.processOracleTextCreate(oracleText);
                     String discard = AutoLine.processOracleTextDiscard(oracleText);
                     String takeControl = AutoLine.processOracleTextTakeControl(oracleText);
-
+                   
+                    String enrage = AutoLine.processOracleTextEnraedControl(oracleText);
+                    
                     String cycling = AutoLine.processOracleTextCycling(oracleText);
                     String embalm = AutoLine.processOracleTextEmbalm(oracleText);
                     String exert = AutoLine.processOracleTextExert(oracleText);
 
                     String afflict = AutoLine.processOracleTextAfflict(oracleText, cardName);
                     String eternalize = AutoLine.processOracleTextEternalize(oracleText);
-
+                    
+                    String raid = AutoLine.processOracleTextRaid(oracleText);
+                    
                     if (!abilities.isEmpty()) {
                         System.out.println("abilities=" + abilities.trim());
                     }
@@ -226,6 +230,13 @@ public class JsonParserWagic {
                     if (eternalize.length() > 0) {
                         System.out.println(eternalize);
                     }
+                    if (enrage.length() > 0) {
+                        System.out.println(enrage);
+                    }
+                    if (raid.length() > 0) {
+                        System.out.println(raid);
+                    }
+                    
                     if (subtype.contains("Equipment")) {
                         System.out.println(AutoLine.processOracleTextAuraEquipBonus(oracleText));
                         System.out.println(AutoLine.processOracleTextEquipCost(oracleText));

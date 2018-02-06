@@ -6,6 +6,34 @@ package JasonParserWagic;
  */
 public class AutoLine {
 
+        static String processOracleTextActivatedAbility(String oracleText, String subtype) {
+        String activatedAbility = "";
+        String activatedAbilityCost;
+        try {
+            String incidence = ":";
+            if (oracleText.contains("Eternalize")){
+                return "";
+            }
+            if (oracleText.contains("Cycling")){
+                return "";
+            }
+
+            if (oracleText.contains(incidence)) {
+                activatedAbilityCost = oracleText.substring(oracleText.indexOf('{'), oracleText.indexOf(incidence)+1);
+                activatedAbilityCost=activatedAbilityCost.replace(",","");
+                activatedAbilityCost=activatedAbilityCost.replace(" ","");
+                activatedAbilityCost=activatedAbilityCost.replace(".","");
+                activatedAbilityCost=activatedAbilityCost.replace("Discardacard", "{D}");
+                activatedAbilityCost=activatedAbilityCost.replace("Sacrifice", "{S}");
+                activatedAbilityCost=activatedAbilityCost.replace("Pay5life", "{L:5}");
+                activatedAbility = "auto=" + activatedAbilityCost;
+            }
+        } catch (Exception ex) {
+
+        }
+        return activatedAbility;
+    }
+        
     //auto={W}{U}:transforms((Bird Artifact Creature,setpower=2,settoughness=2,blue,white,flying)) ueot
     //text={T}: Add {W} or {U} to your mana pool. -- {W}{U}: Azorius Keyrune becomes a 2/2 white and blue Bird artifact creature with flying until end of turn.
     protected static String processOracleTextTransforms(String oracleText, String name) {
@@ -99,6 +127,7 @@ public class AutoLine {
 
     static String processOracleTextMyTarget(String oracleText, String type) {
         String target = "";
+        String myTarget = "";
 
         try {
             String incidence = (type.equals("aura")) ? "Enchant " : "arget ";
@@ -108,55 +137,62 @@ public class AutoLine {
                 target = oracleText.substring(oracleText.indexOf(incidence) + incidence.length());
                 target = target.substring(0, target.indexOf(incidenceEnd));
                 if (target.equals("permanent")) {
-                    target = "*";
+                    myTarget = "*";
                 }
                 if (target.contains("player")) {
-                    target = "player";
+                    myTarget = "player";
                 }
                 if (target.contains("opponent")) {
-                    target = "opponent";
+                    myTarget = "opponent";
+                }
+                if (target.contains("creature")) {
+                    myTarget = "creature";
+                }
+                if (target.contains("creature spell")) {
+                    myTarget = "creature|stack";
+                }
+                if (target.contains("noncreature")) {
+                    myTarget = "*[-creature]";
+                }
+                if (target.contains("noncreature spell")) {
+                    myTarget = "*[-creature]|stack";
                 }
                 if (target.contains(" or ")) {
-                    target = target.replace(" or ", ",");
+                    myTarget = target.replace(" or ", ",");
                 }
                 if (target.contains("nonland permanent")) {
-                    target = "*[-land]";
+                    myTarget = "*[-land]";
                 }              
                 if (target.contains("tapped creature")) {
-                    target = "creature[tapped]";
+                    myTarget = "creature[tapped]";
                 }
                 if (target.contains("creatures")) {
                     incidence = "up to two";
                     String incidence2 = "one or two";
                     if (oracleText.contains(incidence) || oracleText.contains(incidence2)) {
-                        target = "<upto:2>creature";
+                        myTarget = "<upto:2>creature";
                     }
                 }
                 String creatureWith = "creature with ";
-                if (target.contains("creature with")) {
-                    String withWhat = target.substring(target.indexOf(creatureWith) + creatureWith.length(), target.indexOf(" "));
-                    target = "creature[" + withWhat + "]";
+                if (target.contains(creatureWith)) {
+                    String withWhat = target.substring(target.indexOf(creatureWith) + creatureWith.length(), target.lastIndexOf(" "));
+                    myTarget = "creature[" + withWhat + "]";
                 }
                 if (target.contains("target spell")) {
-                    target = "*|stack";
+                    myTarget = "*|stack";
                 }
                 if (target.contains("creature you control")) {
-                    target = "creature|myBattlefield";
+                    myTarget = "creature|myBattlefield";
                 }
-                else if (target.contains("creature you don't control")) {
-                    target = "creature|opponentBattlefield";
-                }
-                else if (target.contains("creature")) {
-                    target = "creature ";
-                }
-
-                target = "target=" + target;
+                if (target.contains("creature you don't control")) {
+                    myTarget = "creature|opponentBattlefield";
+                }               
+                myTarget = "target=" + myTarget;
             }
 
         } catch (Exception ex) {
-
         }
-        return target;
+        return myTarget;
     }
 
     protected static String processOracleTextEquipCost(String oracleText) {
@@ -258,7 +294,7 @@ public class AutoLine {
             }
 
         } catch (Exception ex) {
-
+            
         }
         return exploit;
     }
@@ -446,36 +482,6 @@ public class AutoLine {
         }
         return exert;
     }
-
-    static String processOracleTextActivatedAbility(String oracleText, String subtype) {
-        String activatedAbility = "";
-        String activatedAbilityCost;
-        try {
-            String incidence = ":";
-            String endIncidence = " to your mana pool";
-            if (oracleText.contains("Eternalize")){
-                return "";
-            }
-            if (oracleText.contains("Cycling")){
-                return "";
-            }
-//            if (oracleText.contains("")){
-//                return "";
-//            }
-            if (oracleText.contains(incidence)) {
-                activatedAbilityCost = oracleText.substring(oracleText.indexOf('{'), oracleText.indexOf(incidence)+1);
-                activatedAbilityCost=activatedAbilityCost.replace(",","");
-                activatedAbilityCost=activatedAbilityCost.replace(" ","");
-                activatedAbilityCost=activatedAbilityCost.replace(".","");
-                activatedAbilityCost=activatedAbilityCost.replace("Discardacard", "{D}");
-                activatedAbilityCost=activatedAbilityCost.replace("Sacrifice", "{S}");
-                activatedAbility = "auto=" + activatedAbilityCost;
-            }
-        } catch (Exception ex) {
-
-        }      
-        return activatedAbility;
-    }
     
     static String processOracleTextManaAbility(String oracleText, String subtype) {
         String manaAbility = "";
@@ -527,9 +533,9 @@ public class AutoLine {
         return oppCasts;
 
     }
-//Embalm {5}{W} ({5}{W}, Exile this card from your graveyard: Create a token that's a copy of it,
+    
+    //Embalm {5}{W} ({5}{W}, Exile this card from your graveyard: Create a token that's a copy of it,
     //except it's a white Zombie Angel with no mana cost. Embalm only as a sorcery.)
-
     static String processOracleTextEmbalm(String oracleText) {
         String embalm = "";
         String embalmCost;
@@ -604,7 +610,7 @@ public class AutoLine {
         return takeControl;
     }
     
-        static String processOracleTextEternalize(String oracleText) {
+    static String processOracleTextEternalize(String oracleText) {
         String eternalize = "";
         String eternalizeCost;
         try {
@@ -620,5 +626,37 @@ public class AutoLine {
 
         }
         return eternalize;
+    }
+    
+    // auto=@damaged(this):
+    static String processOracleTextEnraedControl(String oracleText) {
+        String enrage = "";
+        try {
+            String incidence = "Enrage";
+
+            if (oracleText.contains(incidence)) {
+
+                enrage = "auto=@damaged(this):";
+
+            }
+        } catch (Exception e) {
+        }
+        return enrage;
+    }
+
+    // auto=if raid then
+    static String processOracleTextRaid(String oracleText) {
+        String raid = "";
+        try {
+            String incidence = "Raid ";
+
+            if (oracleText.contains(incidence)) {
+
+                raid = "auto=if raid then";
+
+            }
+        } catch (Exception e) {
+        }
+        return raid;
     }
 }
