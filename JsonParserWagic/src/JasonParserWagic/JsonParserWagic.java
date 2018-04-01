@@ -15,7 +15,7 @@ import org.json.simple.parser.ParseException;
 
 public class JsonParserWagic {
 
-    private static String filePath = "C:\\Users\\Eduardo\\Downloads\\rix.json";
+    private static String filePath = "C:\\Users\\Eduardo\\Downloads\\ima.json";
 
     public static String getFilePath() {
         return filePath;
@@ -27,7 +27,7 @@ public class JsonParserWagic {
 
     public static void main(String[] args) {
 
-        boolean generateID = false;
+        boolean generateID = true;
 
         try {
             FileReader reader = new FileReader(getFilePath());
