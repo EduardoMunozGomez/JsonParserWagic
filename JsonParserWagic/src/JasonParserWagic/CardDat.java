@@ -5,7 +5,7 @@ package JasonParserWagic;
  * @author Eduardo
  */
 public class CardDat {
-    
+
     //[card]
     //primitive=Abomination of Gudul 
     //id=386463
@@ -15,21 +15,26 @@ public class CardDat {
         String rarity = rare.toString();
 
         switch (rarity) {
-            case "Common":
+            case "common":
                 rarity = "C";
                 break;
-            case "Uncommon":
+            case "uncommon":
                 rarity = "U";
                 break;
-            case "Rare":
+            case "rare":
                 rarity = "R";
                 break;
-            case "Basic Land":
-                rarity = "L";
-                break;
-            default:
+            case "mythic":
                 rarity = "M";
                 break;
+        }
+
+        String[] basics = {"Plains", "Island", "Swamp", "Mountain", "Forest"};
+
+        for (String basic : basics) {
+            if (primitive.toString().equals(basic)) {
+                rarity = "L";
+            }
         }
 
         System.out.println("[card]");

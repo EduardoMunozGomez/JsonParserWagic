@@ -7,9 +7,9 @@ package JasonParserWagic;
 public class Abilities {
 
     protected static String processAbilities(String oracleText) {
-        String abilities = "";        
+        String abilities = "";
         oracleText = oracleText.toLowerCase();
-        
+
         if (oracleText.contains("flash")) {
             abilities += "flash, ";
         }
@@ -65,23 +65,8 @@ public class Abilities {
         if (oracleText.contains("can't block.")) {
             abilities += "cantblock, ";
         }
-        if (oracleText.contains("attacks each turn if able.")) {
+        if (oracleText.contains("attacks each turn if able.") || oracleText.contains("attacks each combat if able.")) {
             abilities += "mustattack, ";
-        }
-        if (oracleText.contains("islandwalk")) {
-            abilities += "islandwalk, ";
-        }
-        if (oracleText.contains("swampwalk")) {
-            abilities += "swampwalk, ";
-        }
-        if (oracleText.contains("mountainwalk")) {
-            abilities += "mountainwalk, ";
-        }
-        if (oracleText.contains("forestwalk")) {
-            abilities += "forestwalk, ";
-        }
-        if (oracleText.contains("protection from")) {
-            abilities += "protection from, ";
         }
         if (oracleText.contains("power can't block it.")) {
             abilities += "strong, ";
@@ -89,18 +74,33 @@ public class Abilities {
         if (oracleText.contains("can block only creatures with flying.")) {
             abilities += "cloud, ";
         }
-        
+//        if (oracleText.contains("islandwalk")) {
+//            abilities += "islandwalk, ";
+//        }
+//        if (oracleText.contains("swampwalk")) {
+//            abilities += "swampwalk, ";
+//        }
+//        if (oracleText.contains("mountainwalk")) {
+//            abilities += "mountainwalk, ";
+//        }
+//        if (oracleText.contains("forestwalk")) {
+//            abilities += "forestwalk, ";
+//        }
+//        if (oracleText.contains("protection from")) {
+//            abilities += "protection from, ";
+//        }
+
         if (abilities.endsWith(", ")) {
             abilities = abilities.substring(0, abilities.length() - 2);
         }
-        
+
         return abilities;
     }
 
     protected static String processEnchantmentAbilities(String oracleText) {
         String abilities = "";
         oracleText = oracleText.toLowerCase();
-        
+
         if (oracleText.contains("flash")) {
             abilities += "flash";
         }
@@ -111,7 +111,7 @@ public class Abilities {
     protected static String processLandAbilities(String oracleText) {
         String abilities = "";
         oracleText = oracleText.toLowerCase();
-        
+
         if (oracleText.contains("indestructible")) {
             abilities += "indestructible";
         }

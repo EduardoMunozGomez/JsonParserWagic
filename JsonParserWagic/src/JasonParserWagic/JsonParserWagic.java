@@ -15,7 +15,7 @@ import org.json.simple.parser.ParseException;
 
 public class JsonParserWagic {
 
-    private static String filePath = "C:\\Users\\Eduardo\\Downloads\\ima.json";
+    private static String filePath = "C:\\Users\\Eduardo\\Downloads\\rna.json";
 
     public static String getFilePath() {
         return filePath;
@@ -27,13 +27,18 @@ public class JsonParserWagic {
 
     public static void main(String[] args) {
 
-        boolean generateID = true;
+        boolean generateID = false;
 
         try {
             FileReader reader = new FileReader(getFilePath());
             JSONParser jsonParser = new JSONParser();
             JSONObject jsonObject = (JSONObject) jsonParser.parse(reader);
             JSONArray cards = (JSONArray) jsonObject.get("cards");
+
+            // Metadata
+            if (generateID) {
+                Metadata.printMetadata(jsonObject.get("name"), jsonObject.get("releaseDate"), jsonObject.get("totalSetSize"));
+            }
 
             Iterator i = cards.iterator();
             // take each value from the json array separately
@@ -42,9 +47,16 @@ public class JsonParserWagic {
                 JSONObject card = (JSONObject) i.next();
 
                 if (generateID) {
-                    CardDat.generateCardDat(card.get("name"), card.get("multiverseid"), card.get("rarity"));
+                    CardDat.generateCardDat(card.get("name"), card.get("multiverseId"), card.get("rarity"));
                     continue;
                 }
+
+                JSONArray printingsArray = (JSONArray) card.get("printings");
+                if (printingsArray.size() > 3) {
+                    //System.out.println(printingsArray);
+                    continue;
+                }
+
                 if (BasicOrReprint.isReprintOrBasic((String) card.get("name"))) {
                     continue;
                 }
@@ -76,12 +88,14 @@ public class JsonParserWagic {
                 }
 
                 if (card.get("subtypes") != null) {
-                    subtype = "subtype=";
                     JSONArray subtypes = (JSONArray) card.get("subtypes");
-                    Iterator subtypesIter = subtypes.iterator();
-                    while (subtypesIter.hasNext()) {
-                        String subtypeStr = (String) subtypesIter.next();
-                        subtype += subtypeStr + " ";
+                    if (!subtypes.isEmpty()) {
+                        subtype = "subtype=";
+                        Iterator subtypesIter = subtypes.iterator();
+                        while (subtypesIter.hasNext()) {
+                            String subtypeStr = (String) subtypesIter.next();
+                            subtype += subtypeStr + " ";
+                        }
                     }
                 }
 
@@ -95,7 +109,7 @@ public class JsonParserWagic {
                 System.out.println(nameHeader);
 
                 if (oracleText != null) {
-
+                    // Keywords
                     if (type.contains("Creature")) {
                         abilities = Abilities.processAbilities(oracleText);
                     }
@@ -108,64 +122,82 @@ public class JsonParserWagic {
 
                     // Evergreen mechanics
                     String cast = AutoLine.processOracleTextCast(oracleText);
-                    String activatedAbility = AutoLine.processOracleTextActivatedAbility(oracleText, subtype);
+                    String activatedAbility = AutoLine.processOracleActivatedAbilityCost(oracleText, subtype);
                     String manaAbility = AutoLine.processOracleTextManaAbility(oracleText, subtype);
                     String combatDamage = AutoLine.processOracleTextCombatDamage(oracleText);
                     String etb = AutoLine.processOracleTextETB(oracleText, cardName);
                     String firebreating = AutoLine.processOracleTextFirebreting(oracleText, cardName);
                     String oppCasts = AutoLine.processOracleTextOppCasts(oracleText);
-                    String regenerate = AutoLine.processOracleTextRegenerate(oracleText);
                     String dies = AutoLine.processOracleTextThisDies(oracleText, cardName);
                     String targeted = AutoLine.processOracleTextTargeted(oracleText, cardName);
-                    String transforms = AutoLine.processOracleTextTransforms(oracleText, cardName);
                     String upkeep = AutoLine.processOracleTextUpkeep(oracleText);
                     String weak = AutoLine.processOracleTextWeak(oracleText);
-                    String prowess = AutoLine.processOracleTextProwess(oracleText);
                     String attacks = AutoLine.processOracleTextAttacks(oracleText, cardName);
-                    String create = AutoLine.processOracleTextCreate(oracleText);
+                    String draw = AutoLine.processOracleDraw(oracleText);
                     String discard = AutoLine.processOracleTextDiscard(oracleText);
                     String takeControl = AutoLine.processOracleTextTakeControl(oracleText);
-                   
-                    String enrage = AutoLine.processOracleTextEnraedControl(oracleText);
-                    
-                    String cycling = AutoLine.processOracleTextCycling(oracleText);
-                    String embalm = AutoLine.processOracleTextEmbalm(oracleText);
-                    String exert = AutoLine.processOracleTextExert(oracleText);
+                    String scry = AutoLine.processOracleScry(oracleText);
+                    String cantBeBlockedBy = AutoLine.processOraclecantBeBlockedBy(oracleText);
 
-                    String afflict = AutoLine.processOracleTextAfflict(oracleText, cardName);
-                    String eternalize = AutoLine.processOracleTextEternalize(oracleText);
-                    
-                    String raid = AutoLine.processOracleTextRaid(oracleText);
-                    
+                    //String convoke = AutoLineGRN.processOracleTextConvoke(oracleText);
+                    String addendum = AutoLineGRN.processOracleAddendum(oracleText);
+                    String riot = AutoLineGRN.processOracleRiot(oracleText);
+                    String spectacle = AutoLineGRN.processOracleSpectacle(oracleText);
+                    //String prowess = AutoLine.processOracleTextProwess(oracleText);
+                    //String transforms = AutoLine.processOracleTextTransforms(oracleText, cardName);
+                    //String regenerate = AutoLine.processOracleTextRegenerate(oracleText);
+                    //String enrage = AutoLine.processOracleEnraged(oracleText);
+                    //String cycling = AutoLine.processOracleTextCycling(oracleText);
+                    //String embalm = AutoLine.processOracleTextEmbalm(oracleText);
+                    //String exert = AutoLine.processOracleTextExert(oracleText);
+                    //String afflict = AutoLine.processOracleTextAfflict(oracleText, cardName);
+                    //String eternalize = AutoLine.processOracleTextEternalize(oracleText);
+                    //String raid = AutoLine.processOracleTextRaid(oracleText);
                     if (!abilities.isEmpty()) {
                         System.out.println("abilities=" + abilities.trim());
                     }
 
+                    //INSTANT, SORCERY
                     if (type.contains("Instant") || type.contains("Sorcery")) {
                         String target = AutoLine.processOracleTextMyTarget(oracleText, "instantOrSorcery");
                         String exileDestroyDamage = AutoLine.processOracleTextExileDestroyDamage(oracleText);
+                        String gains = AutoLine.processOracleGains(oracleText);
+                        String gets = AutoLine.processOracleGets(oracleText);
                         if (!target.isEmpty()) {
                             System.out.println(target);
                         }
                         if (!exileDestroyDamage.isEmpty()) {
                             System.out.println(exileDestroyDamage);
-                        } else {
-                            System.out.println("auto=");
                         }
+                        if (!gains.isEmpty()) {
+                            System.out.println(gains);
+                        }
+                        if (!gets.isEmpty()) {
+                            System.out.println(gets);
+                        }
+                        //else {
+                        //  System.out.println("auto=");
+                        //}
                     }
+                    // AURA
                     if (subtype.contains("Aura")) {
                         System.out.println(AutoLine.processOracleTextMyTarget(oracleText, "aura"));
                         String auraEquipBonus = AutoLine.processOracleTextAuraEquipBonus(oracleText);
-                        if (auraEquipBonus.length() > 0) {
+                        if (!auraEquipBonus.isEmpty()) {
                             System.out.println(auraEquipBonus);
                         }
                     }
-
+                    if (addendum.length() > 0) {
+                        System.out.println(addendum);
+                    }
                     if (cast.length() > 0) {
                         System.out.println(cast);
                     }
                     if (etb.length() > 0) {
                         System.out.println(etb);
+                    }
+                    if (riot.length() > 0) {
+                        System.out.println(riot);
                     }
                     if (activatedAbility.length() > 0) {
                         System.out.println(activatedAbility);
@@ -182,12 +214,12 @@ public class JsonParserWagic {
                     if (oppCasts.length() > 0) {
                         System.out.println(oppCasts);
                     }
-                    if (prowess.length() > 0) {
-                        System.out.println(prowess);
-                    }
-                    if (regenerate.length() > 0) {
-                        System.out.println(regenerate);
-                    }
+//                    if (prowess.length() > 0) {
+//                        System.out.println(prowess);
+//                    }
+//                    if (regenerate.length() > 0) {
+//                        System.out.println(regenerate);
+//                    }
                     if (dies.length() > 0) {
                         System.out.println(dies);
                     }
@@ -197,9 +229,9 @@ public class JsonParserWagic {
                     if (targeted.length() > 0) {
                         System.out.println(targeted);
                     }
-                    if (transforms.length() > 0) {
-                        System.out.println(transforms);
-                    }
+//                    if (transforms.length() > 0) {
+//                        System.out.println(transforms);
+//                    }
                     if (upkeep.length() > 0) {
                         System.out.println(upkeep);
                     }
@@ -209,12 +241,19 @@ public class JsonParserWagic {
                     if (attacks.length() > 0) {
                         System.out.println(attacks);
                     }
-                    if (create.length() > 0) {
-                        System.out.println(create);
-                    }
+                    //if (create.length() > 0) {
+                    //System.out.println(create);
+                    //}
                     if (discard.length() > 0) {
                         System.out.println(discard);
                     }
+                    if (draw.length() > 0) {
+                        System.out.println(draw);
+                    }
+                    if (scry.length() > 0) {
+                        System.out.println(scry);
+                    }
+                    /*
                     if (cycling.length() > 0) {
                         System.out.println(cycling);
                     }
@@ -236,14 +275,22 @@ public class JsonParserWagic {
                     if (raid.length() > 0) {
                         System.out.println(raid);
                     }
-                    
+                     */
                     if (subtype.contains("Equipment")) {
                         System.out.println(AutoLine.processOracleTextAuraEquipBonus(oracleText));
                         System.out.println(AutoLine.processOracleTextEquipCost(oracleText));
                     }
                     System.out.println("text=" + oracleText.replace("\n", " -- "));
+
+                    //if (!convoke.isEmpty()) {
+                    //  System.out.println(convoke);
+                    //}
+                    if (!spectacle.isEmpty()) {
+                        System.out.println(spectacle);
+                    }
                 }
-                if (mana != null && !type.contains("Land")) {
+                //if (mana != null && !type.contains("Land")) {
+                if (!type.contains("Land")) {
                     System.out.println(mana);
                 }
                 System.out.println(type.trim());
