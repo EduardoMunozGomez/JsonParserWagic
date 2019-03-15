@@ -40,6 +40,9 @@ public class Abilities {
         if (oracleText.contains("can't be blocked.")) {
             abilities += "unblockable, ";
         }
+        if (oracleText.contains("can't be blocked by more than one creature")) {
+            abilities += "oneblocker, ";
+        }        
         if (oracleText.contains("menace")) {
             abilities += "menace, ";
         }
@@ -107,7 +110,17 @@ public class Abilities {
 
         return abilities;
     }
+    
+    protected static String processInstantOrSorceryAbilities(String oracleText) {
+        String abilities = "";
+        oracleText = oracleText.toLowerCase();
 
+        if (oracleText.contains("can't be countered")) {
+            abilities += "nofizzle";
+        }
+
+        return abilities;
+    }
     protected static String processLandAbilities(String oracleText) {
         String abilities = "";
         oracleText = oracleText.toLowerCase();

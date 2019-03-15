@@ -11,8 +11,7 @@ public class CardDat {
     //id=386463
     //rarity=C
     //[/card]
-    public static void generateCardDat(Object primitive, Object id, Object rare) {
-        String rarity = rare.toString();
+    public static void generateCardDat(String primitive, Object id, String rarity) {
 
         switch (rarity) {
             case "common":
@@ -32,14 +31,14 @@ public class CardDat {
         String[] basics = {"Plains", "Island", "Swamp", "Mountain", "Forest"};
 
         for (String basic : basics) {
-            if (primitive.toString().equals(basic)) {
+            if (primitive.equals(basic)) {
                 rarity = "L";
             }
         }
 
         System.out.println("[card]");
-        System.out.println("primitive=" + primitive.toString());
-        System.out.println("id=" + id.toString());
+        System.out.println("primitive=" + primitive);
+        System.out.println("id=" + id);
         System.out.println("rarity=" + rarity);
         System.out.println("[/card]");
     }
