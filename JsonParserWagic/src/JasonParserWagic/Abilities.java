@@ -42,7 +42,7 @@ public class Abilities {
         }
         if (oracleText.contains("can't be blocked by more than one creature")) {
             abilities += "oneblocker, ";
-        }        
+        }
         if (oracleText.contains("menace")) {
             abilities += "menace, ";
         }
@@ -77,6 +77,15 @@ public class Abilities {
         if (oracleText.contains("can block only creatures with flying.")) {
             abilities += "cloud, ";
         }
+        if (oracleText.contains("all creatures able to block ")) {
+            abilities += "lure, ";
+        }
+        if (oracleText.contains("counter on it for each color of mana spent to cast it")) {
+            abilities += "sunburst, ";
+        }
+        if (oracleText.contains("blocks each turn if able")||oracleText.contains("blocks each combat if able")) {
+            abilities += "mustblock, ";
+        }       
 //        if (oracleText.contains("islandwalk")) {
 //            abilities += "islandwalk, ";
 //        }
@@ -110,7 +119,7 @@ public class Abilities {
 
         return abilities;
     }
-    
+
     protected static String processInstantOrSorceryAbilities(String oracleText) {
         String abilities = "";
         oracleText = oracleText.toLowerCase();
@@ -121,6 +130,7 @@ public class Abilities {
 
         return abilities;
     }
+
     protected static String processLandAbilities(String oracleText) {
         String abilities = "";
         oracleText = oracleText.toLowerCase();

@@ -61,7 +61,7 @@ public class AutoLineGRN {
                 String surveilNumber = oracleText.substring(oracleText.indexOf(incidence) + incidence.length(), oracleText.indexOf(incidence) + incidence.length() + 1);
                 surveil = String.format("aicode=name(surveil) activate name(surveil) transforms((,newability[foreach(*[zpos<=%s]|mylibrary) moverandom(*[zpos<=%s]) from(mylibrary) to(mylibrary)])) ueot\n",
                         surveilNumber, surveilNumber);
-                surveil += String.format("auto=name(surveil) reveal:%s optionone name(Put In Graveyard) target(<upto:%s>*|reveal) moveto(ownergraveyard) optiononeend optiontwo name(put in library) target(<%s>*|reveal) moveto(ownerlibrary) optiontwoend revealend",
+                surveil += String.format("auto=name(surveil) reveal:%s optionone name(put in graveyard) target(<upto:%s>*|reveal) moveto(ownergraveyard) optiononeend optiontwo name(put in library) target(<%s>*|reveal) moveto(ownerlibrary) optiontwoend revealend",
                         surveilNumber, surveilNumber, surveilNumber);
             }
         } catch (Exception ex) {
@@ -79,8 +79,7 @@ public class AutoLineGRN {
         try {
             oracleText = oracleText.toLowerCase();
             if (oracleText.contains("undergrowth")) {
-                undergrowth = " type:creature:myGraveyard\n" +
-                              " auto=foreach(creature|mygraveyard)";
+                undergrowth = "auto=foreach(creature|mygraveyard)";
             }
         } catch (Exception ex) {
 
@@ -139,8 +138,8 @@ public class AutoLineGRN {
         try {
             String incidence = "Kicker";
             if (oracleText.contains(incidence)) {
-                kickerCost = oracleText.substring(oracleText.indexOf(incidence) + incidence.length(), oracleText.indexOf("("));
-                kicker = "kicker=" + kickerCost.trim() + " \nauto=kicker";
+                kickerCost = oracleText.substring(oracleText.indexOf(incidence) + incidence.length(), oracleText.lastIndexOf(" "));
+                kicker = "kicker=" + kickerCost.trim(); //+ " \nauto=kicker";
             }
         } catch (Exception ex) {
 
