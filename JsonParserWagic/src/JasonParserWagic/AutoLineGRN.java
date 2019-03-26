@@ -131,7 +131,7 @@ public class AutoLineGRN {
         return spectacle;
     }
 
-    static String processOracleKicker(String oracleText) {
+    static String processOracleKicker(String oracleText, String cardName) {
         String kicker = "";
         String kickerCost;
 
@@ -139,10 +139,14 @@ public class AutoLineGRN {
             String incidence = "Kicker";
             if (oracleText.contains(incidence)) {
                 kickerCost = oracleText.substring(oracleText.indexOf(incidence) + incidence.length(), oracleText.lastIndexOf(" "));
-                kicker = "kicker=" + kickerCost.trim(); //+ " \nauto=kicker";
+                kicker = "kicker=" + kickerCost.trim();
+                //String ifKicked = "was kicked, ";
+                //String ifKickedEffect = oracleText.substring(oracleText.indexOf(ifKicked)+ifKicked.length());
+                
+                //kicker += "\nauto=kicked" + AutoEffects.processEffect(ifKickedEffect, cardName);
             }
         } catch (Exception ex) {
-
+            ex.getMessage();
         }
         return kicker;
     }

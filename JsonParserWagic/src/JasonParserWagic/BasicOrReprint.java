@@ -167,7 +167,7 @@ public class BasicOrReprint {
             }
         }
 
-        for (String reprintSET : DOM) {
+        for (String reprintSET : M19) {
             if (name.equals(reprintSET)) {
                 return true;
             }

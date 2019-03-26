@@ -45,6 +45,7 @@ public class AutoEffects {
         actAbilCost = actAbilCost.replace("Sacrifice " + cardName, "{S}");
         actAbilCost = actAbilCost.replace("Exile " + cardName, "{E}");
         actAbilCost = actAbilCost.replace("Sacrifice a creature", "{S(creature|myBattlefield)}");
+        actAbilCost = actAbilCost.replace("Sacrifice two creatures", "{S(creature|myBattlefield)}{S(creature|myBattlefield)}");
         actAbilCost = actAbilCost.replace("Sacrifice an artifact", "{S(artifact|myBattlefield)}");
         actAbilCost = actAbilCost.replace("Sacrifice an artifact creature", "{S(creature[artifact]|myBattlefield)}");
         actAbilCost = actAbilCost.replace("Sacrifice another creature", "{S(other creature|mybattlefield)}");
@@ -77,6 +78,7 @@ public class AutoEffects {
         }
         effect = effect.toLowerCase();
         cardName = cardName.toLowerCase();
+
         if (effect.contains("create ")) {
             return AutoLine.processOracleCreate(effect);
         }
@@ -87,7 +89,8 @@ public class AutoEffects {
                 + "auto={T}:Add{R}\n"
                 + "auto={T}:Add{G}";
 
-        effect = effect.replace("if it was kicked, ", "kicked ");
+        effect = effect.replace("historic", "artifact,*[legendary],enchantment[saga]");
+        effect = effect.replace("if it was kicked", "kicked ");
         effect = effect.replace("return it to the battlefield tapped under its owner's control at the beginning of the next end step", "(blink)ueot");
         effect = effect.replace("creatures", "creature");
         effect = effect.replace("activate this ability only once each turn", "limit:1");
@@ -111,13 +114,14 @@ public class AutoEffects {
         effect = effect.replace("legendary permanent that's an artifact, creature, or enchantment.", "artifact[legendary], creature[legendary], enchantment[legendary])");
         effect = effect.replace("each opponent discards a card", "ability$!name(discard) reject notatarget(*|myhand)!$ opponent");
         effect = effect.replace("each opponent loses 1 life", "life:-1 opponent");
-        effect = effect.replace("to your hand" ,"moveto(ownerhand)");
+        effect = effect.replace("to your hand", "moveto(ownerhand)");
         effect = effect.replace("whenever this creature attacks, ", "@combat(attacking) source(this):");
         effect = effect.replace("put a +1/+1 counter", "counter(1/1)");
         effect = effect.replace("put two +1/+1 counters on it", "counter(1/1,2)");
         effect = effect.replace("enters the battlefield under your control, ", "@movedTo(|myBattlefield):");
         effect = effect.replace("attacking creature without flying", "creature[attacking;-flying]");
         effect = effect.replace("can't be blocked this turn", ") unblockable");
+        effect = effect.replace("can't be blocked", "unblockable");
         effect = effect.replace("can't block this turn", "cantblock");
         effect = effect.replace("another target ", "target(another ");
         effect = effect.replace("target ", "target(");
@@ -125,6 +129,7 @@ public class AutoEffects {
         effect = effect.replace("up to two", "<upto:2>");
         effect = effect.replace("up to three", "<upto:3>");
         effect = effect.replace("prevent the next", "prevent:");
+        effect = effect.replace("to the battlefield.", "moveTo(mybattlefield)");
 
         effect = effect.replace("each white creature", "(creature[white]");
         effect = effect.replace(" attacking creature with lesser power", "creature[attacking;power<=])");
@@ -132,18 +137,22 @@ public class AutoEffects {
         effect = effect.replace("if you attacked with a creature this turn, ", "if raid then ");
         effect = effect.replace("an opponent controls", "|opponentBattlefield)");
         effect = effect.replace("you control", "|myBattlefield)");
+        effect = effect.replace("loses all abilities", "loseabilities");
         effect = effect.replace("discard a card", "ability$!name(discard) reject notatarget(*|myhand)!$");
         effect = effect.replace("discards a card", "ability$!name(discard) reject notatarget(*|myhand)!$");
-        effect = effect.replace("exile " + cardName, "\nmoveto(exile) all(this)");
+        effect = effect.replace("exile " + cardName, "\nexiledeath");
         effect = effect.replace("card from your graveyard", "|mygraveyard)");
         // Deplete (Mill)
-        effect = effect.replace("puts the top card of their library into their graveyard","deplete:1");
-        effect = effect.replace("puts the top two cards of their library into their graveyard","deplete:2");
-        effect = effect.replace("puts the top three cards of their library into their graveyard","deplete:3");
-        effect = effect.replace("put the top card of your library into your graveyard","deplete:1");
-        effect = effect.replace("put the top two cards of your library into your graveyard","deplete:2");
-        effect = effect.replace("put the top three cards of your library into your graveyard","deplete:3");
-        
+        effect = effect.replace("puts the top card of their library into their graveyard", "deplete:1");
+        effect = effect.replace("puts the top two cards of their library into their graveyard", "deplete:2");
+        effect = effect.replace("puts the top three cards of their library into their graveyard", "deplete:3");
+        effect = effect.replace("puts the top four cards of their library into their graveyard", "deplete:4");
+
+        effect = effect.replace("put the top card of your library into your graveyard", "deplete:1");
+        effect = effect.replace("put the top two cards of your library into your graveyard", "deplete:2");
+        effect = effect.replace("put the top three cards of your library into your graveyard", "deplete:3");
+        effect = effect.replace("put the top four cards of your library into your graveyard", "deplete:4");
+
         effect = effect.replace("you gain 1 life", "life:1");
         effect = effect.replace("you gain 2 life", "life:2");
         effect = effect.replace("you gain 3 life", "life:3");
@@ -178,6 +187,7 @@ public class AutoEffects {
         effect = effect.replace(" and you ", " && ");
         effect = effect.replace(" and ", " && ");
 
+        effect = effect.replace("return ", "");
         effect = effect.replace(" gains ", ") ");
         effect = effect.replace(" gain ", ") ");
         effect = effect.replace(" gets ", ") ");
@@ -187,10 +197,12 @@ public class AutoEffects {
         effect = effect.replace(" it) ", "");
         effect = effect.replace(" it ", "");
         effect = effect.replace(" on ", "");
+        effect = effect.replace(" or ", ",");
         effect = effect.replace(" to ", " ");
 
         effect = effect.replace(":|", ":");
-        effect = effect.replace(".", ")");
+        effect = effect.replace("+", "");
+        effect = effect.replace(".", "");
         effect = effect.replace(cardName, "");
 
         effect = effect.trim();

@@ -352,7 +352,7 @@ public class AutoLine {
         oracleText = oracleText.replace("can't attack or block", "cantattack and cantpwattack and cantblock");
         oracleText = oracleText.replace("its activated abilities can't be activated", "noactivatedability");
         oracleText = oracleText.replace("in addition to its other types", " transforms(())");
-        
+
         Pattern ptn = Pattern.compile("( and has | and gains | and gets | has | gains | gets | and )");
         String[] parts = ptn.split(oracleText);
 
@@ -442,7 +442,7 @@ public class AutoLine {
 
     protected static String processOracleTextCast(String oracleText) {
         String cast = "";
-        String occurrence = "Whenever you cast a";
+        String occurrence = "you cast a";
         String occurrenceEnd = "spell";
         String occurrenceCondition;
         String occurrenceSubString;
@@ -1020,7 +1020,7 @@ public class AutoLine {
         }
         return asLongAsIsMyTurn;
     }
-    
+
     static String processForEach(String oracleText, String type) {
         String forEach = "";
         try {
@@ -1034,6 +1034,27 @@ public class AutoLine {
         } catch (Exception e) {
         }
         return forEach;
+    }
+
+    static String processOracleEpicSaga(String oracleText, String type) {
+        String epicSaga = "";
+        String epicSagaEffect;
+
+        if (oracleText.contains("—")) {
+            epicSaga = " " + oracleText.substring(0, oracleText.indexOf("—") + 2);
+            epicSagaEffect = oracleText.substring(oracleText.indexOf("—") + 1);
+
+            epicSagaEffect = AutoEffects.processEffect(epicSagaEffect, "EpicSaga");
+
+            epicSaga = epicSaga.replace(" I, II —", "auto=counter(0/0,1,Lore)\nauto=@each my firstmain:counter(0/0,1,Lore)\nauto=");
+            epicSaga = epicSaga.replace(" I —", "auto=counter(0/0,1,Lore)\nauto=@each my firstmain:counter(0/0,1,Lore)\nauto=");
+            epicSaga = epicSaga.replace(" II —", "auto=@counteradded(0/0,1,Lore) from(this):this(counter{0/0.2.Lore}<=2)");
+            epicSaga = epicSaga.replace(" III —", "auto=@counteradded(0/0,1,Lore) from(this):this(counter{0/0.3.Lore}) sacrifice(this)"
+                    + "\nauto=@counteradded(0/0,1,Lore) from(this):this(counter{0/0.3.Lore}) ");
+
+            epicSaga += epicSagaEffect;
+        }
+        return epicSaga;
     }
 
     static String processOracleChooseOneOrBoth(String oracleText) {
