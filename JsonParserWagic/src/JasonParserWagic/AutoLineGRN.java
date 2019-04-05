@@ -43,7 +43,7 @@ public class AutoLineGRN {
             oracleText = oracleText.toLowerCase();
             String incidence = "mentor";
             if (oracleText.contains(incidence)) {
-                mentor = "counter(1/1) target(other creature[attacking;power<="+ --powerAsNumber +"]|myBattlefield)";
+                mentor = "counter(1/1) target(other creature[attacking;power<=" + --powerAsNumber + "]|myBattlefield)";
             }
         } catch (Exception ex) {
 
@@ -131,6 +131,68 @@ public class AutoLineGRN {
         return spectacle;
     }
 
+    static String processOracleAscend(String oracleText) {
+        String ascend = "";
+
+        try {
+            String incidence = "Ascend";
+            if (oracleText.contains(incidence)) {
+                ascend = "auto=@movedTo(*|myBattlefield):if type(*|mybattlefield)~morethan~10 && type(emblem[City's Blessing]|mybattlefield)~lessthan~1 then emblem name(City's Blessing)\n"
+                        + "auto=if type(emblem[City's Blessing]|mybattlefield)~lessthan~1 then ";
+            }
+        } catch (Exception ex) {
+
+        }
+        return ascend;
+    }
+
+    static String processOracleAmass(String oracleText) {
+        String ascend = "";
+
+        try {
+            oracleText = oracleText.toLowerCase();
+            String incidence = "amass ";
+            String amassQuant = oracleText.substring(oracleText.indexOf(incidence) + incidence.length(), oracleText.indexOf(incidence) + incidence.length() + 1);
+            if (oracleText.contains(incidence)) {
+                ascend = String.format("auto=_AMASS_(%s)", amassQuant);
+            }
+        } catch (Exception ex) {
+
+        }
+        return ascend;
+    }
+    
+    static String processOracleProliferate(String oracleText) {
+        String proliferate = "";
+
+        try {
+            oracleText = oracleText.toLowerCase();
+            String incidence = "proliferate";           
+            if (oracleText.contains(incidence)) {
+                proliferate = String.format("auto=notatarget(<anyamount>*) proliferate");
+            }
+        } catch (Exception ex) {
+
+        }
+        return proliferate;
+    }
+
+    static String processOraclePartner(String oracleText) {
+        String partner = "";
+
+        try {
+            oracleText = oracleText.toLowerCase();
+            String incidence = "partner with ";
+            String partnerName = oracleText.substring(oracleText.indexOf(incidence) + incidence.length());
+            if (oracleText.contains(incidence)) {
+                partner = String.format("auto=may moveto(myhand) notatarget(%s|mylibrary)", partnerName.trim());
+            }
+        } catch (Exception ex) {
+
+        }
+        return partner;
+    }
+
     static String processOracleKicker(String oracleText, String cardName) {
         String kicker = "";
         String kickerCost;
@@ -142,7 +204,7 @@ public class AutoLineGRN {
                 kicker = "kicker=" + kickerCost.trim();
                 //String ifKicked = "was kicked, ";
                 //String ifKickedEffect = oracleText.substring(oracleText.indexOf(ifKicked)+ifKicked.length());
-                
+
                 //kicker += "\nauto=kicked" + AutoEffects.processEffect(ifKickedEffect, cardName);
             }
         } catch (Exception ex) {

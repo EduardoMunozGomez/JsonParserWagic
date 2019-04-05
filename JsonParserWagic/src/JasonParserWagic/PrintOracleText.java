@@ -7,12 +7,12 @@ import java.util.regex.Pattern;
  *
  * @author Eduardo
  */
-public class OracleText {
+public class PrintOracleText {
 
     static void parseOracleText(String oracleText, String cardName, String type, String subtype, String power, String manaCost) {
         String abilities = "";
         String[] oracleSplit;
-        // Remove remainder text
+        // Remove remainder text        
         Matcher textBetweenPar = Pattern.compile("\\((.*?)\\)").matcher(oracleText);
         while (textBetweenPar.find()) {
             oracleText = oracleText.replace(textBetweenPar.group(1), "");
@@ -47,9 +47,9 @@ public class OracleText {
             // Evergreen mechanics
             check(AutoEffects.processOracleBit(oracleBit, cardName, type, subtype));
             check(AutoLine.processOracleTextManaAbility(oracleBit, subtype));
-            //check(AutoLineGRN.processOracleUndergrowth(oracleBit));
+            check(AutoLineGRN.processOracleUndergrowth(oracleBit));
             check(AutoLineGRN.processOracleKicker(oracleBit, cardName));
-            check(AutoLine.processOracleTextCast(oracleBit));
+            check(AutoLine.processOracleTextCast(oracleBit, cardName));
             check(AutoLine.processOracleTextCombatDamage(oracleBit));
 
             check(AutoLine.processOracleTextOppCasts(oracleBit));
@@ -60,14 +60,18 @@ public class OracleText {
             check(AutoLine.processOracleCantBeBlockedBy(oracleBit));
             check(AutoLine.processOracleLord(oracleBit, type));
             check(AutoLine.processOracleTriggers(oracleBit, cardName, type, subtype, power));
-            check(AutoLine.processAsLongAs(oracleBit, type));
+            check(AutoLine.processAsLongAs(oracleBit, cardName));
             check(AutoLine.processForEach(oracleBit, type));
-            //check(AutoLineGRN.processOracleConvoke(oracleBit));
-            //check(AutoLineGRN.processOracleSurveil(oracleBit));
-            //check(AutoLineGRN.processOracleAddendum(oracleBit));
-            //check(AutoLineGRN.processOracleRiot(oracleBit));
-            //check(AutoLineGRN.processOracleSpectacle(oracleBit));
-
+            check(AutoLineGRN.processOracleConvoke(oracleBit));
+            check(AutoLineGRN.processOracleSurveil(oracleBit));
+            check(AutoLineGRN.processOracleAddendum(oracleBit));
+            check(AutoLineGRN.processOracleRiot(oracleBit));
+            check(AutoLineGRN.processOracleSpectacle(oracleBit));
+            check(AutoLineGRN.processOracleAscend(oracleBit));
+            check(AutoLineGRN.processOracleAmass(oracleBit));
+            check(AutoLineGRN.processOraclePartner(oracleBit));
+            check(AutoLineGRN.processOracleProliferate(oracleBit));
+            
             //INSTANT, SORCERY
             if (type.contains("Instant") || type.contains("Sorcery")) {
                 check(AutoLine.processOracleTextMyTarget(oracleBit, "InstantOrSorcery", subtype));
@@ -79,7 +83,7 @@ public class OracleText {
                 check(AutoLine.processOraclePutA(oracleBit, type), true);
                 check(AutoLine.processOracleChooseOneOrBoth(oracleBit));
 
-                //check(AutoLineGRN.processOracleJumpStart(oracleBit, manaCost));
+                check(AutoLineGRN.processOracleJumpStart(oracleBit, manaCost));
             }
             // AURA
             if (subtype.contains("Aura")) {

@@ -11,99 +11,102 @@ public class Abilities {
         oracleText = oracleText.toLowerCase();
 
         if (oracleText.contains("flash")) {
-            abilities += "flash, ";
+            abilities += "flash,";
         }
         if (oracleText.contains("can't be countered")) {
-            abilities += "nofizzle, ";
+            abilities += "nofizzle,";
         }
         if (oracleText.contains("defender")) {
-            abilities += "defender, ";
+            abilities += "defender,";
         }
         if (oracleText.contains("flying")) {
-            abilities += "flying, ";
+            abilities += "flying,";
         }
         if (oracleText.contains("intimidate")) {
-            abilities += "intimidate, ";
+            abilities += "intimidate,";
         }
         if (oracleText.contains("first strike")) {
-            abilities += "first strike, ";
+            abilities += "first strike,";
         }
         if (oracleText.contains("double strike")) {
-            abilities += "double strike, ";
+            abilities += "double strike,";
         }
         if (oracleText.contains("deathtouch")) {
-            abilities += "deathtouch, ";
+            abilities += "deathtouch,";
         }
         if (oracleText.contains("hexproof")) {
-            abilities += "opponentshroud, ";
+            abilities += "opponentshroud,";
         }
         if (oracleText.contains("can't be blocked.")) {
-            abilities += "unblockable, ";
+            abilities += "unblockable,";
         }
         if (oracleText.contains("can't be blocked by more than one creature")) {
-            abilities += "oneblocker, ";
+            abilities += "oneblocker,";
         }
         if (oracleText.contains("menace")) {
-            abilities += "menace, ";
+            abilities += "menace,";
         }
         if (oracleText.contains("indestructible")) {
-            abilities += "indestructible, ";
+            abilities += "indestructible,";
         }
         if (oracleText.contains("vigilance")) {
-            abilities += "vigilance, ";
+            abilities += "vigilance,";
         }
         if (oracleText.contains("reach")) {
-            abilities = abilities.replace("flying, ", "");
-            abilities += "reach, ";
+            abilities = abilities.replace("flying,", "");
+            abilities += "reach,";
         }
         if (oracleText.contains("trample")) {
-            abilities += "trample, ";
+            abilities += "trample,";
         }
         if (oracleText.contains("lifelink")) {
-            abilities += "lifelink, ";
+            abilities += "lifelink,";
         }
         if (oracleText.contains("haste")) {
-            abilities += "haste, ";
+            abilities += "haste,";
         }
         if (oracleText.contains("can't block.")) {
-            abilities += "cantblock, ";
+            abilities += "cantblock,";
         }
         if (oracleText.contains("attacks each turn if able.") || oracleText.contains("attacks each combat if able.")) {
-            abilities += "mustattack, ";
+            abilities += "mustattack,";
         }
         if (oracleText.contains("power can't block it.")) {
-            abilities += "strong, ";
+            abilities += "strong,";
         }
         if (oracleText.contains("can block only creatures with flying.")) {
-            abilities += "cloud, ";
+            abilities += "cloud,";
         }
         if (oracleText.contains("all creatures able to block ")) {
-            abilities += "lure, ";
+            abilities += "lure,";
         }
         if (oracleText.contains("counter on it for each color of mana spent to cast it")) {
-            abilities += "sunburst, ";
+            abilities += "sunburst,";
         }
-        if (oracleText.contains("blocks each turn if able")||oracleText.contains("blocks each combat if able")) {
-            abilities += "mustblock, ";
-        }       
+        if (oracleText.contains("blocks each turn if able") || oracleText.contains("blocks each combat if able")) {
+            abilities += "mustblock,";
+        }
+        if (oracleText.contains("our opponents can't gain life")) {
+            abilities += "nolifegainopponent,";
+        }
 //        if (oracleText.contains("islandwalk")) {
-//            abilities += "islandwalk, ";
+//            abilities += "islandwalk,";
 //        }
 //        if (oracleText.contains("swampwalk")) {
-//            abilities += "swampwalk, ";
+//            abilities += "swampwalk,";
 //        }
 //        if (oracleText.contains("mountainwalk")) {
-//            abilities += "mountainwalk, ";
+//            abilities += "mountainwalk,";
 //        }
 //        if (oracleText.contains("forestwalk")) {
-//            abilities += "forestwalk, ";
+//            abilities += "forestwalk,";
 //        }
 //        if (oracleText.contains("protection from")) {
-//            abilities += "protection from, ";
+//            abilities += "protection from,";
 //        }
 
-        if (abilities.endsWith(", ")) {
-            abilities = abilities.substring(0, abilities.length() - 2);
+        if (abilities.endsWith(",")) {
+            abilities = abilities.substring(0, abilities.length() - 1);
         }
 
         return abilities;

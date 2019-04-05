@@ -23,7 +23,7 @@ public class AutoEffects {
         //  System.out.println("PRO EFF " + actAbil[0]);
         //}
         if (actAbil.length > 1) {
-            replacedOracleBit = processActAbil(actAbil, cardName);
+            replacedOracleBit = processActAbil(actAbil, cardName, type);
         } else {
             //replacedOracleBit = processEffect(oracleBit, cardName);
             return "";
@@ -33,7 +33,7 @@ public class AutoEffects {
     }
 
     //Activated Abiliti Cost
-    private static String processActAbil(String[] actAbil, String cardName) {
+    private static String processActAbil(String[] actAbil, String cardName, String type) {
         String actAbilCost;
         String actAbilEffect;
 
@@ -56,6 +56,10 @@ public class AutoEffects {
         actAbilCost = actAbilCost.replace(",", "");
         actAbilCost = actAbilCost.replace(" ", "");
         actAbilCost = actAbilCost.replace(".", "");
+        
+        if(type.contains("Planeswalker")){
+            actAbilCost = addLoyaltyCounters(actAbilCost);
+        }
 
         actAbilCost = actAbilCost.concat(":");
         actAbilCost = "auto=" + actAbilCost;
@@ -83,12 +87,13 @@ public class AutoEffects {
             return AutoLine.processOracleCreate(effect);
         }
 
-        String manaOfAnyColor = "\nauto={T}:Add{W}\n"
+        String manaOfAnyColor = "\nAdd{W}\n"
                 + "auto={T}:Add{U}\n"
                 + "auto={T}:Add{B}\n"
                 + "auto={T}:Add{R}\n"
                 + "auto={T}:Add{G}";
-
+        
+        effect = effect.replace("return target nonland permanent you don't control to its owner's hand","target(-land|opponentBattlefield) moveTo(ownerHand)");
         effect = effect.replace("historic", "artifact,*[legendary],enchantment[saga]");
         effect = effect.replace("if it was kicked", "kicked ");
         effect = effect.replace("return it to the battlefield tapped under its owner's control at the beginning of the next end step", "(blink)ueot");
@@ -130,7 +135,9 @@ public class AutoEffects {
         effect = effect.replace("up to three", "<upto:3>");
         effect = effect.replace("prevent the next", "prevent:");
         effect = effect.replace("to the battlefield.", "moveTo(mybattlefield)");
-
+        effect = effect.replace("creature doesn't untap during its controller's next untap step","freeze");
+            
+        effect = effect.replace("creature you control", "creature|myBattlefield)");
         effect = effect.replace("each white creature", "(creature[white]");
         effect = effect.replace(" attacking creature with lesser power", "creature[attacking;power<=])");
         effect = effect.replace("nonland permanent an opponent controls", "*[-land]|opponentbattlefield)");
@@ -158,8 +165,12 @@ public class AutoEffects {
         effect = effect.replace("you gain 3 life", "life:3");
         effect = effect.replace("you gain 4 life", "life:4");
         effect = effect.replace("you gain 5 life", "life:5");
+        
+        effect = effect.replace("loses 10 life", "life:-10");
 
+        effect = effect.replace("each ", "all(");
         effect = effect.replace("draw a card", "draw:1");
+        effect = effect.replace("draws two cards", "draw:2");
         effect = effect.replace("for each creature ", "type:creature:");
         effect = effect.replace("until end of turn", "ueot");
         effect = effect.replace(cardName + " gains", "");
@@ -175,7 +186,7 @@ public class AutoEffects {
 
         effect = effect.replace("if you do, ", ":");
         effect = effect.replace("when you do, ", ":");
-        effect = effect.replace("you may pay", "may");
+        effect = effect.replace("you may pay", "may pay(");
         effect = effect.replace("you may", "may");
         effect = effect.replace("add one mana of any color", manaOfAnyColor);
 
@@ -209,5 +220,30 @@ public class AutoEffects {
         //effect = effect.toLowerCase();
 
         return effect;
+    }
+
+    private static String addLoyaltyCounters(String actAbilCost) {
+        actAbilCost = actAbilCost.replace( "0", "{C(0/0,0,Loyalty)}");
+        actAbilCost = actAbilCost.replace("+1", "{C(0/0,1,Loyalty)}");
+        actAbilCost = actAbilCost.replace("+2", "{C(0/0,2,Loyalty)}");
+        actAbilCost = actAbilCost.replace("+3", "{C(0/0,3,Loyalty)}");
+        actAbilCost = actAbilCost.replace("+4", "{C(0/0,4,Loyalty)}");
+        actAbilCost = actAbilCost.replace("+5", "{C(0/0,5,Loyalty)}");
+        actAbilCost = actAbilCost.replace("+6", "{C(0/0,6,Loyalty)}");
+        actAbilCost = actAbilCost.replace("+7", "{C(0/0,7,Loyalty)}");
+        actAbilCost = actAbilCost.replace("+8", "{C(0/0,8,Loyalty)}");
+        actAbilCost = actAbilCost.replace("+9", "{C(0/0,9,Loyalty)}");
+        
+        actAbilCost = actAbilCost.replace("-1", "{C(0/0,-1,Loyalty)}");
+        actAbilCost = actAbilCost.replace("-2", "{C(0/0,-2,Loyalty)}");
+        actAbilCost = actAbilCost.replace("-3", "{C(0/0,-3,Loyalty)}");
+        actAbilCost = actAbilCost.replace("-4", "{C(0/0,-4,Loyalty)}");
+        actAbilCost = actAbilCost.replace("-5", "{C(0/0,-5,Loyalty)}");
+        actAbilCost = actAbilCost.replace("-6", "{C(0/0,-6,Loyalty)}");
+        actAbilCost = actAbilCost.replace("-7", "{C(0/0,-7,Loyalty)}");
+        actAbilCost = actAbilCost.replace("-8", "{C(0/0,-8,Loyalty)}");
+        actAbilCost = actAbilCost.replace("-9", "{C(0/0,-9,Loyalty)}");        
+        
+        return actAbilCost;
     }
 }

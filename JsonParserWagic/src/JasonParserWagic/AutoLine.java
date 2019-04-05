@@ -440,7 +440,7 @@ public class AutoLine {
         return firebreating;
     }
 
-    protected static String processOracleTextCast(String oracleText) {
+    protected static String processOracleTextCast(String oracleText, String cardName) {
         String cast = "";
         String occurrence = "you cast a";
         String occurrenceEnd = "spell";
@@ -469,7 +469,7 @@ public class AutoLine {
             cast = "auto=@movedTo(" + occurrenceCondition + "|mystack):";
 
             String effect = oracleText.substring(oracleText.indexOf(",") + 2);
-            effect = AutoEffects.processEffect(effect, "");
+            effect = AutoEffects.processEffect(effect, cardName);
             if (effect.length() > 0) {
                 cast += effect;
             }
@@ -773,6 +773,9 @@ public class AutoLine {
                 tokenAbility = tokenAbility.replace("that are tapped,attacking", ":battleready");
 
                 create = "create(" + tokenName + ":" + tokenType + " " + tokenName + ":" + tokenPT + ":" + tokenColor + ":" + tokenAbility + ")" + tokenMultipl;
+                if (create.endsWith(":)")){
+                    create = create.replace(":)", ")");
+                }
             }
         } catch (Exception e) {
             e.getMessage();
@@ -1006,16 +1009,17 @@ public class AutoLine {
         return numberAsString;
     }
 
-    static String processAsLongAs(String oracleText, String type) {
+    static String processAsLongAs(String oracleText, String name) {
         String asLongAsIsMyTurn = "";
         try {
             oracleText = oracleText.toLowerCase();
-            String incidence = "as long as it's your turn";
+            String incidence = "as long as it's your turn,";
 
             if (oracleText.contains(incidence)) {
-                asLongAsIsMyTurn = "auto=this(variable{controllerturn}>0)";
-            }
-
+                asLongAsIsMyTurn = "auto=this(variable{controllerturn}>0) ";
+                oracleText = oracleText.substring(oracleText.indexOf(incidence)+incidence.length());
+                asLongAsIsMyTurn += AutoEffects.processEffect(oracleText, name);
+            }            
         } catch (Exception e) {
         }
         return asLongAsIsMyTurn;
@@ -1030,7 +1034,7 @@ public class AutoLine {
             if (oracleText.contains(incidence)) {
                 forEach = "auto=foreach(|myBattlefield)";
             }
-
+            
         } catch (Exception e) {
         }
         return forEach;
@@ -1116,6 +1120,8 @@ public class AutoLine {
                 trigger = trigger.replace(" you gain life ", "lifeof(player):");
                 trigger = trigger.replace("you may pay ", "pay(");
                 trigger = trigger.replace(". If you do ", "):");
+                trigger = trigger.replace("you draw a card","drawof(player):");
+                trigger = trigger.replace(cardName + " becomes tapped","tapped(this):");
                 // Moved to battlefield
                 trigger = trigger.replace("a creature enters the battlefield under your control", "movedTo(creature|myBattlefield):");
                 trigger = trigger.replace("a land enters the battlefield under your control", "movedTo(land|myBattlefield):");
@@ -1129,9 +1135,11 @@ public class AutoLine {
                 trigger = trigger.replace("When this creature dies", "movedTo(this|graveyard) from(battlefield):");
                 trigger = trigger.replace("a creature dies", "movedTo(creature|graveyard) from(battlefield):");
                 trigger = trigger.replace("another creature dies", "movedTo(other creature|graveyard) from(battlefield):");
+                trigger = trigger.replace("another creature or planeswalker you control dies", "movedTo(other *[creature;planeswalker]|graveyard) from(myBattlefield):");
                 trigger = trigger.replace("a creature you control dies", "movedTo(creature|graveyard) from(mybattlefield):");
                 trigger = trigger.replace("a creature an opponent controls dies", "movedTo(creature|graveyard) from(opponentbattlefield):");
                 trigger = trigger.replace("a creature or planeswalker you control dies", "movedTo(creature,planeswalker|graveyard) from(mybattlefield):");
+                trigger = trigger.replace(" dies", "movedTo(|graveyard) from(battlefield):");
                 // Phases
                 trigger = trigger.replace("At the beginning of ", "@");
                 trigger = trigger.replace("your upkeep", "each my upkeep:");

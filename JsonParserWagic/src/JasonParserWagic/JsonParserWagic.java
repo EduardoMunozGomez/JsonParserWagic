@@ -15,7 +15,7 @@ import org.json.simple.parser.ParseException;
 
 public class JsonParserWagic {
 
-    private static String filePath = "C:\\Users\\Eduardo\\Downloads\\m19.json";
+    private static String filePath = "C:\\Users\\Eduardo\\Downloads\\c18.json";
 
     public static String getFilePath() {
         return filePath;
@@ -27,7 +27,7 @@ public class JsonParserWagic {
 
     public static void main(String[] args) {
 
-        boolean createCardsDat = false;
+        boolean createCardsDat = true;
 
         try {
             FileReader reader = new FileReader(getFilePath());
@@ -69,6 +69,7 @@ public class JsonParserWagic {
                 String subtype = "";
                 String power = "";
                 String toughness = "";
+                String loyalty = "";
 
                 if (card.get("supertypes") != null) {
                     JSONArray supertypes = (JSONArray) card.get("supertypes");
@@ -102,17 +103,23 @@ public class JsonParserWagic {
                     power = "power=" + card.get("power");
                     toughness = "toughness=" + card.get("toughness");
                 }
-
+                
+                if (card.get("loyalty") != null) {
+                    loyalty = "auto=counter(0/0," + card.get("loyalty") + ",loyalty)";
+                }
                 //if ((type.contains("Instant")) || (type.contains("Sorcery")||(type.contains("Planeswalker")))) continue;
                 // CARD TAG
                 System.out.println("[card]");
                 System.out.println(nameHeader);
-
+                
+                if (type.contains("Planeswalker")) {
+                    System.out.println(loyalty);
+                }
+                // ORACLE TEXT
                 if (oracleText != null) {
-                    OracleText.parseOracleText(oracleText, cardName, type, subtype, (String) card.get("power"), manaCost);
+                    PrintOracleText.parseOracleText(oracleText, cardName, type, subtype, (String) card.get("power"), manaCost);
                     System.out.println("text=" + oracleText.replace("\n", " -- "));
                 }
-
                 if (!type.contains("Land")) {
                     System.out.println(mana);
                 }
