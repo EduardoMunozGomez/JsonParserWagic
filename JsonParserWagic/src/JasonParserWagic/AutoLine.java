@@ -331,7 +331,7 @@ public class AutoLine {
         return equip;
     }
 
-    protected static String processOracleREPLACERAuraEquipBonus(String oracleText, String cardType) {
+    protected static String processOracleReplacerAuraEquipBonus(String oracleText, String cardType) {
         String bonus = "";
 
         oracleText = oracleText.replace("Enchant creature", "");
@@ -375,9 +375,6 @@ public class AutoLine {
     // Enters the battlefield
     protected static String processOracleTextETB(String oracleText, String name, String type, String subtype) {
         String etb = "";
-        if (subtype.contains("Aura") || subtype.contains("Equipment")) {
-            return "";
-        }
 
         try {
             if (oracleText.contains(name + " enters the battlefield")) {
@@ -571,6 +568,7 @@ public class AutoLine {
         String manaAbility = "";
         String manaProduced;
         String[] basicLandTypes = {"Plains", "Island", "Swamp", "Mountain", "Forest"};
+        
         for (String basicLandType : basicLandTypes) {
             if (subtype.contains(basicLandType)) {
                 manaAbility = "";
@@ -585,8 +583,7 @@ public class AutoLine {
                 manaProduced = oracleText.substring(oracleText.indexOf(incidence) + incidence.length(), oracleText.indexOf(endIncidence));
                 manaProduced = manaProduced.replace(".", "");
 
-                if (manaProduced.contains(",") || manaProduced.contains(" or ")) {
-                    //manaProduced = manaProduced.replace(",", "\nauto={T}:Add");
+                if (manaProduced.contains(",") || manaProduced.contains(" or ")) {                  
                     manaProduced = manaProduced.replace(" or ", "\nauto={T}:Add");
                 }
 
@@ -717,8 +714,6 @@ public class AutoLine {
         return gets;
     }
 
-    // create a 1/1 white Warrior creature token with vigilance.
-    // create(Servo:Artifact Creature Servo:1/1)
     // auto=create(Thopter:Artifact Creature Thopter:1/1:flying)*2
     static String processOracleCreate(String oracleText) {
         String create = "";
@@ -847,7 +842,6 @@ public class AutoLine {
                 scryNumber = oracleText.substring(oracleText.indexOf(incidence) + incidence.length(), oracleText.indexOf(incidence) + incidence.length() + 1);
 
                 scry = "auto=_SCRY_(" + scryNumber + ")";
-                //scry = "auto=reveal:" + scryNumber;
             }
         } catch (Exception e) {
         }

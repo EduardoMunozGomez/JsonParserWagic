@@ -89,6 +89,9 @@ public class Abilities {
         if (oracleText.contains("opponents can't gain life")) {
             abilities += "nolifegainopponent,";
         }
+        if (oracleText.contains("modular")) {
+            abilities += "modular\nmodular=";
+        }
 //        if (oracleText.contains("islandwalk")) {
 //            abilities += "islandwalk,";
 //        }

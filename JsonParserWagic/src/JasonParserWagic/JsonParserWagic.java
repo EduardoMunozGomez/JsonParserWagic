@@ -13,7 +13,7 @@ import org.json.simple.parser.ParseException;
 // @author Eduardo
 public class JsonParserWagic {
 
-    private static String filePath = "C:\\Users\\Eduardo\\Downloads\\MTGJSON\\THB.json";
+    private static String filePath = "C:\\Users\\Eduardo\\Downloads\\MTGJSON\\med.json";
 
     public static String getFilePath() {
         return filePath;
@@ -25,7 +25,7 @@ public class JsonParserWagic {
 
     public static void main(String[] args) {
 
-        boolean createCardsDat = false;
+        boolean createCardsDat = true;
 
         try {
             FileReader reader = new FileReader(getFilePath());
@@ -34,14 +34,13 @@ public class JsonParserWagic {
             JSONObject data = (JSONObject) jsonObject.get("data");
             JSONArray cards = (JSONArray) data.get("cards");
 
-            // Metadata
+            // Metadata header
             if (createCardsDat) {
                 Metadata.printMetadata(data.get("name"), data.get("releaseDate"), data.get("baseSetSize"));
             }
 
             Iterator i = cards.iterator();
-            // take each value from the json array separately
-            // innerObj is a card
+            // take each value from the json array separately as a card
             while (i.hasNext()) {
                 JSONObject card = (JSONObject) i.next();
                 JSONObject identifiers = (JSONObject) card.get("identifiers");
@@ -51,8 +50,12 @@ public class JsonParserWagic {
                     continue;
                 }
 
+                // If card is a reprint, skip it
                 JSONArray printingsArray = (JSONArray) card.get("printings");
-                if (printingsArray.size() > 1) {
+                if (printingsArray.size() > 3) {
+                    continue;
+                }
+                if (Reprint.isReprint((String) card.get("name"))) {
                     continue;
                 }
 
@@ -99,25 +102,25 @@ public class JsonParserWagic {
                     power = "power=" + card.get("power");
                     toughness = "toughness=" + card.get("toughness");
                 }
-                
+
                 if (card.get("loyalty") != null) {
                     loyalty = "auto=counter(0/0," + card.get("loyalty") + ",loyalty)";
                 }
-                //if ((type.contains("Instant")) || (type.contains("Sorcery")||(type.contains("Planeswalker")))) continue;
+
                 // CARD TAG
                 System.out.println("[card]");
                 System.out.println(nameHeader);
-                
+
                 if (type.contains("Planeswalker")) {
                     System.out.println(loyalty);
                 }
                 // ORACLE TEXT
                 if (oracleText != null) {
-                    PrintOracleText.parseOracleText(oracleText, cardName, type, subtype, (String) card.get("power"), manaCost);
+                    OracleTextToWagic.parseOracleText(oracleText, cardName, type, subtype, (String) card.get("power"), manaCost);
                     System.out.println("text=" + oracleText.replace("\n", " -- "));
                 }
                 if (!type.contains("Land")) {
-                    mana=mana.replace("/", "");
+                    mana = mana.replace("/", "");
                     System.out.println(mana);
                 }
                 System.out.println(type.trim());
