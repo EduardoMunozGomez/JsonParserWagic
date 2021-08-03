@@ -3,10 +3,7 @@ package JasonParserWagic;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- *
- * @author Eduardo
- */
+// @author Eduardo
 public class PrintOracleText {
 
     static void parseOracleText(String oracleText, String cardName, String type, String subtype, String power, String manaCost) {
@@ -29,88 +26,89 @@ public class PrintOracleText {
         if (type.contains("Creature")) {
             abilities = Abilities.processAbilities(oracleText);
         }
-        if (type.contains("Enchantment")) {
-            abilities = Abilities.processEnchantmentAbilities(oracleText);
-        }
+        //if (type.contains("Enchantment")) {
+            //abilities = Abilities.processEnchantmentAbilities(oracleText);
+        //}
         if (type.contains("Instant") || type.contains("Sorcery")) {
             abilities = Abilities.processInstantOrSorceryAbilities(oracleText);
         }
         if (type.contains("Land")) {
             abilities = Abilities.processLandAbilities(oracleText);
         }
-        if (!abilities.isEmpty()) {
+        if (abilities.length()>0) {
             System.out.println("abilities=" + abilities.trim());
         }
         // Auto lines
         oracleSplit = oracleText.split("\n");
         for (String oracleBit : oracleSplit) {
             // Evergreen mechanics
-            check(AutoEffects.processOracleBit(oracleBit, cardName, type, subtype));
-            check(AutoLine.processOracleTextManaAbility(oracleBit, subtype));
-            check(AutoLineGRN.processOracleUndergrowth(oracleBit));
-            check(AutoLineGRN.processOracleKicker(oracleBit, cardName));
-            check(AutoLine.processOracleTextCast(oracleBit, cardName));
-            check(AutoLine.processOracleTextCombatDamage(oracleBit));
+            autoLineExists(AutoEffects.processOracleBit(oracleBit, cardName, type, subtype));
+            autoLineExists(AutoLine.processOracleTextManaAbility(oracleBit, subtype));
+            //check(AutoLineGRN.processOracleUndergrowth(oracleBit));
+            //check(AutoLineGRN.processOracleKicker(oracleBit, cardName));
+            autoLineExists(AutoLine.processOracleTextCast(oracleBit, cardName));
+            autoLineExists(AutoLine.processOracleTextCombatDamage(oracleBit));
 
-            check(AutoLine.processOracleTextOppCasts(oracleBit));
-            check(AutoLine.processOracleTextWeak(oracleBit));
-            check(AutoLine.processOracleDiscarded(oracleBit));
-            check(AutoLine.processOracleTextTakeControl(oracleBit));
-            check(AutoLine.processOracleScry(oracleBit));
-            check(AutoLine.processOracleCantBeBlockedBy(oracleBit));
-            check(AutoLine.processOracleLord(oracleBit, type));
-            check(AutoLine.processOracleTriggers(oracleBit, cardName, type, subtype, power));
-            check(AutoLine.processAsLongAs(oracleBit, cardName));
-            check(AutoLine.processForEach(oracleBit, type));
-            check(AutoLineGRN.processOracleConvoke(oracleBit));
-            check(AutoLineGRN.processOracleSurveil(oracleBit));
-            check(AutoLineGRN.processOracleAddendum(oracleBit));
-            check(AutoLineGRN.processOracleRiot(oracleBit));
-            check(AutoLineGRN.processOracleSpectacle(oracleBit));
-            check(AutoLineGRN.processOracleAscend(oracleBit));
-            check(AutoLineGRN.processOracleAmass(oracleBit));
-            check(AutoLineGRN.processOraclePartner(oracleBit));
-            check(AutoLineGRN.processOracleProliferate(oracleBit));
+            autoLineExists(AutoLine.processOracleTextOppCasts(oracleBit));
+            autoLineExists(AutoLine.processOracleTextWeak(oracleBit));
+            autoLineExists(AutoLine.processOracleDiscarded(oracleBit));
+            autoLineExists(AutoLine.processOracleTextTakeControl(oracleBit));
+            autoLineExists(AutoLine.processOracleScry(oracleBit));
+            autoLineExists(AutoLine.processOracleCantBeBlockedBy(oracleBit));
+            autoLineExists(AutoLine.processOracleLord(oracleBit, type));
+            autoLineExists(AutoLine.processOracleTriggers(oracleBit, cardName, type, subtype, power));
+            autoLineExists(AutoLine.processAsLongAs(oracleBit, cardName));
+            autoLineExists(AutoLine.processForEach(oracleBit, type));
+          /*autoLineExists(AutoLineGRN.processOracleConvoke(oracleBit));
+            autoLineExists(AutoLineGRN.processOracleSurveil(oracleBit));
+            autoLineExists(AutoLineGRN.processOracleAddendum(oracleBit));
+            autoLineExists(AutoLineGRN.processOracleRiot(oracleBit));
+            autoLineExists(AutoLineGRN.processOracleSpectacle(oracleBit));
+            autoLineExists(AutoLineGRN.processOracleAscend(oracleBit));
+            autoLineExists(AutoLineGRN.processOraclePartner(oracleBit));*/
+            autoLineExists(AutoLineGRN.processOracleAmass(oracleBit));
+            autoLineExists(AutoLineGRN.processOracleProliferate(oracleBit));
             
             //INSTANT, SORCERY
             if (type.contains("Instant") || type.contains("Sorcery")) {
-                check(AutoLine.processOracleTextMyTarget(oracleBit, "InstantOrSorcery", subtype));
-                check(AutoLine.processOracleTextExileDestroyDamage(oracleBit, type));
-                check(AutoLine.processOracleREPLACERAuraEquipBonus(oracleBit, "InstantOrSorcery"));
-                check(AutoLine.processOracleCreate(oracleBit), true);
-                check(AutoLine.processOracleGainLife(oracleBit), true);
-                check(AutoLine.processOracleDraw(oracleBit));
-                check(AutoLine.processOraclePutA(oracleBit, type), true);
-                check(AutoLine.processOracleChooseOneOrBoth(oracleBit));
+                autoLineExists(AutoLine.processOracleTextMyTarget(oracleBit, "InstantOrSorcery", subtype));
+                autoLineExists(AutoEffects.processEffect(oracleBit, type));
+                autoLineExists(AutoLine.processOracleTextExileDestroyDamage(oracleBit, type));
+                autoLineExists(AutoLine.processOracleREPLACERAuraEquipBonus(oracleBit, "InstantOrSorcery"));
+                autoLineExists(AutoLine.processOracleCreate(oracleBit), true);
+                autoLineExists(AutoLine.processOracleGainLife(oracleBit), true);
+                autoLineExists(AutoLine.processOracleDraw(oracleBit));
+                autoLineExists(AutoLine.processOraclePutA(oracleBit, type), true);
+                autoLineExists(AutoLine.processOracleChooseOneOrBoth(oracleBit));
 
-                check(AutoLineGRN.processOracleJumpStart(oracleBit, manaCost));
+                autoLineExists(AutoLineGRN.processOracleJumpStart(oracleBit, manaCost));
             }
             // AURA
             if (subtype.contains("Aura")) {
-                check(AutoLine.processOracleTextMyTarget(oracleBit, subtype, subtype));
+                autoLineExists(AutoLine.processOracleTextMyTarget(oracleBit, subtype, subtype));
                 String auraEquipBonus = AutoLine.processOracleREPLACERAuraEquipBonus(oracleBit, subtype);
                 if (!auraEquipBonus.isEmpty()) {
-                    check(auraEquipBonus);
+                    autoLineExists(auraEquipBonus);
                 }
             }
             // EQUIPMENT
             if (subtype.contains("Equipment")) {
-                check(AutoLine.processOracleTextAuraEquipBonus(oracleBit, "Equipment"));
-                check(AutoLine.processOracleTextEquipCost(oracleBit));
+                autoLineExists(AutoLine.processOracleTextAuraEquipBonus(oracleBit, "Equipment"));
+                autoLineExists(AutoLine.processOracleTextEquipCost(oracleBit));
             }
-            // SAGA
+            /*/ SAGA
             if (subtype.contains("Saga")) {
-                check(AutoLine.processOracleEpicSaga(oracleBit, subtype));
+                autoLineExists(AutoLine.processOracleEpicSaga(oracleBit, subtype));
                 String epicSaga = "";
                 //= AutoLine.processOracleREPLACERAuraEquipBonus(oracleBit, subtype);
                 if (!epicSaga.isEmpty()) {
-                    check(epicSaga);
+                    autoLineExists(epicSaga);
                 }
-            }
+            }*/
         }
     }
 
-    static void check(String outcome, boolean... needAuto) {
+    static void autoLineExists(String outcome, boolean... needAuto) {
         if (outcome.length() > 0) {
             outcome += "\n";
             if (needAuto.length > 0) {

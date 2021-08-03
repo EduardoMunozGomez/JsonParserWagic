@@ -2,10 +2,7 @@ package JasonParserWagic;
 
 import java.util.regex.Pattern;
 
-/**
- *
- * @author Eduardo
- */
+// @author Eduardo
 public class AutoLine {
 
     static String processOracleActivatedAbilityCost(String oracleText, String cardName, String type, String subtype) {
@@ -226,6 +223,9 @@ public class AutoLine {
                 }
                 if (target.contains("creature" + letterS + " you control")) {
                     myTarget = "creature|myBattlefield";
+                }                
+                if (target.contains("creature" + letterS + " an opponent controls")) {
+                    myTarget = "creature|opponentBattlefield";
                 }
                 if (target.contains("creature" + letterS + " you don't control")) {
                     myTarget = "creature|opponentBattlefield";
@@ -465,7 +465,6 @@ public class AutoLine {
             occurrenceCondition = occurrenceCondition.replace(" black ", "*[black]");
             occurrenceCondition = occurrenceCondition.replace(" red ", "*[red]");
             occurrenceCondition = occurrenceCondition.replace(" green ", "*[green]");
-            //System.out.println("HELP ME OOOOUT11111 "+occurrenceCondition);
             cast = "auto=@movedTo(" + occurrenceCondition + "|mystack):";
 
             String effect = oracleText.substring(oracleText.indexOf(",") + 2);
@@ -847,7 +846,7 @@ public class AutoLine {
             if (oracleText.contains(incidence)) {
                 scryNumber = oracleText.substring(oracleText.indexOf(incidence) + incidence.length(), oracleText.indexOf(incidence) + incidence.length() + 1);
 
-                scry = "auto=scry:" + scryNumber + " scrycore delayed dontshow donothing scrycoreend scryend";
+                scry = "auto=_SCRY_(" + scryNumber + ")";
                 //scry = "auto=reveal:" + scryNumber;
             }
         } catch (Exception e) {
@@ -900,7 +899,10 @@ public class AutoLine {
             String incidence = "s you control";
             String justOther = "other ";
             oracleText = oracleText.toLowerCase();
-
+            if (oracleText.contains("zombie tokens you control")) {
+                    lord = oracleText.replace("zombie tokens you control have", "auto=lord(Zombie[token]|myBattlefield)");
+                    return lord;
+            }
             if (oracleText.contains(incidence) && !oracleText.contains("enters the battlefield")) {
                 if (oracleText.contains("creatures you control")) {
                     onlyOther = "other ";
@@ -1131,7 +1133,7 @@ public class AutoLine {
                 trigger = trigger.replace(cardName + " attacks", "combat(attacking) source(this):");
                 trigger = trigger.replace(cardName + " and at least two other creatures attack", "combat(attacking) source(this) restriction{type(other creature[attacking]|myBattlefield)~morethan~1}:");
 
-                trigger = trigger.replace(cardName + " dies", "movedTo(this|graveyard) from(battlefield):");
+                trigger = trigger.replace("@" + cardName + " dies", "_DIES_");
                 trigger = trigger.replace("When this creature dies", "movedTo(this|graveyard) from(battlefield):");
                 trigger = trigger.replace("a creature dies", "movedTo(creature|graveyard) from(battlefield):");
                 trigger = trigger.replace("another creature dies", "movedTo(other creature|graveyard) from(battlefield):");
@@ -1165,10 +1167,5 @@ public class AutoLine {
         } catch (Exception e) {
         }
         return trigger;
-    }
-
-    static String processOracleInstantSorcery(String oracleText) {
-        String effect = oracleText;
-        return effect;
     }
 }

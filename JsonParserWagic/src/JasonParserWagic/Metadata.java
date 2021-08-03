@@ -1,9 +1,6 @@
 package JasonParserWagic;
 
-/**
- *
- * @author Eduardo
- */
+// @author Eduardo
 public class Metadata {
 
     //  [meta]

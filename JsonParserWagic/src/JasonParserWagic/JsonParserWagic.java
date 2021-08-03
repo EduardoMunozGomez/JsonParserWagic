@@ -1,8 +1,5 @@
 package JasonParserWagic;
 
-/**
- * @author Eduardo
- */
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -13,9 +10,10 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+// @author Eduardo
 public class JsonParserWagic {
 
-    private static String filePath = "C:\\Users\\Eduardo\\Downloads\\c18.json";
+    private static String filePath = "C:\\Users\\Eduardo\\Downloads\\MTGJSON\\THB.json";
 
     public static String getFilePath() {
         return filePath;
@@ -27,17 +25,18 @@ public class JsonParserWagic {
 
     public static void main(String[] args) {
 
-        boolean createCardsDat = true;
+        boolean createCardsDat = false;
 
         try {
             FileReader reader = new FileReader(getFilePath());
             JSONParser jsonParser = new JSONParser();
             JSONObject jsonObject = (JSONObject) jsonParser.parse(reader);
-            JSONArray cards = (JSONArray) jsonObject.get("cards");
+            JSONObject data = (JSONObject) jsonObject.get("data");
+            JSONArray cards = (JSONArray) data.get("cards");
 
             // Metadata
             if (createCardsDat) {
-                Metadata.printMetadata(jsonObject.get("name"), jsonObject.get("releaseDate"), jsonObject.get("totalSetSize"));
+                Metadata.printMetadata(data.get("name"), data.get("releaseDate"), data.get("baseSetSize"));
             }
 
             Iterator i = cards.iterator();
@@ -45,18 +44,15 @@ public class JsonParserWagic {
             // innerObj is a card
             while (i.hasNext()) {
                 JSONObject card = (JSONObject) i.next();
+                JSONObject identifiers = (JSONObject) card.get("identifiers");
 
                 if (createCardsDat) {
-                    CardDat.generateCardDat((String) card.get("name"), card.get("multiverseId"), (String) card.get("rarity"));
+                    CardDat.generateCardDat((String) card.get("name"), identifiers.get("multiverseId"), (String) card.get("rarity"));
                     continue;
                 }
 
                 JSONArray printingsArray = (JSONArray) card.get("printings");
-                if (printingsArray.size() > 3) {
-                    continue;
-                }
-
-                if (BasicOrReprint.isReprintOrBasic((String) card.get("name"))) {
+                if (printingsArray.size() > 1) {
                     continue;
                 }
 
@@ -121,6 +117,7 @@ public class JsonParserWagic {
                     System.out.println("text=" + oracleText.replace("\n", " -- "));
                 }
                 if (!type.contains("Land")) {
+                    mana=mana.replace("/", "");
                     System.out.println(mana);
                 }
                 System.out.println(type.trim());

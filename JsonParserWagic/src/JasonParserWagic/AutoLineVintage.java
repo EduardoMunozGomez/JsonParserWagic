@@ -1,9 +1,6 @@
 package JasonParserWagic;
 
-/**
- *
- * @author Eduardo
- */
+// @author Eduardo
 public class AutoLineVintage {
 
     protected static String processOracleTextAfflict(String oracleText, String name) {

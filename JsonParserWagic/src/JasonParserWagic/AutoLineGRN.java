@@ -1,9 +1,6 @@
 package JasonParserWagic;
 
-/**
- *
- * @author Eduardo
- */
+// @author Eduardo
 public class AutoLineGRN {
 
     // other={convoke} name(Convoke)
@@ -169,7 +166,7 @@ public class AutoLineGRN {
             oracleText = oracleText.toLowerCase();
             String incidence = "proliferate";           
             if (oracleText.contains(incidence)) {
-                proliferate = String.format("auto=notatarget(<anyamount>*) proliferate");
+                proliferate = String.format("auto=_PROLIFERATE_");
             }
         } catch (Exception ex) {
 

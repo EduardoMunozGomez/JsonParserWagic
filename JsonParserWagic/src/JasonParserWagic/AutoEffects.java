@@ -1,9 +1,6 @@
 package JasonParserWagic;
 
-/**
- *
- * @author Eduardo
- */
+// @author Eduardo
 public class AutoEffects {
 
     static String processOracleBit(String oracleBit, String cardName, String type, String subtype) {
@@ -32,7 +29,7 @@ public class AutoEffects {
         return replacedOracleBit;
     }
 
-    //Activated Abiliti Cost
+    //Activated Ability Cost
     private static String processActAbil(String[] actAbil, String cardName, String type) {
         String actAbilCost;
         String actAbilEffect;
@@ -93,7 +90,23 @@ public class AutoEffects {
                 + "auto={T}:Add{R}\n"
                 + "auto={T}:Add{G}";
         
+        effect = effect.replace("amass 1", "_AMASS_(1)");
+        effect = effect.replace("amass 2", "_AMASS_(2)");
+        effect = effect.replace("amass 3", "_AMASS_(3)");
+        effect = effect.replace("amass 4", "_AMASS_(4)");
+        effect = effect.replace("amass x", "_AMASS_()");
+        effect = effect.replace("proliferate", "_PROLIFERATE_");
+        effect = effect.replace("scry 1", "_SCRY_(1)");
+        effect = effect.replace("scry 4", "_SCRY_(4)");
+        
+        effect = effect.replace("that was dealt damage this turn","[damaged]");
+        effect = effect.replace("+1/+1 counter","counter(1/1)");
+        effect = effect.replace("loyalty counter","counter(0/0,1,Loyalty)");
+        effect = effect.replace("on the bottom of its owner's library","bottomoflibrary");
+        effect = effect.replace("creature with power 4 or greater","creature[power>=4]");
+        
         effect = effect.replace("return target nonland permanent you don't control to its owner's hand","target(-land|opponentBattlefield) moveTo(ownerHand)");
+        effect = effect.replace("to its owner's hand","moveto(ownerhand)");
         effect = effect.replace("historic", "artifact,*[legendary],enchantment[saga]");
         effect = effect.replace("if it was kicked", "kicked ");
         effect = effect.replace("return it to the battlefield tapped under its owner's control at the beginning of the next end step", "(blink)ueot");
@@ -105,7 +118,7 @@ public class AutoEffects {
         effect = effect.replace("your opponents control", ")|opponentBattlefield)");
         effect = effect.replace("to any target", "target(creature,player)");
         effect = effect.replace("if you do, ", "");
-        effect = effect.replace("another", "other");
+        effect = effect.replace("another ", "other ");
         effect = effect.replace("return target creature an opponent controls to its owner's hand", "moveto(ownerHand) target(creature|opponentBattlefield)");
         effect = effect.replace("return target creature to its owner's hand", "moveto(ownerHand) target(creature)");
         effect = effect.replace("exile target nonland permanent an opponent controls until " + cardName + " leaves the battlefield.", "(blink)forsrc target(*[-land]|opponentbattlefield)");
@@ -122,7 +135,7 @@ public class AutoEffects {
         effect = effect.replace("to your hand", "moveto(ownerhand)");
         effect = effect.replace("whenever this creature attacks, ", "@combat(attacking) source(this):");
         effect = effect.replace("put a +1/+1 counter", "counter(1/1)");
-        effect = effect.replace("put two +1/+1 counters on it", "counter(1/1,2)");
+        effect = effect.replace("put two +1/+1 counters on ", "counter(1/1,2)");
         effect = effect.replace("enters the battlefield under your control, ", "@movedTo(|myBattlefield):");
         effect = effect.replace("attacking creature without flying", "creature[attacking;-flying]");
         effect = effect.replace("can't be blocked this turn", ") unblockable");
@@ -136,19 +149,23 @@ public class AutoEffects {
         effect = effect.replace("prevent the next", "prevent:");
         effect = effect.replace("to the battlefield.", "moveTo(mybattlefield)");
         effect = effect.replace("creature doesn't untap during its controller's next untap step","freeze");
-            
+        
         effect = effect.replace("creature you control", "creature|myBattlefield)");
         effect = effect.replace("each white creature", "(creature[white]");
         effect = effect.replace(" attacking creature with lesser power", "creature[attacking;power<=])");
         effect = effect.replace("nonland permanent an opponent controls", "*[-land]|opponentbattlefield)");
         effect = effect.replace("if you attacked with a creature this turn, ", "if raid then ");
-        effect = effect.replace("an opponent controls", "|opponentBattlefield)");
-        effect = effect.replace("you control", "|myBattlefield)");
+        effect = effect.replace(" an opponent controls", "|opponentBattlefield)");
+        effect = effect.replace(" you control", "|myBattlefield)");
         effect = effect.replace("loses all abilities", "loseabilities");
         effect = effect.replace("discard a card", "ability$!name(discard) reject notatarget(*|myhand)!$");
         effect = effect.replace("discards a card", "ability$!name(discard) reject notatarget(*|myhand)!$");
+        effect = effect.replace("discards two cards", "ability$!name(discard) reject notatarget(<2>*|myhand)!$");
+        
+        effect = effect.replace("sacrifices a creature", "ability$!sacrifice notatarget(creature|mybattlefield)!$ targetedplayer");
         effect = effect.replace("exile " + cardName, "\nexiledeath");
-        effect = effect.replace("card from your graveyard", "|mygraveyard)");
+        effect = effect.replace(" card from your graveyard", "|mygraveyard)");
+        effect = effect.replace("take an extra turn after this one","turns:+1");
         // Deplete (Mill)
         effect = effect.replace("puts the top card of their library into their graveyard", "deplete:1");
         effect = effect.replace("puts the top two cards of their library into their graveyard", "deplete:2");
@@ -166,6 +183,12 @@ public class AutoEffects {
         effect = effect.replace("you gain 4 life", "life:4");
         effect = effect.replace("you gain 5 life", "life:5");
         
+        effect = effect.replace("you lose 1 life", "life:-1");        
+        effect = effect.replace("loses 1 life", "life:-1");
+        effect = effect.replace("loses 2 life", "life:-2");
+        effect = effect.replace("loses 3 life", "life:-3");
+        effect = effect.replace("loses 4 life", "life:-4");
+        effect = effect.replace("loses 5 life", "life:-5");
         effect = effect.replace("loses 10 life", "life:-10");
 
         effect = effect.replace("each ", "all(");
@@ -197,6 +220,7 @@ public class AutoEffects {
         effect = effect.replace(" and has ", " && ");
         effect = effect.replace(" and you ", " && ");
         effect = effect.replace(" and ", " && ");
+        effect = effect.replace(" put a ", " ");
 
         effect = effect.replace("return ", "");
         effect = effect.replace(" gains ", ") ");
@@ -204,6 +228,7 @@ public class AutoEffects {
         effect = effect.replace(" gets ", ") ");
         effect = effect.replace(" get ", ") ");
         effect = effect.replace(" has ", ") ");
+        effect = effect.replace(", then "," && ");
 
         effect = effect.replace(" it) ", "");
         effect = effect.replace(" it ", "");
@@ -211,6 +236,7 @@ public class AutoEffects {
         effect = effect.replace(" or ", ",");
         effect = effect.replace(" to ", " ");
 
+        effect = effect.replace("} {", "}{");
         effect = effect.replace(":|", ":");
         effect = effect.replace("+", "");
         effect = effect.replace(".", "");
@@ -223,6 +249,9 @@ public class AutoEffects {
     }
 
     private static String addLoyaltyCounters(String actAbilCost) {
+        actAbilCost = actAbilCost.replace("10", "{C(0/0,10,Loyalty)}");
+        actAbilCost = actAbilCost.replace("−10", "{C(0/0,−10,Loyalty)}");
+        
         actAbilCost = actAbilCost.replace( "0", "{C(0/0,0,Loyalty)}");
         actAbilCost = actAbilCost.replace("+1", "{C(0/0,1,Loyalty)}");
         actAbilCost = actAbilCost.replace("+2", "{C(0/0,2,Loyalty)}");

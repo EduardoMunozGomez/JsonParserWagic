@@ -1,9 +1,6 @@
 package JasonParserWagic;
 
-/**
- *
- * @author Eduardo
- */
+// @author Eduardo
 public class Abilities {
 
     protected static String processAbilities(String oracleText) {
@@ -85,8 +82,11 @@ public class Abilities {
         }
         if (oracleText.contains("blocks each turn if able") || oracleText.contains("blocks each combat if able")) {
             abilities += "mustblock,";
+        }        
+        if (oracleText.contains("players can't gain life")) {
+            abilities += "nolifegain,";
         }
-        if (oracleText.contains("our opponents can't gain life")) {
+        if (oracleText.contains("opponents can't gain life")) {
             abilities += "nolifegainopponent,";
         }
 //        if (oracleText.contains("islandwalk")) {
