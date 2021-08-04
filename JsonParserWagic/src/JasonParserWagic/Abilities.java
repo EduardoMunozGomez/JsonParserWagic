@@ -88,26 +88,25 @@ public class Abilities {
         }
         if (oracleText.contains("opponents can't gain life")) {
             abilities += "nolifegainopponent,";
+        }        
+        if (oracleText.contains("islandwalk")) {
+            abilities += "islandwalk,";
+        }
+        if (oracleText.contains("swampwalk")) {
+            abilities += "swampwalk,";
+        }
+        if (oracleText.contains("mountainwalk")) {
+            abilities += "mountainwalk,";
+        }
+        if (oracleText.contains("forestwalk")) {
+            abilities += "forestwalk,";
+        }
+        if (oracleText.contains("protection from")) {
+            abilities += "protection from,";
         }
         if (oracleText.contains("modular")) {
             abilities += "modular\nmodular=";
         }
-//        if (oracleText.contains("islandwalk")) {
-//            abilities += "islandwalk,";
-//        }
-//        if (oracleText.contains("swampwalk")) {
-//            abilities += "swampwalk,";
-//        }
-//        if (oracleText.contains("mountainwalk")) {
-//            abilities += "mountainwalk,";
-//        }
-//        if (oracleText.contains("forestwalk")) {
-//            abilities += "forestwalk,";
-//        }
-//        if (oracleText.contains("protection from")) {
-//            abilities += "protection from,";
-//        }
-
         if (abilities.endsWith(",")) {
             abilities = abilities.substring(0, abilities.length() - 1);
         }

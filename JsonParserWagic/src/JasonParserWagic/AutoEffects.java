@@ -121,7 +121,7 @@ public class AutoEffects {
         effect = effect.replace("each opponent discards a card", "ability$!name(discard) reject notatarget(*|myhand)!$ opponent");
         effect = effect.replace("each opponent loses 1 life", "life:-1 opponent");
         effect = effect.replace("to your hand", "moveto(ownerhand)");
-        effect = effect.replace("whenever this creature attacks, ", "@combat(attacking) source(this):");
+        effect = effect.replace("whenever this creature attacks, ", "_ATTACKING_");
         effect = effect.replace("put a +1/+1 counter", "counter(1/1)");
         effect = effect.replace("put two +1/+1 counters on ", "counter(1/1,2)");
         effect = effect.replace("enters the battlefield under your control, ", "@movedTo(|myBattlefield):");

@@ -13,7 +13,7 @@ import org.json.simple.parser.ParseException;
 // @author Eduardo
 public class JsonParserWagic {
 
-    private static String filePath = "C:\\Users\\Eduardo\\Downloads\\MTGJSON\\med.json";
+    private static String filePath = "C:\\Users\\Eduardo\\Downloads\\MTGJSON\\mh2.json";
 
     public static String getFilePath() {
         return filePath;
@@ -25,7 +25,7 @@ public class JsonParserWagic {
 
     public static void main(String[] args) {
 
-        boolean createCardsDat = true;
+        boolean createCardsDat = false;
 
         try {
             FileReader reader = new FileReader(getFilePath());
@@ -50,12 +50,8 @@ public class JsonParserWagic {
                     continue;
                 }
 
-                // If card is a reprint, skip it
-                JSONArray printingsArray = (JSONArray) card.get("printings");
-                if (printingsArray.size() > 3) {
-                    continue;
-                }
-                if (Reprint.isReprint((String) card.get("name"))) {
+                // If card is a reprint, skip it                
+                if (card.get("isReprint") != null) {
                     continue;
                 }
 

@@ -223,7 +223,7 @@ public class AutoLine {
                 }
                 if (target.contains("creature" + letterS + " you control")) {
                     myTarget = "creature|myBattlefield";
-                }                
+                }
                 if (target.contains("creature" + letterS + " an opponent controls")) {
                     myTarget = "creature|opponentBattlefield";
                 }
@@ -497,7 +497,7 @@ public class AutoLine {
         String thisDies = "";
         try {
             if (oracleText.contains("When " + name + " dies,") || oracleText.contains("When this creature dies")) {
-                thisDies = "auto=@movedTo(this|graveyard) from(battlefield):";
+                thisDies = "auto=_DIES_";
                 String create = AutoLine.processOracleCreate(oracleText);
                 thisDies += create;
             }
@@ -568,7 +568,7 @@ public class AutoLine {
         String manaAbility = "";
         String manaProduced;
         String[] basicLandTypes = {"Plains", "Island", "Swamp", "Mountain", "Forest"};
-        
+
         for (String basicLandType : basicLandTypes) {
             if (subtype.contains(basicLandType)) {
                 manaAbility = "";
@@ -583,7 +583,7 @@ public class AutoLine {
                 manaProduced = oracleText.substring(oracleText.indexOf(incidence) + incidence.length(), oracleText.indexOf(endIncidence));
                 manaProduced = manaProduced.replace(".", "");
 
-                if (manaProduced.contains(",") || manaProduced.contains(" or ")) {                  
+                if (manaProduced.contains(",") || manaProduced.contains(" or ")) {
                     manaProduced = manaProduced.replace(" or ", "\nauto={T}:Add");
                 }
 
@@ -767,7 +767,7 @@ public class AutoLine {
                 tokenAbility = tokenAbility.replace("that are tapped,attacking", ":battleready");
 
                 create = "create(" + tokenName + ":" + tokenType + " " + tokenName + ":" + tokenPT + ":" + tokenColor + ":" + tokenAbility + ")" + tokenMultipl;
-                if (create.endsWith(":)")){
+                if (create.endsWith(":)")) {
                     create = create.replace(":)", ")");
                 }
             }
@@ -894,8 +894,8 @@ public class AutoLine {
             String justOther = "other ";
             oracleText = oracleText.toLowerCase();
             if (oracleText.contains("zombie tokens you control")) {
-                    lord = oracleText.replace("zombie tokens you control have", "auto=lord(Zombie[token]|myBattlefield)");
-                    return lord;
+                lord = oracleText.replace("zombie tokens you control have", "auto=lord(Zombie[token]|myBattlefield)");
+                return lord;
             }
             if (oracleText.contains(incidence) && !oracleText.contains("enters the battlefield")) {
                 if (oracleText.contains("creatures you control")) {
@@ -1013,9 +1013,9 @@ public class AutoLine {
 
             if (oracleText.contains(incidence)) {
                 asLongAsIsMyTurn = "auto=this(variable{controllerturn}>0) ";
-                oracleText = oracleText.substring(oracleText.indexOf(incidence)+incidence.length());
+                oracleText = oracleText.substring(oracleText.indexOf(incidence) + incidence.length());
                 asLongAsIsMyTurn += AutoEffects.processEffect(oracleText, name);
-            }            
+            }
         } catch (Exception e) {
         }
         return asLongAsIsMyTurn;
@@ -1030,7 +1030,7 @@ public class AutoLine {
             if (oracleText.contains(incidence)) {
                 forEach = "auto=foreach(|myBattlefield)";
             }
-            
+
         } catch (Exception e) {
         }
         return forEach;
@@ -1094,7 +1094,7 @@ public class AutoLine {
                     && !(oracleText.contains("Whenever you cast"))) {
 
                 if (oracleText.contains("Mentor")) {
-                    trigger = "auto=@combat(attacking) source(this):";
+                    trigger = "auto=_ATTACKING_";
 
                     String mentor = AutoLineGRN.processOracleMentor(oracleText, power);
                     if (mentor.length() > 0) {
@@ -1116,16 +1116,16 @@ public class AutoLine {
                 trigger = trigger.replace(" you gain life ", "lifeof(player):");
                 trigger = trigger.replace("you may pay ", "pay(");
                 trigger = trigger.replace(". If you do ", "):");
-                trigger = trigger.replace("you draw a card","drawof(player):");
-                trigger = trigger.replace(cardName + " becomes tapped","tapped(this):");
+                trigger = trigger.replace("you draw a card", "drawof(player):");
+                trigger = trigger.replace(cardName + " becomes tapped", "tapped(this):");
                 // Moved to battlefield
                 trigger = trigger.replace("a creature enters the battlefield under your control", "movedTo(creature|myBattlefield):");
                 trigger = trigger.replace("a land enters the battlefield under your control", "movedTo(land|myBattlefield):");
                 trigger = trigger.replace("a creature enters the battlefield", "movedTo(creature|Battlefield):");
                 trigger = trigger.replace("enters the battlefield under your control", "movedTo(*[]|myBattlefield):");
 
-                trigger = trigger.replace(cardName + " attacks", "combat(attacking) source(this):");
-                trigger = trigger.replace(cardName + " and at least two other creatures attack", "combat(attacking) source(this) restriction{type(other creature[attacking]|myBattlefield)~morethan~1}:");
+                trigger = trigger.replace(cardName + " attacks", "_ATTACKING_");
+                trigger = trigger.replace(cardName + " and at least two other creatures attack", "_ATTACKING_restriction{type(other creature[attacking]|myBattlefield)~morethan~1}:");
 
                 trigger = trigger.replace("@" + cardName + " dies", "_DIES_");
                 trigger = trigger.replace("When this creature dies", "movedTo(this|graveyard) from(battlefield):");

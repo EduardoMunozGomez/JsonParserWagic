@@ -125,7 +125,7 @@ public class AutoLineVintage {
         String exert = "";
         try {
             if (oracleText.contains("ou may exert ")) {
-                exert = "auto=@combat(attacking) source(this):may freeze this";
+                exert = "auto=_ATTACKING_may exert";
             }
         } catch (Exception ex) {
 
@@ -172,7 +172,7 @@ public class AutoLineVintage {
                 megamorphCost = megamorphCost.substring(0, megamorphCost.indexOf("(") - 1);
                 morph = "facedown={3}\n"
                         + "autofacedown=" + megamorphCost + ":morph\n"
-                        + "autofaceup=counter(1/1,1)";
+                        + "autofaceup=counter(1/1)";
             }
         } catch (Exception ex) {
 
