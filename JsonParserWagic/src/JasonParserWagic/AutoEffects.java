@@ -45,7 +45,10 @@ public class AutoEffects {
         actAbilCost = actAbilCost.replace(".", "");
 
         if (type.contains("Planeswalker")) {
-            actAbilCost = modifyLoyaltyCounters(actAbilCost);
+            //actAbilCost = modifyLoyaltyCounters(actAbilCost);
+            actAbilCost=actAbilCost.replace("[", "");
+            actAbilCost=actAbilCost.replace("]", "");
+            actAbilCost = "{C(0/0,"+actAbilCost+",Loyalty)}";
         }
 
         actAbilCost = actAbilCost.concat(":");
@@ -184,9 +187,10 @@ public class AutoEffects {
         effect = effect.replace("draws two cards", "draw:2");
         effect = effect.replace("for each creature ", "type:creature:");
         effect = effect.replace("until end of turn", "ueot");
+        effect = effect.replace("Activate only as a sorcery", "asSorcery");
         effect = effect.replace(cardName + " gains", "");
         effect = effect.replace(cardName + " gets", "");
-        effect = effect.replace(cardName + " has", "");
+        effect = effect.replace(cardName + " has", "");        
 
         effect = effect.replace("deals 1 damage", "damage:1");
         effect = effect.replace("deals 2 damage", "damage:2");

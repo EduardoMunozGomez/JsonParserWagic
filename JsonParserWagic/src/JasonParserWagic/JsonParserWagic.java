@@ -13,7 +13,7 @@ import org.json.simple.parser.ParseException;
 // @author Eduardo
 public class JsonParserWagic {
 
-    private static String filePath = "C:\\Users\\Eduardo\\Downloads\\MTGJSON\\mh2.json";
+    private static String filePath = "C:\\Users\\Eduardo\\Downloads\\MTGJSON\\afr.json";
 
     public static String getFilePath() {
         return filePath;

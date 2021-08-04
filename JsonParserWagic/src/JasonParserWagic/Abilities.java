@@ -88,7 +88,10 @@ public class Abilities {
         }
         if (oracleText.contains("opponents can't gain life")) {
             abilities += "nolifegainopponent,";
-        }        
+        }
+        if (oracleText.contains("doesn't untap during your untap step")) {
+            abilities += "doesnotuntap,";
+        }     
         if (oracleText.contains("islandwalk")) {
             abilities += "islandwalk,";
         }

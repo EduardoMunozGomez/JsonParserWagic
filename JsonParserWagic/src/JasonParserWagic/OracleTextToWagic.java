@@ -41,7 +41,7 @@ public class OracleTextToWagic {
         // Auto lines
         oracleSplit = oracleText.split("\n");
         for (String oracleBit : oracleSplit) {
-            if (!type.contains("Instant") || !type.contains("Sorcery") || !subtype.contains("Aura") || !subtype.contains("Equipment")) {
+            if (!(type.contains("Instant") || type.contains("Sorcery") || subtype.contains("Aura") || subtype.contains("Equipment"))) {
                 // Evergreen mechanics
                 autoLineExists(AutoEffects.processOracleBit(oracleBit, cardName, type, subtype));
                 autoLineExists(AutoLine.processOracleTextManaAbility(oracleBit, subtype));
@@ -66,7 +66,7 @@ public class OracleTextToWagic {
                 autoLineExists(AutoLineGRN.processOracleAscend(oracleBit));
                 autoLineExists(AutoLineGRN.processOraclePartner(oracleBit));
                 autoLineExists(AutoLineGRN.processOracleAmass(oracleBit));
-                autoLineExists(AutoLineGRN.processOracleProliferate(oracleBit));*/
+                autoLineExists(AutoLineGRN.processOracleProliferate(oracleBit));*/                
             }
             //INSTANT, SORCERY
             if (type.contains("Instant") || type.contains("Sorcery")) {
@@ -84,6 +84,7 @@ public class OracleTextToWagic {
             // AURA
             if (subtype.contains("Aura")) {
                 autoLineExists(AutoLine.processOracleTextMyTarget(oracleBit, subtype, subtype));
+                //autoLineExists(AutoLine.processOracleTriggers(oracleBit, cardName, type, subtype, power));
                 String auraEquipBonus = AutoLine.processOracleReplacerAuraEquipBonus(oracleBit, subtype);
                 if (!auraEquipBonus.isEmpty()) {
                     autoLineExists(auraEquipBonus);
@@ -91,8 +92,10 @@ public class OracleTextToWagic {
             }
             // EQUIPMENT
             if (subtype.contains("Equipment")) {
+                //autoLineExists(AutoLine.processOracleTriggers(oracleBit, cardName, type, subtype, power));
                 autoLineExists(AutoLine.processOracleTextAuraEquipBonus(oracleBit, "Equipment"));
-                autoLineExists(AutoLine.processOracleTextEquipCost(oracleBit));
+                if (oracleBit.contains("Equip "))
+                    autoLineExists(AutoLine.processOracleTextEquipCost(oracleBit));
             }
             /*/ SAGA
             if (subtype.contains("Saga")) {

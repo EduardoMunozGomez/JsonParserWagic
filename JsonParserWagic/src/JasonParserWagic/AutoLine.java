@@ -730,6 +730,9 @@ public class AutoLine {
                 if (oracleText.contains("Create a token that's a copy of ")) {
                     return "clone";
                 }
+                if (oracleText.contains("treasure token")) {
+                    return "token(Treasure,Artifact Treasure) and!( transforms((,newability[{T}{S}:Add{W}])(,newability[{T}{S}:Add{R}])(,newability[{T}{S}:Add{G}])(,newability[{T}{S}:Add{U}])(,newability[{T}{S}:Add{B}])) forever )!";
+                }
 
                 create = oracleText.substring(oracleText.indexOf(incidence) + incidence.length());
                 create = create.substring(0, create.indexOf("."));
@@ -1081,8 +1084,9 @@ public class AutoLine {
         }
         try {
             cardName = cardName.replace(",", "");
-
+            // Trigger conditions
             if ((oracleText.toLowerCase().contains("whenever ")
+                    || oracleText.contains("As " + cardName)
                     || oracleText.contains("At the beginning")
                     || oracleText.contains(cardName + " enters the battlefield")
                     || oracleText.contains("When " + cardName + " dies,")
@@ -1120,12 +1124,14 @@ public class AutoLine {
                 trigger = trigger.replace(cardName + " becomes tapped", "tapped(this):");
                 // Moved to battlefield
                 trigger = trigger.replace("a creature enters the battlefield under your control", "movedTo(creature|myBattlefield):");
+                trigger = trigger.replace("another creature enters the battlefield under your control", "movedTo(other creature|myBattlefield):");
                 trigger = trigger.replace("a land enters the battlefield under your control", "movedTo(land|myBattlefield):");
                 trigger = trigger.replace("a creature enters the battlefield", "movedTo(creature|Battlefield):");
                 trigger = trigger.replace("enters the battlefield under your control", "movedTo(*[]|myBattlefield):");
 
                 trigger = trigger.replace(cardName + " attacks", "_ATTACKING_");
                 trigger = trigger.replace(cardName + " and at least two other creatures attack", "_ATTACKING_restriction{type(other creature[attacking]|myBattlefield)~morethan~1}:");
+                trigger = trigger.replace("combat damage to a player", "combatdamaged(player) from(this):");
 
                 trigger = trigger.replace("@" + cardName + " dies", "_DIES_");
                 trigger = trigger.replace("When this creature dies", "movedTo(this|graveyard) from(battlefield):");
