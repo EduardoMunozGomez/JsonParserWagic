@@ -4,6 +4,9 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Iterator;
+import java.io.File;  // Import the File class
+import java.io.FileWriter;
+import java.io.IOException;  // Import the IOException class to handle errors
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -13,7 +16,8 @@ import org.json.simple.parser.ParseException;
 // @author Eduardo
 public class JsonParserWagic {
 
-    private static String filePath = "C:\\Users\\Eduardo\\Downloads\\MTGJSON\\afr.json";
+    private static final String setCode = "neo";
+    private static String filePath = "C:\\Users\\Eduardo_\\Downloads\\MTGJSON\\" + setCode + ".json";
 
     public static String getFilePath() {
         return filePath;
@@ -29,6 +33,13 @@ public class JsonParserWagic {
 
         try {
             FileReader reader = new FileReader(getFilePath());
+            File directorio = new File("C:\\Users\\Eduardo_\\Downloads\\MTGJSON\\" + setCode);
+            directorio.mkdir();
+            File myObj = new File("C:\\Users\\Eduardo_\\Downloads\\MTGJSON\\" + setCode + "\\_cards.dat");
+            myObj.createNewFile();
+            FileWriter myWriter = new FileWriter("C:\\Users\\Eduardo_\\Downloads\\MTGJSON\\" + setCode + "\\_cards.dat");
+            FileWriter myWriterImages = new FileWriter("C:\\Users\\Eduardo_\\Downloads\\MTGJSON\\image.cvs", true);
+
             JSONParser jsonParser = new JSONParser();
             JSONObject jsonObject = (JSONObject) jsonParser.parse(reader);
             JSONObject data = (JSONObject) jsonObject.get("data");
@@ -36,7 +47,7 @@ public class JsonParserWagic {
 
             // Metadata header
             if (createCardsDat) {
-                Metadata.printMetadata(data.get("name"), data.get("releaseDate"), data.get("baseSetSize"));
+                Metadata.printMetadata(data.get("name"), data.get("releaseDate"), data.get("totalSetSize"), myWriter);
             }
 
             Iterator i = cards.iterator();
@@ -44,9 +55,26 @@ public class JsonParserWagic {
             while (i.hasNext()) {
                 JSONObject card = (JSONObject) i.next();
                 JSONObject identifiers = (JSONObject) card.get("identifiers");
-
+                String primitiveCardName;
+                String primitiveRarity;
+                String side="front/";
+                
                 if (createCardsDat) {
-                    CardDat.generateCardDat((String) card.get("name"), identifiers.get("multiverseId"), (String) card.get("rarity"));
+                    if (card.get("faceName") != null) {
+                        primitiveCardName = (String) card.get("faceName");
+                    } else {
+                        primitiveCardName = (String) card.get("name");
+                    }
+                    if (card.get("side") != null && "b".equals(card.get("side").toString())) {
+                        primitiveRarity = "T";
+                        side="back/";
+                    } else {
+                        primitiveRarity = (String) card.get("rarity");
+                    }
+
+                    CardDat.generateCardDat(primitiveCardName, identifiers.get("multiverseId"), primitiveRarity, myWriter);
+                    CardDat.generateCSV((String) card.get("setCode"), identifiers.get("multiverseId"), (String) identifiers.get("scryfallId"), myWriterImages, side);
+
                     continue;
                 }
 
@@ -129,6 +157,8 @@ public class JsonParserWagic {
                 }
                 System.out.println("[/card]\n");
             }
+            myWriter.close();
+            myWriterImages.close();
 
         } catch (FileNotFoundException ex) {
             System.out.println("FileNotFoundException " + ex.getMessage());
