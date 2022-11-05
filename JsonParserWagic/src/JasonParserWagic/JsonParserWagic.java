@@ -2,12 +2,10 @@ package JasonParserWagic;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
 import java.util.Iterator;
-import java.io.File;  // Import the File class
+import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;  // Import the IOException class to handle errors
-
+import java.io.IOException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -16,7 +14,7 @@ import org.json.simple.parser.ParseException;
 // @author Eduardo
 public class JsonParserWagic {
 
-    private static final String setCode = "neo";
+    private static final String setCode = "DMC";
     private static String filePath = "C:\\Users\\Eduardo_\\Downloads\\MTGJSON\\" + setCode + ".json";
 
     public static String getFilePath() {
@@ -37,8 +35,10 @@ public class JsonParserWagic {
             directorio.mkdir();
             File myObj = new File("C:\\Users\\Eduardo_\\Downloads\\MTGJSON\\" + setCode + "\\_cards.dat");
             myObj.createNewFile();
-            FileWriter myWriter = new FileWriter("C:\\Users\\Eduardo_\\Downloads\\MTGJSON\\" + setCode + "\\_cards.dat");
-            FileWriter myWriterImages = new FileWriter("C:\\Users\\Eduardo_\\Downloads\\MTGJSON\\image.cvs", true);
+            FileWriter myWriter;
+            myWriter = new FileWriter("C:\\Users\\Eduardo_\\Downloads\\MTGJSON\\" + setCode + "\\_cards.dat");
+            FileWriter myWriterImages;
+            myWriterImages = new FileWriter("C:\\Users\\Eduardo_\\Downloads\\MTGJSON\\image.cvs", true);
 
             JSONParser jsonParser = new JSONParser();
             JSONObject jsonObject = (JSONObject) jsonParser.parse(reader);
@@ -47,7 +47,7 @@ public class JsonParserWagic {
 
             // Metadata header
             if (createCardsDat) {
-                Metadata.printMetadata(data.get("name"), data.get("releaseDate"), data.get("totalSetSize"), myWriter);
+                Metadata.printMetadata(data.get("name"), data.get("releaseDate"), data.get("totalSetSize"), myWriter);                
             }
 
             Iterator i = cards.iterator();
@@ -57,20 +57,21 @@ public class JsonParserWagic {
                 JSONObject identifiers = (JSONObject) card.get("identifiers");
                 String primitiveCardName;
                 String primitiveRarity;
-                String side="front/";
-                
-                if (createCardsDat) {
-                    if (card.get("faceName") != null) {
-                        primitiveCardName = (String) card.get("faceName");
-                    } else {
-                        primitiveCardName = (String) card.get("name");
-                    }
-                    if (card.get("side") != null && "b".equals(card.get("side").toString())) {
-                        primitiveRarity = "T";
-                        side="back/";
-                    } else {
-                        primitiveRarity = (String) card.get("rarity");
-                    }
+                String side = "front/";
+
+                if (card.get("faceName") != null) {
+                    primitiveCardName = (String) card.get("faceName");
+                } else {
+                    primitiveCardName = (String) card.get("name");
+                }
+                if (card.get("side") != null && "b".equals(card.get("side").toString())) {
+                    primitiveRarity = "T";
+                    side = "back/";
+                } else {
+                    primitiveRarity = (String) card.get("rarity");
+                }
+
+                if (createCardsDat && identifiers.get("multiverseId") != null) {
 
                     CardDat.generateCardDat(primitiveCardName, identifiers.get("multiverseId"), primitiveRarity, myWriter);
                     CardDat.generateCSV((String) card.get("setCode"), identifiers.get("multiverseId"), (String) identifiers.get("scryfallId"), myWriterImages, side);
@@ -83,9 +84,9 @@ public class JsonParserWagic {
                     continue;
                 }
 
-                String nameHeader = "name=" + card.get("name");
-                String cardName = card.get("name").toString();
-                String oracleText = (String) card.get("text");
+                String nameHeader = "name=" + primitiveCardName;
+                String cardName = primitiveCardName;
+                String oracleText = card.get("text").toString();
                 String manaCost = (String) card.get("manaCost");
                 String mana = "mana=" + manaCost;
                 String type = "type=";
