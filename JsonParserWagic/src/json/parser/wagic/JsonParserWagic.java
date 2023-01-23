@@ -1,4 +1,4 @@
-package JasonParserWagic;
+package json.parser.wagic;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -14,7 +14,7 @@ import org.json.simple.parser.ParseException;
 // @author Eduardo
 public class JsonParserWagic {
 
-    private static final String setCode = "DMC";
+    private static final String setCode = "BRO";
     private static String filePath = "C:\\Users\\Eduardo_\\Downloads\\MTGJSON\\" + setCode + ".json";
 
     public static String getFilePath() {
@@ -47,30 +47,24 @@ public class JsonParserWagic {
 
             // Metadata header
             if (createCardsDat) {
-                Metadata.printMetadata(data.get("name"), data.get("releaseDate"), data.get("totalSetSize"), myWriter);                
+                Metadata.printMetadata(data.get("name"), data.get("releaseDate"), data.get("totalSetSize"), myWriter);
             }
 
             Iterator i = cards.iterator();
             // take each value from the json array separately as a card
             while (i.hasNext()) {
                 JSONObject card = (JSONObject) i.next();
+                // If card is a reprint, skip it                
+                if (card.get("isReprint") != null) {
+                    continue;
+                }
                 JSONObject identifiers = (JSONObject) card.get("identifiers");
                 String primitiveCardName;
                 String primitiveRarity;
                 String side = "front/";
 
-                if (card.get("faceName") != null) {
-                    primitiveCardName = (String) card.get("faceName");
-                } else {
-                    primitiveCardName = (String) card.get("name");
-                }
-                if (card.get("side") != null && "b".equals(card.get("side").toString())) {
-                    primitiveRarity = "T";
-                    side = "back/";
-                } else {
-                    primitiveRarity = (String) card.get("rarity");
-                }
-
+                primitiveCardName = (String) card.get("faceName") != null ? (String) card.get("faceName") : (String) card.get("name");
+                primitiveRarity = card.get("side") != null && "b".equals(card.get("side").toString()) ? "T" : (String) card.get("rarity");
                 if (createCardsDat && identifiers.get("multiverseId") != null) {
 
                     CardDat.generateCardDat(primitiveCardName, identifiers.get("multiverseId"), primitiveRarity, myWriter);
@@ -79,14 +73,10 @@ public class JsonParserWagic {
                     continue;
                 }
 
-                // If card is a reprint, skip it                
-                if (card.get("isReprint") != null) {
-                    continue;
-                }
-
                 String nameHeader = "name=" + primitiveCardName;
                 String cardName = primitiveCardName;
                 String oracleText = card.get("text").toString();
+                JSONArray keywords = (JSONArray) card.get("keywords");
                 String manaCost = (String) card.get("manaCost");
                 String mana = "mana=" + manaCost;
                 String type = "type=";
@@ -141,7 +131,7 @@ public class JsonParserWagic {
                 }
                 // ORACLE TEXT
                 if (oracleText != null) {
-                    OracleTextToWagic.parseOracleText(oracleText, cardName, type, subtype, (String) card.get("power"), manaCost);
+                    OracleTextToWagic.parseOracleText(keywords, oracleText, cardName, type, subtype, (String) card.get("power"), manaCost);
                     System.out.println("text=" + oracleText.replace("\n", " -- "));
                 }
                 if (!type.contains("Land")) {
