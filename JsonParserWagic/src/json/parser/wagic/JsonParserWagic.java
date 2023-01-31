@@ -14,8 +14,8 @@ import org.json.simple.parser.ParseException;
 // @author Eduardo
 public class JsonParserWagic {
 
-    private static final String setCode = "BRO";
-    private static String filePath = "C:\\Users\\Eduardo_\\Downloads\\MTGJSON\\" + setCode + ".json";
+    private static final String setCode = "ONE";
+    private static String filePath = "C:\\Users\\Eduardo_\\Downloads\\MTGJSON\\" + setCode;
 
     public static String getFilePath() {
         return filePath;
@@ -29,14 +29,15 @@ public class JsonParserWagic {
 
         boolean createCardsDat = false;
 
+        File directorio = new File(getFilePath());
+        directorio.mkdir();
+
         try {
-            FileReader reader = new FileReader(getFilePath());
-            File directorio = new File("C:\\Users\\Eduardo_\\Downloads\\MTGJSON\\" + setCode);
-            directorio.mkdir();
-            File myObj = new File("C:\\Users\\Eduardo_\\Downloads\\MTGJSON\\" + setCode + "\\_cards.dat");
+            FileReader reader = new FileReader(getFilePath() + ".json");
+            File myObj = new File(getFilePath() + "\\_cards.dat");
             myObj.createNewFile();
             FileWriter myWriter;
-            myWriter = new FileWriter("C:\\Users\\Eduardo_\\Downloads\\MTGJSON\\" + setCode + "\\_cards.dat");
+            myWriter = new FileWriter(myObj.getCanonicalPath());
             FileWriter myWriterImages;
             myWriterImages = new FileWriter("C:\\Users\\Eduardo_\\Downloads\\MTGJSON\\image.cvs", true);
 
@@ -50,14 +51,9 @@ public class JsonParserWagic {
                 Metadata.printMetadata(data.get("name"), data.get("releaseDate"), data.get("totalSetSize"), myWriter);
             }
 
-            Iterator i = cards.iterator();
-            // take each value from the json array separately as a card
-            while (i.hasNext()) {
-                JSONObject card = (JSONObject) i.next();
-                // If card is a reprint, skip it                
-                if (card.get("isReprint") != null) {
-                    continue;
-                }
+            for (Object o : cards) {
+                JSONObject card = (JSONObject) o;
+
                 JSONObject identifiers = (JSONObject) card.get("identifiers");
                 String primitiveCardName;
                 String primitiveRarity;
@@ -72,7 +68,10 @@ public class JsonParserWagic {
 
                     continue;
                 }
-
+                // If card is a reprint, skip it                
+                if (card.get("isReprint") != null) {
+                    continue;
+                }
                 String nameHeader = "name=" + primitiveCardName;
                 String cardName = primitiveCardName;
                 String oracleText = card.get("text").toString();

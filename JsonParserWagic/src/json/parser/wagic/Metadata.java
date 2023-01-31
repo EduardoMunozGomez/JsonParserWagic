@@ -24,12 +24,5 @@ public class Metadata {
         } catch (IOException e) {
             System.out.println("An error occurred.");
         }
-
-//        System.out.println("[meta]");
-//        System.out.println("author=Wagic Team");
-//        System.out.println("name=" + name);
-//        System.out.println("year=" + year);
-//        System.out.println("total=" + total);
-//        System.out.println("[/meta]");
     }
 }

@@ -48,21 +48,13 @@ public class CardDat {
         } catch (IOException e) {
 
         }
-//        System.out.println("[card]");
-//        System.out.println("primitive=" + primitive);
-//        System.out.println("id=" + id);
-//        System.out.println("rarity=" + rarity);
-//        System.out.println("[/card]");
     }
 
     static void generateCSV(String string, Object id, String scryfallId, FileWriter myWriterImages, String side) {
-
         try {
             myWriterImages.write(string + ";" + id + ";" + "https://cards.scryfall.io/large/" + side + scryfallId.substring(0, 1) + "/" + scryfallId.substring(1, 2) + "/" + scryfallId + ".jpg\n");
         } catch (IOException e) {
             System.out.println("Error in generateCSV");
-
         }
-        //System.out.println(string + ";" + id + ";" + "https://cards.scryfall.io/large/" + side + scryfallId.substring(0, 1) + "/" + scryfallId.substring(1, 2) + "/" + scryfallId + ".jpg");
     }
 }

@@ -1,6 +1,5 @@
 package json.parser.wagic;
 
-import java.util.Iterator;
 import org.json.simple.JSONArray;
 
 // @author Eduardo
@@ -8,14 +7,10 @@ public class Abilities {
 
     protected static String processKeywordsAbilities(JSONArray keywords, String oracleText) {
         String abilities = "";
-        Iterator i = keywords.iterator();
-        // take each value from the json array separately as a keyword
-        while (i.hasNext()) {
-            String keyword = (String) i.next();
+        for (Object keyword : keywords) {
+            String keywordString = (String) keyword;
 
-            keyword = keyword.toLowerCase();
-
-            switch (keyword) {
+            switch (keywordString.toLowerCase()) {
                 case "flash":
                     abilities += "flash,";
                     break;
@@ -76,17 +71,18 @@ public class Abilities {
             }
         }
 
-        abilities = processAbilities(oracleText, abilities);
-        if (abilities.endsWith(",")) {
-            abilities = abilities.substring(0, abilities.length() - 1);
-        }
+        abilities = processCustomAbilities(oracleText, abilities);
+        abilities = abilities.replaceAll(",$", "");
         return abilities;
     }
 
-    protected static String processAbilities(String oracleText, String abilities) {
+    protected static String processCustomAbilities(String oracleText, String abilities) {
 
         oracleText = oracleText.toLowerCase();
-
+        
+        if (oracleText.contains("you may look at the top card of your library any time")) {
+            abilities += "showfromtoplibrary,";
+        }
         if (oracleText.contains("you have no maximum hand size")) {
             abilities += "nomaxhand,";
         }
@@ -99,9 +95,18 @@ public class Abilities {
         if (oracleText.contains("can't be blocked by more than one creature")) {
             abilities += "oneblocker,";
         }
-        if (oracleText.contains("can't block.")) {
-            abilities += "cantblock,";
+        if (oracleText.contains("toxic 1")) {
+            abilities += "poisontoxic,";
         }
+        if (oracleText.contains("toxic 2")) {
+            abilities += "poisontwotoxic,";
+        }
+        if (oracleText.contains("toxic 3")) {
+            abilities += "poisonthreetoxic,";
+        }
+//        if (oracleText.contains("can't block.")) {
+//            abilities += "cantblock,";
+//        }
         if (oracleText.contains("attacks each turn if able.") || oracleText.contains("attacks each combat if able.")) {
             abilities += "mustattack,";
         }
@@ -132,48 +137,16 @@ public class Abilities {
         if (oracleText.contains("protection from")) {
             abilities += "protection from,";
         }
+        if (oracleText.contains("Affinity for artifacts")) {
+            abilities += "affinityartifacts,";
+        }
         if (oracleText.contains("choose a background")) {
             abilities += "chooseabackground,";
         }
         if (oracleText.contains("modular")) {
             abilities += "modular\nmodular=";
         }
-        if (abilities.endsWith(",")) {
-            abilities = abilities.substring(0, abilities.length() - 1);
-        }
-
-        return abilities;
-    }
-
-    protected static String processEnchantmentAbilities(String oracleText) {
-        String abilities = "";
-        oracleText = oracleText.toLowerCase();
-
-        if (oracleText.contains("flash")) {
-            abilities += "flash";
-        }
-
-        return abilities;
-    }
-
-    protected static String processInstantOrSorceryAbilities(String oracleText) {
-        String abilities = "";
-        oracleText = oracleText.toLowerCase();
-
-        if (oracleText.contains("can't be countered")) {
-            abilities += "nofizzle";
-        }
-
-        return abilities;
-    }
-
-    protected static String processLandAbilities(String oracleText) {
-        String abilities = "";
-        oracleText = oracleText.toLowerCase();
-
-        if (oracleText.contains("indestructible")) {
-            abilities += "indestructible";
-        }
+        abilities = abilities.replaceAll(",$", "");
 
         return abilities;
     }
