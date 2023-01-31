@@ -1,10 +1,10 @@
-package JasonParserWagic;
+package json.parser.wagic;
 
 // @author Eduardo
 public class AutoLineGRN {
 
     // other={convoke} name(Convoke)
-    protected static String processOracleConvoke(String oracleText) {
+    protected static String Convoke(String oracleText) {
         String convoke = "";
 
         try {
@@ -18,7 +18,7 @@ public class AutoLineGRN {
         return convoke;
     }
 
-    protected static String processOracleJumpStart(String oracleText, String mana) {
+    protected static String JumpStart(String oracleText, String mana) {
         String jumpStart = "";
 
         try {
@@ -33,7 +33,7 @@ public class AutoLineGRN {
         return jumpStart;
     }
 
-    protected static String processOracleMentor(String oracleText, String power) {
+    protected static String Mentor(String oracleText, String power) {
         String mentor = "";
         int powerAsNumber = Integer.parseInt(power);
         try {
@@ -48,7 +48,7 @@ public class AutoLineGRN {
         return mentor;
     }
 
-    protected static String processOracleSurveil(String oracleText) {
+    protected static String Surveil(String oracleText) {
         String surveil = "";
 
         try {
@@ -70,7 +70,7 @@ public class AutoLineGRN {
     // type:creature:myGraveyard
     // auto=foreach(creature|mygraveyard) 1/0
     // text=Target creature gets +X/+0 until end of turn, where X is the number of creature cards in your graveyard.
-    protected static String processOracleUndergrowth(String oracleText) {
+    protected static String Undergrowth(String oracleText) {
         String undergrowth = "";
 
         try {
@@ -85,7 +85,7 @@ public class AutoLineGRN {
     }
 
     //auto=if compare(restriction{assorcery}~morethan~0) then damage:3 all(creature,player) else damage:2 all(creature,player)
-    static String processOracleAddendum(String oracleText) {
+    static String Addendum(String oracleText) {
         String addendum = "";
         String incidence = "Addendum";
         if (oracleText.contains(incidence)) {
@@ -97,7 +97,7 @@ public class AutoLineGRN {
     }
 
     // other={convoke} name(Convoke)
-    protected static String processOracleRiot(String oracleText) {
+    protected static String Riot(String oracleText) {
         String riot = "";
 
         try {
@@ -112,7 +112,7 @@ public class AutoLineGRN {
         return riot;
     }
 
-    static String processOracleSpectacle(String oracleText) {
+    static String Spectacle(String oracleText) {
         String spectacle = "";
         String spectacleCost;
 
@@ -128,7 +128,7 @@ public class AutoLineGRN {
         return spectacle;
     }
 
-    static String processOracleAscend(String oracleText) {
+    static String Ascend(String oracleText) {
         String ascend = "";
 
         try {
@@ -143,7 +143,7 @@ public class AutoLineGRN {
         return ascend;
     }
 
-    static String processOracleAmass(String oracleText) {
+    static String Amass(String oracleText) {
         String ascend = "";
 
         try {
@@ -159,7 +159,7 @@ public class AutoLineGRN {
         return ascend;
     }
     
-    static String processOracleProliferate(String oracleText) {
+    static String Proliferate(String oracleText) {
         String proliferate = "";
 
         try {
@@ -174,7 +174,7 @@ public class AutoLineGRN {
         return proliferate;
     }
 
-    static String processOraclePartner(String oracleText) {
+    static String Partner(String oracleText) {
         String partner = "";
 
         try {
@@ -190,7 +190,7 @@ public class AutoLineGRN {
         return partner;
     }
 
-    static String processOracleKicker(String oracleText, String cardName) {
+    static String Kicker(String oracleText, String cardName) {
         String kicker = "";
         String kickerCost;
 

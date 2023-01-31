@@ -1,4 +1,4 @@
-package JasonParserWagic;
+package json.parser.wagic;
 
 // @author Eduardo
 public class AutoLineVintage {
@@ -178,19 +178,6 @@ public class AutoLineVintage {
 
         }
         return morph;
-    }
-
-    //Prowess
-    protected static String processOracleTextProwess(String oracleText) {
-        String prowess = "";
-        String prowessTrigger;
-
-        if (oracleText.contains("Prowess")) {
-            //prowessTrigger = oracleText.substring(oracleText.indexOf("Whenever you cast a "), oracleText.indexOf(","));
-            prowessTrigger = "*[-creature]";
-            prowess = "auto=@movedTo(" + prowessTrigger + "|mystack):1/1 ueot";
-        }
-        return prowess;
     }
 
     //auto={G}:regenerate
