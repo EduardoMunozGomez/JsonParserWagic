@@ -28,6 +28,7 @@ public class OracleTextToWagic {
             // Permanents, exclude this types
             if (!(type.contains("Instant") || type.contains("Sorcery") || subtype.contains("Aura") || subtype.contains("Equipment"))) {
                 // Evergreen mechanics
+                autoLineExists(AutoLine.Corrupted(oracleBit, cardName));
                 autoLineExists(AutoEffects.DetermineActivatedAbility(oracleBit, cardName, type, subtype));
                 autoLineExists(AutoLine.ManaAbility(oracleBit, subtype));
                 autoLineExists(AutoLine.Cast(oracleBit, cardName));
@@ -46,10 +47,9 @@ public class OracleTextToWagic {
                 autoLineExists(AutoLine.Prowess(oracleBit));
 
                 autoLineExists(AutoLineGRN.Proliferate(oracleBit));
-                autoLineExists(AutoLine.Corrupted(oracleBit, cardName));
 
-//                autoLineExists(AutoLine.Unearth(oracleBit));
-//                autoLineExists(AutoLine.Prototype(oracleBit));
+                autoLineExists(AutoLine.Unearth(oracleBit));
+                autoLineExists(AutoLine.Prototype(oracleBit));
 //                autoLineExists(AutoLine.Blitz(oracleBit));
 //                autoLineExists(AutoLineGRN.Kicker(oracleBit, cardName));
 //                autoLineExists(AutoLine.Ninjutsu(oracleBit));
@@ -64,18 +64,21 @@ public class OracleTextToWagic {
             }
             //INSTANT, SORCERY
             if (type.contains("Instant") || type.contains("Sorcery")) {
+                autoLineExists(AutoLine.Corrupted(oracleBit, cardName));
+                autoLineExists(AutoLine.ChooseOneOrBoth(oracleBit));
                 autoLineExists(AutoLine.MyTarget(oracleBit, "InstantOrSorcery", subtype));
                 autoLineExists(AutoEffects.ProcessEffect(oracleBit, type));
-                //autoLineExists(AutoLine.ExileDestroyDamage(oracleBit, type));
-                //autoLineExists(AutoLine.ReplacerAuraEquipBonus(oracleBit, "InstantOrSorcery"));
-                //autoLineExists(AutoLine.Create(oracleBit));
-                //autoLineExists(AutoLine.PutA(oracleBit, type));
-                autoLineExists(AutoLine.ChooseOneOrBoth(oracleBit));
+                autoLineExists(AutoLine.ExileDestroyDamage(oracleBit, type));
+                autoLineExists(AutoLine.ReplacerAuraEquipBonus(oracleBit, "InstantOrSorcery"));
+                autoLineExists(AutoLine.Create(oracleBit));
+                autoLineExists(AutoLine.PutA(oracleBit, type));
+
                 //autoLineExists(AutoLineGRN.Kicker(oracleBit, cardName));
                 //autoLineExists(AutoLineGRN.JumpStart(oracleBit, manaCost));
             }
             // AURA
             if (subtype.contains("Aura")) {
+                autoLineExists(AutoLine.Corrupted(oracleBit, cardName));
                 autoLineExists(AutoLine.MyTarget(oracleBit, subtype, subtype));
                 //autoLineExists(AutoLine.Triggers(oracleBit, cardName, type, subtype, power));
                 String auraEquipBonus = AutoLine.ReplacerAuraEquipBonus(oracleBit, subtype);

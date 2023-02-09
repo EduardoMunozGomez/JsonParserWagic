@@ -11,10 +11,11 @@ public class AutoEffects {
     // Determine if the card has an activated ability
     static String DetermineActivatedAbility(String oracleBit, String cardName, String type, String subtype) {
         String[] activatedAbililty = oracleBit.split(":");
-        if (activatedAbililty.length <= 1) {
+        if (activatedAbililty.length > 1) {
+            return ActivatedAbililtyCost(activatedAbililty, cardName, type);
+        } else {
             return "";
         }
-        return ActivatedAbililtyCost(activatedAbililty, cardName, type);
     }
 
     // Activated ability cost
@@ -34,38 +35,33 @@ public class AutoEffects {
 
         actAbilCost = actAbil[0];
 
-        Map<String, String> replacements = new HashMap<>();
-        replacements.put("\\{[WUBRG]\\/P\\}", "{P($0)}");
-        replacements.put("Channel ", "autohand=");
-        replacements.put("discard your hand" + cardName, "reject all(*|myhand)");
-        replacements.put(", Discard " + cardName, "{discard}");
-        replacements.put("Discard a card", "{D(*|myhand)}");
-        replacements.put("Discard a land card", "{D(land|myhand)}");
-        replacements.put("Discard three cards", "{D(*|myhand)}{D(*|myhand)}{D(*|myhand)}");
-        replacements.put("Discard a creature card", "{D(creature|myhand)}");
-        replacements.put("Sacrifice a creature with defender", "{S(creature[defender]|myBattlefield)}");
-        replacements.put("Sacrifice " + cardName, "{S}");
-        replacements.put("Exile " + cardName, "{E}");
-        replacements.put("Sacrifice a creature", "{S(creature|myBattlefield)}");
-        replacements.put("Sacrifice two creatures", "{S(creature|myBattlefield)}{S(creature|myBattlefield)}");
-        replacements.put("Sacrifice an artifact", "{S(artifact|myBattlefield)}");
-        replacements.put("Sacrifice an artifact creature", "{S(creature[artifact]|myBattlefield)}");
-        replacements.put("Sacrifice a land", "{S(land|myBattlefield)}");
-        replacements.put("Sacrifice another ([a-zA-Z]+)", "{S(other $1|mybattlefield)}");
-        replacements.put("Remove (an?|a) ([a-zA-Z]+) counter from " + cardName, "{C(0/0,-1,$2)}");
-        replacements.put("Remove two oil counters from ", "{C(0/0,-2,oil)}");
-        replacements.put("Remove three oil counters from ", "{C(0/0,-3,oil)}");
-        replacements.put("Exile " + cardName + " from your graveyard", "{E}");
-        replacements.put("Pay ", "{L:");
-        replacements.put(" life", "}");
-        replacements.put(cardName, "");
-        replacements.put(", ", "");
-        replacements.put(" ", "");
-        replacements.put(".", "");
-
-        for (Map.Entry<String, String> entry : replacements.entrySet()) {
-            actAbilCost = actAbilCost.replaceAll(entry.getKey(), entry.getValue());
-        }
+        actAbilCost = actAbilCost.replaceAll("\\{[WUBRG]\\/P\\}", "{P($0)}");
+        actAbilCost = actAbilCost.replace("Channel ", "autohand=");
+        actAbilCost = actAbilCost.replace("discard your hand" + cardName, "reject all(*|myhand)");
+        actAbilCost = actAbilCost.replace(", Discard " + cardName, "{discard}");
+        actAbilCost = actAbilCost.replace("Discard a card", "{D(*|myhand)}");
+        actAbilCost = actAbilCost.replace("Discard a land card", "{D(land|myhand)}");
+        actAbilCost = actAbilCost.replace("Discard three cards", "{D(*|myhand)}{D(*|myhand)}{D(*|myhand)}");
+        actAbilCost = actAbilCost.replace("Discard a creature card", "{D(creature|myhand)}");
+        actAbilCost = actAbilCost.replace("Sacrifice a creature with defender", "{S(creature[defender]|myBattlefield)}");
+        actAbilCost = actAbilCost.replace("Sacrifice " + cardName, "{S}");
+        actAbilCost = actAbilCost.replace("Exile " + cardName, "{E}");
+        actAbilCost = actAbilCost.replace("Sacrifice a creature", "{S(creature|myBattlefield)}");
+        actAbilCost = actAbilCost.replace("Sacrifice two creatures", "{S(creature|myBattlefield)}{S(creature|myBattlefield)}");
+        actAbilCost = actAbilCost.replace("Sacrifice an artifact", "{S(artifact|myBattlefield)}");
+        actAbilCost = actAbilCost.replace("Sacrifice an artifact creature", "{S(creature[artifact]|myBattlefield)}");
+        actAbilCost = actAbilCost.replace("Sacrifice a land", "{S(land|myBattlefield)}");
+        actAbilCost = actAbilCost.replaceAll("Sacrifice another ([a-zA-Z]+)", "{S(other $1|mybattlefield)}");
+        actAbilCost = actAbilCost.replaceAll("Remove (an?|a) ([a-zA-Z]+) counter from " + cardName, "{C(0/0,-1,$2)}");
+        actAbilCost = actAbilCost.replace("Remove two oil counters from ", "{C(0/0,-2,oil)}");
+        actAbilCost = actAbilCost.replace("Remove three oil counters from ", "{C(0/0,-3,oil)}");
+        actAbilCost = actAbilCost.replace("Exile " + cardName + " from your graveyard", "{E}");
+        actAbilCost = actAbilCost.replace("Pay ", "{L:");
+        actAbilCost = actAbilCost.replace(" life", "}");
+        actAbilCost = actAbilCost.replace(cardName, "");
+        actAbilCost = actAbilCost.replace(", ", "");
+        actAbilCost = actAbilCost.replace(" ", "");
+        actAbilCost = actAbilCost.replace(".", "");
 
         if (type.contains("Planeswalker")) {
             actAbilCost = actAbilCost.replace("[", "");
@@ -100,6 +96,10 @@ public class AutoEffects {
             return AutoLine.Scry(effect);
         }
 
+        effect = effect.replace("from your graveyard the battlefield","moveTo(battlefield) from(myGraveyard)");
+        effect = effect.replace("exile the top card of your library. you may play it this turn","__PLAY_TOP_FROM_EXILE__");
+        effect = effect.replaceAll("ward \\{(\\d+)\\}", "_WARD_($1)");
+        effect = effect.replace("choose one or both -", "");
         effect = effect.replaceAll("amass (\\d+)", "_AMASS_($1)");
         effect = effect.replace("until end of turn", "ueot");
         effect = effect.replace("until your next turn", "uynt");
@@ -223,6 +223,7 @@ public class AutoEffects {
 
         effect = effect.replaceAll(", and that creature gains| and gains | and gain | and gets | and has | and you | and ", " && ");
 
+        effect = effect.replace(" with a ", "");
         effect = effect.replace(" put a ", " ");
         effect = effect.replace("return ", "");
         effect = effect.replaceAll(" gains | gain | gets | get | has ", ") ");

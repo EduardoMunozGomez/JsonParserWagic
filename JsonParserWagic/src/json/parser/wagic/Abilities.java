@@ -137,7 +137,7 @@ public class Abilities {
         if (oracleText.contains("protection from")) {
             abilities += "protection from,";
         }
-        if (oracleText.contains("Affinity for artifacts")) {
+        if (oracleText.contains("affinity for artifacts")) {
             abilities += "affinityartifacts,";
         }
         if (oracleText.contains("choose a background")) {

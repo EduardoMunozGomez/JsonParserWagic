@@ -123,6 +123,9 @@ public class AutoLine {
                 if (target.contains("nonland permanent" + letterS)) {
                     myTarget = "*[-land]";
                 }
+                if (target.contains("basic land" + letterS)) {
+                    myTarget = "land[basic]";
+                }
                 if (target.contains("nonbasic land" + letterS)) {
                     myTarget = "land[-basic]";
                 }
@@ -753,10 +756,10 @@ public class AutoLine {
 
             if (oracleText.contains(incidence)) {
                 prototypeCost = oracleText.substring(oracleText.indexOf(incidence) + incidence.length(), oracleText.lastIndexOf("}"));
-                prototypePow = oracleText.substring(oracleText.indexOf(incidence) + incidence.length(), oracleText.lastIndexOf("}"));
-                prototypeTou = oracleText.substring(oracleText.indexOf(incidence) + incidence.length(), oracleText.lastIndexOf("}"));
+                prototypePow = oracleText.substring(oracleText.indexOf("/") - 1, oracleText.lastIndexOf("/"));
+                prototypeTou = oracleText.substring(oracleText.indexOf("/") + 1, oracleText.lastIndexOf("/") + 2);
 
-                prototype = "auto={" + prototypeCost + "} name(prototype)\nauto=if paid(alternative) then ";
+                prototype = "other={" + prototypeCost + "} name(prototype)\nauto=if paid(alternative) then becomes(," + prototypePow + "/" + prototypeTou + ",)";
             }
         } catch (Exception e) {
         }
@@ -1007,7 +1010,10 @@ public class AutoLine {
             if (oracleText.contains(incidence)) {
                 chooseOneOrBoth = "auto=choice name( \n"
                         + "auto=choice name( \n"
-                        + "auto=choice name(Both)";
+                        + "auto=choice name(Choose Both)";
+            } else if (oracleText.contains("choose one")) {
+                chooseOneOrBoth = "auto=choice name( \n"
+                        + "auto=choice name( \n";
             }
         } catch (Exception e) {
         }
@@ -1029,10 +1035,11 @@ public class AutoLine {
                     || oracleText.contains(cardName + " enters the battlefield")
                     || oracleText.contains("When " + cardName + " dies,")
                     || oracleText.contains("When this creature dies")
-                    || oracleText.contains(cardName + " becomes the target of a spell or ability")
+                    || oracleText.contains(cardName + " becomes the target of a spe l or ability")
                     || oracleText.contains("becomes the target of a spell or ability an opponent controls")
                     || oracleText.contains("Mentor")
-                    || oracleText.contains("Raid "))
+                    || oracleText.contains("Raid ")
+                    || oracleText.toLowerCase().contains("ward "))
                     && !(oracleText.contains("Whenever you cast"))) {
 
                 // The comma limits the trigger
@@ -1058,6 +1065,7 @@ public class AutoLine {
                 // Moved to battlefield
                 trigger = trigger.replace("a creature enters the battlefield under your control", "movedTo(creature|myBattlefield):");
                 trigger = trigger.replace("another creature enters the battlefield under your control", "movedTo(other creature|myBattlefield):");
+                trigger = trigger.replace("another artifact enters the battlefield under your control", "movedTo(other artifact|myBattlefield):");
                 trigger = trigger.replace("a land enters the battlefield under your control", "movedTo(land|myBattlefield):");
                 trigger = trigger.replace("a creature enters the battlefield", "movedTo(creature|Battlefield):");
                 trigger = trigger.replace("enters the battlefield under your control", "movedTo(*[]|myBattlefield):");
@@ -1096,6 +1104,8 @@ public class AutoLine {
 
                 trigger = trigger.replace("becomes the target of a spell or ability an opponent controls", "targeted(this|mybattlefield) from(*|opponentbattlefield,opponenthand,opponentstack,opponentgraveyard,opponentexile,opponentlibrary):");
                 trigger = trigger.replace(cardName + " becomes the target of a spell or ability", "targeted(this):");
+                trigger = trigger.replace("Whenever another", "@other");
+                trigger = trigger.replace("Whenever you attack", "@each my blockers:");
                 trigger = trigger.replace("Whenever you ", "@");
                 trigger = trigger.replace("Whenever a ", "@");
                 trigger = trigger.replace("Whenever ", "@");
