@@ -6,7 +6,36 @@ import static json.parser.wagic.AutoEffects.ProcessEffect;
 // @author Eduardo
 public class AutoLine {
 
-    //Corrupted
+    // Backup
+    protected static String Backup(String oracleText) {
+        String backup = "";
+
+        if (oracleText.contains("Backup ")) {
+            //oracleText = oracleText.replace("Backup 1", "");
+            backup = "auto=name(This creature) target(this) counter(1/1)\n"
+                    + "auto=name(Target other creature) target(other creature) transforms((,newability[counter(1/1)],newability[])) ueot";
+        }
+        return backup;
+    }
+
+    // Casualty 2 (As you cast this spell, you may sacrifice a creature with power 2 or greater. When you do, copy this spell.)
+    protected static String Casualty(String oracleText, String cardName, String manaCost) {
+        String casualty = "";
+        String casualtyCost;
+        try {
+            if (oracleText.contains("Casualty")) {
+                casualtyCost = oracleText.substring(oracleText.indexOf("casualty") + 10, oracleText.indexOf("casualty") + 11);
+                casualty = "other=" + manaCost + "{S(creature[power>=" + casualtyCost + "]|myBattlefield)} name(Casualty " + casualtyCost + ")\n"
+                        + "otherrestriction=type(creature[power>=" + casualtyCost + "]|myBattlefield)~morethan~1\n"
+                        + "auto=if paid(alternative) then ability$!name(copy " + cardName + ") activate castcard(copied noevent named!:" + cardName + ":!)!$ controller";
+            }
+        } catch (Exception ex) {
+
+        }
+        return casualty;
+    }
+
+    // Corrupted
     protected static String Corrupted(String oracleText, String cardName) {
         String corrupted = "";
 
@@ -179,6 +208,7 @@ public class AutoLine {
                 }
             }
             myTarget = myTarget.replace(",,", ",");
+            myTarget = myTarget.replace(".", "");
 
             if (!(type.contains("Instant") || type.contains("Sorcery") || subtype.contains("Aura") || subtype.contains("Equipment")) && myTarget.contains("target")) {
                 myTarget = myTarget.replace("target=", "target(");
@@ -1071,6 +1101,7 @@ public class AutoLine {
                 trigger = trigger.replace("enters the battlefield under your control", "movedTo(*[]|myBattlefield):");
                 trigger = trigger.replace("enters the battlefield under an opponent's control", "movedTo(*[]|opponentBattlefield):");
 
+                trigger = trigger.replace("Whenever this creature attacks", "_ATTACKING_");
                 trigger = trigger.replace("Whenever " + cardName + " attacks", "_ATTACKING_");
                 trigger = trigger.replace(cardName + " and at least two other creatures attack", "_ATTACKING_restriction{type(other creature[attacking]|myBattlefield)~morethan~1}:");
                 trigger = trigger.replace("Whenever " + cardName + " deals combat damage to a player", "combatdamaged(player) from(this):");

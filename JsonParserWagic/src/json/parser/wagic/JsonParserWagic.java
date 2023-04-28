@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -14,26 +15,22 @@ import org.json.simple.parser.ParseException;
 // @author Eduardo
 public class JsonParserWagic {
 
-    private static final String setCode = "CLB";
-    private static String filePath = "C:\\Users\\Eduardo_\\Downloads\\MTGJSON\\" + setCode;
+    private static final String setCode = "MOC";
+    private static final String filePath = "C:\\Users\\Eduardo_\\Downloads\\MTGJSON\\" + setCode;
 
     public static String getFilePath() {
         return filePath;
     }
 
-    public static void setFilePath(String aFilePath) {
-        filePath = aFilePath;
-    }
-
     public static void main(String[] args) {
 
-        boolean createCardsDat = false;
+        boolean createCardsDat = true;
 
         File directorio = new File(getFilePath());
         directorio.mkdir();
 
         try {
-            FileReader reader = new FileReader(getFilePath() + ".json");
+            FileReader reader = new FileReader(getFilePath() + ".json", StandardCharsets.UTF_8);
             File myObj = new File(getFilePath() + "\\_cards.dat");
             myObj.createNewFile();
             FileWriter myWriter;
@@ -53,28 +50,30 @@ public class JsonParserWagic {
 
             for (Object o : cards) {
                 JSONObject card = (JSONObject) o;
+                JSONArray subtypes = (JSONArray) card.get("subtypes");
 
                 JSONObject identifiers = (JSONObject) card.get("identifiers");
                 String primitiveCardName;
                 String primitiveRarity;
-                String side = "front/";
+                String side;
 
                 primitiveCardName = (String) card.get("faceName") != null ? (String) card.get("faceName") : (String) card.get("name");
                 primitiveRarity = card.get("side") != null && "b".equals(card.get("side").toString()) ? "T" : (String) card.get("rarity");
+                side = card.get("side") != null && "b".equals(card.get("side").toString()) ? "back/" : "front/";
                 if (createCardsDat && identifiers.get("multiverseId") != null) {
-
                     CardDat.generateCardDat(primitiveCardName, identifiers.get("multiverseId"), primitiveRarity, myWriter);
                     CardDat.generateCSV((String) card.get("setCode"), identifiers.get("multiverseId"), (String) identifiers.get("scryfallId"), myWriterImages, side);
-
-                    continue;
                 }
                 // If card is a reprint, skip it                
-                if (card.get("isReprint") != null) {
+                if (card.get("isReprint") != null || "[\"Siege\"]".equals(subtypes.toString())) {
                     continue;
                 }
                 String nameHeader = "name=" + primitiveCardName;
                 String cardName = primitiveCardName;
-                String oracleText = card.get("text").toString();
+                String oracleText = null;
+                if (card.get("text") != null) {
+                    oracleText = card.get("text").toString();
+                }
                 JSONArray keywords = (JSONArray) card.get("keywords");
                 String manaCost = (String) card.get("manaCost");
                 String mana = "mana=" + manaCost;
@@ -83,6 +82,7 @@ public class JsonParserWagic {
                 String power = "";
                 String toughness = "";
                 String loyalty = "";
+                String colorIndicator = "";
 
                 if (card.get("supertypes") != null) {
                     JSONArray supertypes = (JSONArray) card.get("supertypes");
@@ -100,15 +100,12 @@ public class JsonParserWagic {
                     type += typeStr + " ";
                 }
 
-                if (card.get("subtypes") != null) {
-                    JSONArray subtypes = (JSONArray) card.get("subtypes");
-                    if (!subtypes.isEmpty()) {
-                        subtype = "subtype=";
-                        Iterator subtypesIter = subtypes.iterator();
-                        while (subtypesIter.hasNext()) {
-                            String subtypeStr = (String) subtypesIter.next();
-                            subtype += subtypeStr + " ";
-                        }
+                if (!subtypes.isEmpty()) {
+                    subtype = "subtype=";
+                    Iterator subtypesIter = subtypes.iterator();
+                    while (subtypesIter.hasNext()) {
+                        String subtypeStr = (String) subtypesIter.next();
+                        subtype += subtypeStr + " ";
                     }
                 }
 
@@ -119,6 +116,10 @@ public class JsonParserWagic {
 
                 if (card.get("loyalty") != null) {
                     loyalty = "auto=counter(0/0," + card.get("loyalty") + ",loyalty)";
+                }
+
+                if (card.get("colorIndicator") != null) {
+                    colorIndicator = "color=" + card.get("colorIndicator");
                 }
 
                 // CARD TAG
@@ -133,9 +134,21 @@ public class JsonParserWagic {
                     OracleTextToWagic.parseOracleText(keywords, oracleText, cardName, type, subtype, (String) card.get("power"), manaCost);
                     System.out.println("text=" + oracleText.replace("\n", " -- "));
                 }
-                if (!type.contains("Land")) {
+                if (manaCost != null) {
                     mana = mana.replace("/", "");
                     System.out.println(mana);
+                }
+                if (!colorIndicator.isEmpty()) {
+                    colorIndicator = colorIndicator.replace("W", "white");
+                    colorIndicator = colorIndicator.replace("U", "blue");
+                    colorIndicator = colorIndicator.replace("B", "black");
+                    colorIndicator = colorIndicator.replace("R", "red");
+                    colorIndicator = colorIndicator.replace("G", "green");
+                    colorIndicator = colorIndicator.replace("[", "");
+                    colorIndicator = colorIndicator.replace("]", "");
+                    colorIndicator = colorIndicator.replace("\"", "");
+
+                    System.out.println(colorIndicator);
                 }
                 System.out.println(type.trim());
                 if (!subtype.isEmpty()) {

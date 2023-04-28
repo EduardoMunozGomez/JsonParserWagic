@@ -35,7 +35,12 @@ public class AutoEffects {
 
         actAbilCost = actAbil[0];
 
-        actAbilCost = actAbilCost.replaceAll("\\{[WUBRG]\\/P\\}", "{P($0)}");
+        actAbilCost = actAbilCost.replace("{W/P}", "{p(W)}");
+        actAbilCost = actAbilCost.replace("{U/P}", "{p(U)}");
+        actAbilCost = actAbilCost.replace("{B/P}", "{p(B)}");
+        actAbilCost = actAbilCost.replace("{R/P}", "{p(R)}");
+        actAbilCost = actAbilCost.replace("{G/P}", "{p(G)}");
+        
         actAbilCost = actAbilCost.replace("Channel ", "autohand=");
         actAbilCost = actAbilCost.replace("discard your hand" + cardName, "reject all(*|myhand)");
         actAbilCost = actAbilCost.replace(", Discard " + cardName, "{discard}");
@@ -48,6 +53,8 @@ public class AutoEffects {
         actAbilCost = actAbilCost.replace("Exile " + cardName, "{E}");
         actAbilCost = actAbilCost.replace("Sacrifice a creature", "{S(creature|myBattlefield)}");
         actAbilCost = actAbilCost.replace("Sacrifice two creatures", "{S(creature|myBattlefield)}{S(creature|myBattlefield)}");
+        actAbilCost = actAbilCost.replace("Sacrifice an artifact or creature", "{S(*[artifact;creature]|myBattlefield)}");
+        actAbilCost = actAbilCost.replace("Sacrifice an artifact or land", "{S(*[artifact;land]|myBattlefield)}");
         actAbilCost = actAbilCost.replace("Sacrifice an artifact", "{S(artifact|myBattlefield)}");
         actAbilCost = actAbilCost.replace("Sacrifice an artifact creature", "{S(creature[artifact]|myBattlefield)}");
         actAbilCost = actAbilCost.replace("Sacrifice a land", "{S(land|myBattlefield)}");
@@ -96,8 +103,11 @@ public class AutoEffects {
             return AutoLine.Scry(effect);
         }
 
-        effect = effect.replace("from your graveyard the battlefield","moveTo(battlefield) from(myGraveyard)");
-        effect = effect.replace("exile the top card of your library. you may play it this turn","__PLAY_TOP_FROM_EXILE__");
+        effect = effect.replace("connives","_CONNIVES_");
+        effect = effect.replace("top of your library", "moveTo(mylibrary)");
+        effect = effect.replace("transform ", "flip(backside)");
+        effect = effect.replace("from your graveyard the battlefield", "moveTo(battlefield) from(myGraveyard)");
+        effect = effect.replace("exile the top card of your library. you may play it this turn", "__PLAY_TOP_FROM_EXILE__");
         effect = effect.replaceAll("ward \\{(\\d+)\\}", "_WARD_($1)");
         effect = effect.replace("choose one or both -", "");
         effect = effect.replaceAll("amass (\\d+)", "_AMASS_($1)");
