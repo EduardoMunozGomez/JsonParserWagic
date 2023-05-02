@@ -15,7 +15,7 @@ import org.json.simple.parser.ParseException;
 // @author Eduardo
 public class JsonParserWagic {
 
-    private static final String setCode = "MOC";
+    private static final String setCode = "BRO";
     private static final String filePath = "C:\\Users\\Eduardo_\\Downloads\\MTGJSON\\" + setCode;
 
     public static String getFilePath() {
