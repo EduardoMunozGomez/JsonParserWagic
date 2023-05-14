@@ -69,6 +69,7 @@ public class AutoEffects {
         actAbilCost = actAbilCost.replace(", ", "");
         actAbilCost = actAbilCost.replace(" ", "");
         actAbilCost = actAbilCost.replace(".", "");
+        actAbilCost = actAbilCost.replace("/", "");
 
         if (type.contains("Planeswalker")) {
             actAbilCost = actAbilCost.replace("[", "");
