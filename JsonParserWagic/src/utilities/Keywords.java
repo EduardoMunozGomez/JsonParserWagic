@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Arrays;
 
 public class Keywords {
 
@@ -17,10 +18,6 @@ public class Keywords {
             System.out.println("Processing file: " + file.getName());
 
             String line;
-            String[] keywords = {"toxic", "combattoughness", "affinityforests", "weak", "evadebigger", "discardtoplaybyopponent", "legendruleremove", "cantbeblockedby(eldrazi scion)", "oppgcreatureexiler", "legendarylandwalk", "auraward", "infect", "swamphome", "skulk", "islandhome", "desertwalk", "spellmastery", "nonbasiclandwalk", "dethrone", "cantattack", "cantpwattack", "librarydeath", "phasing", "cantmilllose", "wilting", "foresthome", "offering", "phantom", "vigor", "poisontwotoxic", "poisontoxic", "cantchangelife", "threeblockers", "cantlifelose", "shackler", "shufflelibrarydeath", "twodngtrg", "wither", "affinityartifacts", "leyline", "hydra", "totemarmor", "nosolo", "showopponenthand", "showcontrollerhand", "canplayfromexile", "canplayfromgraveyard", "noentertrg", "foretell", "exiledeath", "lifefaker", "partner", "hasnokicker", "hasstrive", "tokenizer", "hasaftermath", "mutate", "Flying", "Trample", "doublefacedeath", "boast", "isconspiracy", "hasdisturb", "daybound", "nightbound", "mentor", "hellbent", "overload", "adventure", "undamageable", "Haste", "training", "overload", "inplaydeath", "canbecommander", "storm", "soulbond", "split second", "fear", "mygraveexiler", "undying", "shadow", "flanking", "horsemanship", "plainswalk", "snowforestlandwalk", "snowplainslandwalk", "snowmountainlandwalk", "snowislandlandwalk", "snowswamplandwalk", "hiddenface", "hasotherkicker", "changeling", "shroud", "cycling", "exalted", "persist", "controllershroud", "devoid", "prowess", "madness", "flash", "defender", "flying", "intimidate", "first strike", "double strike", "deathtouch", "opponentshroud", "menace", "indestructible", "vigilance", "reach", "trample", "lifelink", "haste", "islandwalk", "swampwalk", "mountainwalk", "forestwalk", "showfromtoplibrary", "nomaxhand", "nofizzle", "unblockable", "oneblocker", "cantblock", "mustattack", "strong", "cloud", "lure", "sunburst", "mustblock", "nolifegain", "nolifegainopponent", "doesnotuntap", "protection from", "chooseabackground", "modular"};
-            String[] startingKeywords = {"grade", "[card]", "[/card]", "text", "name", "mana", "type", "subtype", "power", "toughness", "auto", "target", "abilities", "aicode", "other", "otherrestriction", "flashback", "color", "suspend", "kicker", "buyback", "modular", "doublefaced", "bestow", "retrace", "partner", "#AUTO_DEFINE", "dredge", "backside", "restriction", "anyzone", "alias", "facedown", "crewbonus", "phasedoutbonus", "#"};
-            String[] validTargets = {"creature", "artifact", "<upto:2>", "player", "land", "enchantment", "opponent", "*|stack", "equipment", "wall", "*|battlefield", "*|mybattlefield", "*|mygraveyard"};
-            String[] validTypes = {"artifact", "creature", "enchantment", "instant", "land", "legendary", "planeswalker", "sorcery", "tribal","conspiracy","emblem","dungeon","battle"};
 
             int lineNumber = 0;
 
@@ -35,20 +32,24 @@ public class Keywords {
                             continue;
                         }
                         if (line.startsWith("abilities=")) {
-                            boolean containsKeyword = false;
-                            for (String keyword : keywords) {
-                                if (line.contains(keyword)) {
-                                    containsKeyword = true;
+                            String subline = line.substring(10); // exclude "abilities=" from the string
+                            String[] lineKeywords = subline.split("[,]");
+                            boolean containsOnlyKeywords = false; // initialize to false
+                            for (String keyword : lineKeywords) {
+                                if (!Arrays.asList(Constants.KEYWORDS).contains(keyword.trim())) {
+                                    containsOnlyKeywords = false;
                                     break;
+                                } else {
+                                    containsOnlyKeywords = true; // set to true if keyword is found
                                 }
                             }
-                            if (!containsKeyword) {
-                                System.out.println("Line " + lineNumber + " does not contain any of the keywords: " + line);
+                            if (!containsOnlyKeywords) {
+                                System.out.println("Line " + lineNumber + " does not contain valid keywords: " + subline);
                             }
                         }
                         if (line.startsWith("type=")) {
                             boolean containsType = false;
-                            for (String type : validTypes) {
+                            for (String type : Constants.VALID_TYPES) {
                                 if (line.contains(type)) {
                                     containsType = true;
                                     break;
@@ -60,7 +61,7 @@ public class Keywords {
                         }
                         if (line.startsWith("target=")) {
                             boolean containsTarget = false;
-                            for (String validTarget : validTargets) {
+                            for (String validTarget : Constants.VALID_TARGETS) {
                                 if (line.contains(validTarget)) {
                                     containsTarget = true;
                                     break;
@@ -71,14 +72,14 @@ public class Keywords {
                             }
                         }
                         boolean startsWithKeyword = false;
-                        for (String startingkeyword : startingKeywords) {
+                        for (String startingkeyword : Constants.STARTING_KEYWORDS) {
                             if (line.startsWith(startingkeyword)) {
                                 startsWithKeyword = true;
                                 break;
                             }
                         }
                         if (!startsWithKeyword) {
-                            System.out.println("Line " + lineNumber + ": " + line);
+                            System.out.println("Line does not starts with keyword " + lineNumber + ": " + line);
                         }
                     }
                 }

@@ -15,7 +15,7 @@ import org.json.simple.parser.ParseException;
 // @author Eduardo
 public class JsonParserWagic {
 
-    private static final String setCode = "MH2";
+    private static final String setCode = "MOM";
     private static final String filePath = "C:\\Users\\Eduardo_\\Downloads\\MTGJSON\\" + setCode;
 
     public static String getFilePath() {
@@ -65,7 +65,7 @@ public class JsonParserWagic {
                     CardDat.generateCSV((String) card.get("setCode"), identifiers.get("multiverseId"), (String) identifiers.get("scryfallId"), myWriterImages, side);
                 }
                 // If card is a reprint, skip it                
-                if (card.get("isReprint") != null || "[\"Siege\"]".equals(subtypes.toString())) {
+                if (card.get("isReprint") != null) {
                     continue;
                 }
                 String nameHeader = "name=" + primitiveCardName;

@@ -23,12 +23,15 @@ public class CardValidation {
                 int lineNum = 0;
                 boolean isValid = true;
                 boolean hasTarget = false;
+                boolean isCreature = false;
+
                 while ((line = reader.readLine()) != null) {
                     lineNum++;
                     line = line.trim();
                     if (line.startsWith("[card]")) {
                         currentCard = "";
-                        hasTarget = false;
+                    } else if (line.startsWith("auto=auto")) {
+                        System.out.println("auto=auto \"" + currentCard + "\" at line " + lineNum);
                     } else if (line.startsWith("name=")) {
                         currentCard = line.substring(5);
                         hasTarget = false;
@@ -39,14 +42,22 @@ public class CardValidation {
                             System.out.println("ERROR: Aura card \"" + currentCard + "\" at line " + lineNum + " is missing a target line.");
                             isValid = false;
                         }
-                    } else if (line.startsWith("type=") && line.contains("Creature") && !currentCard.isEmpty() && !currentCard.endsWith("*")) {
+                    } else if (line.startsWith("type=") && (line.contains("Creature") || line.contains("Artifact") || line.contains("Planeswalker") || line.contains("Land") || line.contains("Battle")) && !currentCard.isEmpty() && !currentCard.endsWith("*")) {
                         if (hasTarget) {
-                            System.out.println("ERROR: creature card \"" + currentCard + "\" at line " + lineNum + " is a target line.");
+                            System.out.println("ERROR: card \"" + currentCard + "\" at line " + lineNum + " is a target line.");
                             isValid = false;
                         }
-                    } else if (line.startsWith("subtype=") && line.contains("Equipment") && !currentCard.isEmpty() && !currentCard.endsWith("*")) {
-                        if (hasTarget) {
-                            System.out.println("ERROR: equip card \"" + currentCard + "\" at line " + lineNum + " is a target line.");
+                        isCreature = line.contains("Creature");
+                    } else if (isCreature && line.startsWith("power=")) {
+                        String power = line.substring(6).trim();
+                        if (!power.matches("\\*|[-+]?\\d+\\+?\\*?")) {
+                            System.out.println("ERROR: invalid power value \"" + power + "\" for creature card \"" + currentCard + "\" at line " + lineNum + ".");
+                            isValid = false;
+                        }
+                    } else if (isCreature && line.startsWith("toughness=")) {
+                        String toughness = line.substring(10).trim();
+                        if (!toughness.matches("\\*|[-+]?\\d+[-+]?\\*?|\\*\\+\\d+")) {
+                            System.out.println("ERROR: invalid toughness value \"" + toughness + "\" for creature card \"" + currentCard + "\" at line " + lineNum + ".");
                             isValid = false;
                         }
                     }

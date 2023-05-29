@@ -102,9 +102,9 @@ public class OracleTextToWagic {
                 }
             }
             // SAGA
-//            if (subtype.contains("Saga")) {
-//                autoLineExists(AutoLine.EpicSaga(oracleBit, subtype));
-//            }
+            if (subtype.contains("Saga")) {
+                autoLineExists(AutoLine.EpicSaga(oracleBit, subtype));
+            }
         }
     }
 
