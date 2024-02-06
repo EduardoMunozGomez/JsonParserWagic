@@ -28,7 +28,7 @@ public class OracleTextToWagic {
             // Permanents, exclude this types
             if (!(type.contains("Instant") || type.contains("Sorcery") || subtype.contains("Aura") || subtype.contains("Equipment") || subtype.contains("Siege"))) {
                 // Evergreen mechanics
-//                autoLineExists(AutoLine.Corrupted(oracleBit, cardName));
+//              autoLineExists(AutoLine.Corrupted(oracleBit, cardName));
                 autoLineExists(AutoEffects.DetermineActivatedAbility(oracleBit, cardName, type, subtype));
                 autoLineExists(AutoLine.ManaAbility(oracleBit, subtype));
                 autoLineExists(AutoLine.Cast(oracleBit, cardName));
@@ -39,16 +39,17 @@ public class OracleTextToWagic {
                 autoLineExists(AutoLine.TakeControl(oracleBit));
                 autoLineExists(AutoLine.CantBeBlockedBy(oracleBit));
                 autoLineExists(AutoLine.Lord(oracleBit, type));
-                autoLineExists(AutoLine.Triggers(oracleBit, cardName, type, subtype, power));
-                autoLineExists(AutoLine.processAsLongAs(oracleBit, cardName));
-                autoLineExists(AutoLine.processForEach(oracleBit, type));
+                autoLineExists(Triggers.processTriggers(oracleBit, cardName, type, subtype, power));
+                autoLineExists(AutoLine.ProcessAsLongAs(oracleBit, cardName));
+                autoLineExists(AutoLine.ProcessForEach(oracleBit, type));
                 autoLineExists(AutoLine.CostReduction(oracleBit));
                 autoLineExists(AutoLineGRN.Surveil(oracleBit));
                 autoLineExists(AutoLine.Prowess(oracleBit));
-                autoLineExists(AutoLine.Backup(oracleBit));
+                autoLineExists(AutoLine.Disguise(oracleBit));
+                //autoLineExists(AutoLine.Backup(oracleBit));
 
-                autoLineExists(AutoLineGRN.Proliferate(oracleBit));
-                autoLineExists(AutoLineGRN.Convoke(oracleBit));
+                //autoLineExists(AutoLineGRN.Proliferate(oracleBit));
+                //autoLineExists(AutoLineGRN.Convoke(oracleBit));
 
 //                autoLineExists(AutoLine.Unearth(oracleBit));
 //                autoLineExists(AutoLine.Prototype(oracleBit));
@@ -65,7 +66,7 @@ public class OracleTextToWagic {
             }
             //INSTANT, SORCERY
             if (type.contains("Instant") || type.contains("Sorcery")) {
-                autoLineExists(AutoLine.Corrupted(oracleBit, cardName));
+                //autoLineExists(AutoLine.Corrupted(oracleBit, cardName));
                 autoLineExists(AutoLine.ChooseOneOrBoth(oracleBit));
                 autoLineExists(AutoLine.MyTarget(oracleBit, "InstantOrSorcery", subtype));
                 autoLineExists(AutoEffects.ProcessEffect(oracleBit, type));
@@ -74,6 +75,7 @@ public class OracleTextToWagic {
                 autoLineExists(AutoLine.Create(oracleBit));
                 autoLineExists(AutoLine.PutA(oracleBit, type));
 //                autoLineExists(AutoLine.Casualty(oracleBit, cardName, manaCost));
+                autoLineExists(AutoLineGRN.Surveil(oracleBit));
                 autoLineExists(AutoLineGRN.Convoke(oracleBit));
 
                 //autoLineExists(AutoLineGRN.Kicker(oracleBit, cardName));
@@ -102,9 +104,9 @@ public class OracleTextToWagic {
                 }
             }
             // SAGA
-            if (subtype.contains("Saga")) {
-                autoLineExists(AutoLine.EpicSaga(oracleBit, subtype));
-            }
+            //if (subtype.contains("Saga")) {
+              //  autoLineExists(AutoLine.EpicSaga(oracleBit, subtype));
+            //}
         }
     }
 

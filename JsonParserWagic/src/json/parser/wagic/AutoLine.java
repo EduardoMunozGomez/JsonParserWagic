@@ -66,6 +66,18 @@ public class AutoLine {
         }
         return prowess;
     }
+    
+    //Prowess
+    protected static String Disguise(String oracleText) {
+        String disguise = "";
+        String disguiseCost;
+
+        if (oracleText.contains("Disguise")) {
+            disguiseCost = oracleText.substring(oracleText.indexOf("{"), oracleText.lastIndexOf("}")+1);
+            disguise = "facedown={3}" + "\nautofacedown=_WARD_(2)" + "\nautofacedown=" + disguiseCost + ":morph";
+        }
+        return disguise;
+    }
 
     protected static String CombatDamage(String oracleText) {
         String combatDamage = "";
@@ -160,6 +172,9 @@ public class AutoLine {
                 }
                 if (target.contains("tapped creature" + letterS)) {
                     myTarget = "creature[tapped]";
+                }
+                if (target.contains("attacking creature" + letterS)) {
+                    myTarget = "creature[attacking]";
                 }
                 if (target.contains("creatures")) {
                     incidence = "up to two";
@@ -662,7 +677,8 @@ public class AutoLine {
                     return "clone";
                 }
                 if (oracleText.contains("treasure token")) {
-                    return "token(Treasure,Artifact Treasure) and!( transforms((,newability[{T}{S}:Add{W}])(,newability[{T}{S}:Add{R}])(,newability[{T}{S}:Add{G}])(,newability[{T}{S}:Add{U}])(,newability[{T}{S}:Add{B}])) forever )!";
+                    //return "token(Treasure,Artifact Treasure) and!( transforms((,newability[{T}{S}:Add{W}])(,newability[{T}{S}:Add{R}])(,newability[{T}{S}:Add{G}])(,newability[{T}{S}:Add{U}])(,newability[{T}{S}:Add{B}])) forever )!";
+                    return "create(Treasure)";
                 }
 
                 create = oracleText.substring(oracleText.indexOf(incidence) + incidence.length());
@@ -671,7 +687,7 @@ public class AutoLine {
                 create = create.substring(create.indexOf(" ") + 1);
                 tokenPT = create.substring(0, create.indexOf(" "));
                 create = create.substring(create.indexOf(" ") + 1);
-                create = create.replace(" and ", ",");
+                create = create.replace(" and ", ":");
                 tokenColor = create.substring(0, create.indexOf(" "));
                 create = create.substring(create.indexOf(" ") + 1);
                 if (create.contains(" creature")) {
@@ -979,7 +995,7 @@ public class AutoLine {
         return numberAsString;
     }
 
-    static String processAsLongAs(String oracleText, String name) {
+    static String ProcessAsLongAs(String oracleText, String name) {
         String asLongAsIsMyTurn = "";
         try {
             oracleText = oracleText.toLowerCase();
@@ -995,7 +1011,7 @@ public class AutoLine {
         return asLongAsIsMyTurn;
     }
 
-    static String processForEach(String oracleText, String type) {
+    static String ProcessForEach(String oracleText, String type) {
         String forEach = "";
         try {
             oracleText = oracleText.toLowerCase();
@@ -1048,106 +1064,5 @@ public class AutoLine {
         } catch (Exception e) {
         }
         return chooseOneOrBoth;
-    }
-
-    static String Triggers(String oracleText, String cardName, String type, String subtype, String power) {
-        String trigger = "";
-        String triggerEffect;
-        if (subtype.contains("Aura") || subtype.contains("Equipment")) { //
-            return "";
-        }
-        try {
-            cardName = cardName.replace(",", "");
-            // Trigger conditions
-            if ((oracleText.toLowerCase().contains("whenever ")
-                    || oracleText.contains("As " + cardName)
-                    || oracleText.contains("At the beginning")
-                    || oracleText.contains(cardName + " enters the battlefield")
-                    || oracleText.contains("When " + cardName + " dies,")
-                    || oracleText.contains("When this creature dies")
-                    || oracleText.contains(cardName + " becomes the target of a spe l or ability")
-                    || oracleText.contains("becomes the target of a spell or ability an opponent controls")
-                    || oracleText.contains("Mentor")
-                    || oracleText.contains("Raid ")
-                    || oracleText.toLowerCase().contains("ward "))
-                    && !(oracleText.contains("Whenever you cast"))) {
-
-                // The comma limits the trigger
-                if (oracleText.contains(",")) {
-                    trigger = oracleText.substring(0, oracleText.indexOf(","));
-                    triggerEffect = oracleText.substring(oracleText.indexOf(",") + 1);
-                } else {
-                    triggerEffect = oracleText.replace(cardName + " enters the battlefield", "");
-                }
-
-                trigger = trigger.replace("Enrage - ", "");
-                trigger = trigger.replace("Raid - ", "");
-
-                trigger = trigger.replace(cardName + " enters the battlefield tapped", "tap(noevent)");
-                trigger = trigger.replace("When " + cardName + " enters the battlefield", "");
-                trigger = trigger.replace(cardName + " enters the battlefield", "");
-
-                trigger = trigger.replace(" you gain life ", "lifeof(player):");
-                trigger = trigger.replace("you may pay ", "pay(");
-                trigger = trigger.replace(". If you do ", "):");
-                trigger = trigger.replace("you draw a card", "drawof(player):");
-                trigger = trigger.replace(cardName + " becomes tapped", "tapped(this):");
-                // Moved to battlefield
-                trigger = trigger.replace("a creature enters the battlefield under your control", "movedTo(creature|myBattlefield):");
-                trigger = trigger.replace("another creature enters the battlefield under your control", "movedTo(other creature|myBattlefield):");
-                trigger = trigger.replace("another artifact enters the battlefield under your control", "movedTo(other artifact|myBattlefield):");
-                trigger = trigger.replace("a land enters the battlefield under your control", "movedTo(land|myBattlefield):");
-                trigger = trigger.replace("a creature enters the battlefield", "movedTo(creature|Battlefield):");
-                trigger = trigger.replace("enters the battlefield under your control", "movedTo(*[]|myBattlefield):");
-                trigger = trigger.replace("enters the battlefield under an opponent's control", "movedTo(*[]|opponentBattlefield):");
-
-                trigger = trigger.replace("Whenever this creature attacks", "_ATTACKING_");
-                trigger = trigger.replace("Whenever " + cardName + " attacks", "_ATTACKING_");
-                trigger = trigger.replace(cardName + " and at least two other creatures attack", "_ATTACKING_restriction{type(other creature[attacking]|myBattlefield)~morethan~1}:");
-                trigger = trigger.replace("Whenever " + cardName + " deals combat damage to a player", "combatdamaged(player) from(this):");
-                trigger = trigger.replace("a Samurai or Warrior you control attacks alone", "combat(attackedalone) source(*[Samurai;Warrior]|myBattlefield):all(trigger[to])");
-
-                trigger = trigger.replace("When " + cardName + " dies", "_DIES_");
-                trigger = trigger.replace("Whenever " + cardName + " dies", "_DIES_");
-                trigger = trigger.replace("When this creature dies", "movedTo(this|graveyard) from(battlefield):");
-                trigger = trigger.replace("a creature dies", "movedTo(creature|graveyard) from(battlefield):");
-                trigger = trigger.replace("another creature dies", "movedTo(other creature|graveyard) from(battlefield):");
-                trigger = trigger.replace("another creature or planeswalker you control dies", "movedTo(other *[creature;planeswalker]|graveyard) from(myBattlefield):");
-                trigger = trigger.replace("a creature you control dies", "movedTo(creature|graveyard) from(mybattlefield):");
-                trigger = trigger.replace("a creature an opponent controls dies", "movedTo(creature|graveyard) from(opponentbattlefield):");
-                trigger = trigger.replace("a creature or planeswalker you control dies", "movedTo(creature,planeswalker|graveyard) from(mybattlefield):");
-                trigger = trigger.replace(" dies", "movedTo(|graveyard) from(battlefield):");
-                // Phases
-                trigger = trigger.replace("At the beginning of ", "@");
-                trigger = trigger.replace("your upkeep", "each my upkeep:");
-                trigger = trigger.replace("your draw step", "each my draw:");
-                trigger = trigger.replace("your precombat main phase", "each my firstmain:");
-                trigger = trigger.replace("combat on your turn", "each my combatbegins:");
-                trigger = trigger.replace("your end step", "each my endofturn:");
-                trigger = trigger.replace("each end step", "each endofturn:");
-                trigger = trigger.replace("your next end step", "my endofturn once");
-
-                trigger = trigger.replace("If you attacked with a creature this turn", "if raid then ");
-                trigger = trigger.replace("if it was kicked", "kicked ");
-
-                trigger = trigger.replace(cardName + " is dealt damage", "damaged(this):");
-                trigger = trigger.replace("you gain life", "lifeof(player):");
-
-                trigger = trigger.replace("becomes the target of a spell or ability an opponent controls", "targeted(this|mybattlefield) from(*|opponentbattlefield,opponenthand,opponentstack,opponentgraveyard,opponentexile,opponentlibrary):");
-                trigger = trigger.replace(cardName + " becomes the target of a spell or ability", "targeted(this):");
-                trigger = trigger.replace("Whenever another", "@other");
-                trigger = trigger.replace("Whenever you attack", "@each my blockers:");
-                trigger = trigger.replace("Whenever you ", "@");
-                trigger = trigger.replace("Whenever a ", "@");
-                trigger = trigger.replace("Whenever ", "@");
-                trigger = trigger.replace("When ", "@");
-
-                triggerEffect = AutoEffects.ProcessEffect(triggerEffect, cardName);
-                trigger = "auto=" + trigger + triggerEffect;
-
-            }
-        } catch (Exception e) {
-        }
-        return trigger;
     }
 }

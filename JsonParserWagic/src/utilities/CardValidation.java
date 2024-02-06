@@ -32,6 +32,9 @@ public class CardValidation {
                         currentCard = "";
                     } else if (line.startsWith("auto=auto")) {
                         System.out.println("auto=auto \"" + currentCard + "\" at line " + lineNum);
+                    } else if (line.startsWith("auto=")) {
+                        if (line.contains("if ") && !line.contains("then"))
+                        System.out.println("eyes without a face " + lineNum);
                     } else if (line.startsWith("name=")) {
                         currentCard = line.substring(5);
                         hasTarget = false;

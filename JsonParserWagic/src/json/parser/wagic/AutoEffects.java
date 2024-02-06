@@ -104,6 +104,8 @@ public class AutoEffects {
             return AutoLine.Scry(effect);
         }
 
+        effect = effect.replace(cardName + " enters the battlefield tapped.", "auto=tap(noevent)");
+        effect = effect.replace("investigate","create(Clue)");
         effect = effect.replace("connives","_CONNIVES_");
         effect = effect.replace("top of your library", "moveTo(mylibrary)");
         effect = effect.replace("transform ", "flip(backside)");
@@ -218,8 +220,7 @@ public class AutoEffects {
         // Draw Monsta Cardo!
         effect = effect.replace("draw a card", "draw:1");
         effect = effect.replace("for each creature ", "type:creature:");
-        effect = effect.replace("each ", "all(");
-        effect = effect.replace(cardName + " enters the battlefield tapped.", "auto=tap(noevent)");
+        effect = effect.replace("each ", "all(");        
         effect = effect.replace(cardName + " gains ", "");
         effect = effect.replace(cardName + " gets ", "");
         effect = effect.replace(cardName + " has ", "");
@@ -238,11 +239,12 @@ public class AutoEffects {
         effect = effect.replace(" put a ", " ");
         effect = effect.replace("return ", "");
         effect = effect.replaceAll(" gains | gain | gets | get | has ", ") ");
-        effect = effect.replace(", then ", " && ");
-
+        effect = effect.replace(", then ", " && ");      
+        
+        effect = effect.replace(" on it.", "");
         effect = effect.replace(" it) ", "");
         effect = effect.replace(" it ", "");
-        effect = effect.replace(" on ", "");
+        effect = effect.replace("on ", "");
         effect = effect.replace(" or ", ",");
         effect = effect.replace(" to ", " ");
 
