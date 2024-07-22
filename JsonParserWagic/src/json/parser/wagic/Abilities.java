@@ -9,64 +9,31 @@ public class Abilities {
         String abilities = "";
         for (Object keyword : keywords) {
             String keywordString = (String) keyword;
+            keywordString = keywordString.toLowerCase();
 
-            switch (keywordString.toLowerCase()) {
+            switch (keywordString) {
                 case "flash":
-                    abilities += "flash,";
-                    break;
                 case "defender":
-                    abilities += "defender,";
-                    break;
                 case "flying":
-                    abilities += "flying,";
-                    break;
                 case "intimidate":
-                    abilities += "intimidate,";
-                    break;
                 case "first strike":
-                    abilities += "first strike,";
-                    break;
                 case "double strike":
-                    abilities += "double strike,";
-                    break;
                 case "deathtouch":
-                    abilities += "deathtouch,";
-                    break;
                 case "hexproof":
-                    abilities += "opponentshroud,";
-                    break;
                 case "menace":
-                    abilities += "menace,";
-                    break;
                 case "indestructible":
-                    abilities += "indestructible,";
-                    break;
                 case "vigilance":
-                    abilities += "vigilance,";
-                    break;
                 case "reach":
-                    abilities += "reach,";
-                    break;
                 case "trample":
-                    abilities += "trample,";
-                    break;
                 case "lifelink":
-                    abilities += "lifelink,";
-                    break;
                 case "haste":
-                    abilities += "haste,";
-                    break;
                 case "islandwalk":
-                    abilities += "islandwalk,";
-                    break;
                 case "swampwalk":
-                    abilities += "swampwalk,";
-                    break;
                 case "mountainwalk":
-                    abilities += "mountainwalk,";
-                    break;
                 case "forestwalk":
-                    abilities += "forestwalk,";
+                case "devoid":
+                case "cycling":
+                    abilities += keywordString + ',';
                     break;
             }
         }
@@ -79,7 +46,7 @@ public class Abilities {
     protected static String processCustomAbilities(String oracleText, String abilities) {
 
         oracleText = oracleText.toLowerCase();
-        
+
         if (oracleText.contains("you may look at the top card of your library any time")) {
             abilities += "showfromtoplibrary,";
         }
@@ -104,9 +71,9 @@ public class Abilities {
         if (oracleText.contains("toxic 3")) {
             abilities += "poisonthreetoxic,";
         }
-//        if (oracleText.contains("can't block.")) {
-//            abilities += "cantblock,";
-//        }
+        if (oracleText.contains("can't block.")) {
+            abilities += "cantblock,";
+        }
         if (oracleText.contains("attacks each turn if able.") || oracleText.contains("attacks each combat if able.")) {
             abilities += "mustattack,";
         }

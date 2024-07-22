@@ -15,7 +15,7 @@ import org.json.simple.parser.ParseException;
 // @author Eduardo
 public class JsonParserWagic {
 
-    private static final String setCode = "MKM";
+    private static final String setCode = "BLB";
     private static final String filePath = "C:\\Users\\Eduardo_\\Downloads\\MTGJSON\\" + setCode;
 
     public static String getFilePath() {
@@ -24,47 +24,57 @@ public class JsonParserWagic {
 
     public static void main(String[] args) {
 
-        boolean createCardsDat = false;
-
         File directorio = new File(getFilePath());
         directorio.mkdir();
 
-        try {
-            FileReader reader = new FileReader(getFilePath() + ".json", StandardCharsets.UTF_8);
-            File myObj = new File(getFilePath() + "\\_cards.dat");
-            myObj.createNewFile();
-            FileWriter myWriter;
-            myWriter = new FileWriter(myObj.getCanonicalPath());
-            FileWriter myWriterImages;
-            myWriterImages = new FileWriter("C:\\Users\\Eduardo_\\Downloads\\MTGJSON\\image.cvs", true);
+        try ( FileReader reader = new FileReader(getFilePath() + ".json", StandardCharsets.UTF_8);  FileWriter myWriter = new FileWriter(getFilePath() + "\\_cards.dat");  FileWriter myWriterImages = new FileWriter("C:\\Users\\Eduardo_\\Downloads\\MTGJSON\\image.cvs", true)) {
 
-            JSONParser jsonParser = new JSONParser();
-            JSONObject jsonObject = (JSONObject) jsonParser.parse(reader);
+            JSONObject jsonObject = (JSONObject) new JSONParser().parse(reader);
             JSONObject data = (JSONObject) jsonObject.get("data");
             JSONArray cards = (JSONArray) data.get("cards");
+            JSONArray tokens = (JSONArray) data.get("tokens");
+            JSONObject card;
+            JSONArray subtypes;
 
+            JSONObject identifiers;
+            String primitiveCardName;
+            String primitiveRarity;
+            String side;
             // Metadata header
-            if (createCardsDat) {
-                Metadata.printMetadata(data.get("name"), data.get("releaseDate"), data.get("totalSetSize"), myWriter);
-            }
+            Metadata.printMetadata(data.get("name"), data.get("releaseDate"), data.get("totalSetSize"), myWriter);
 
+//            for (Object tkn : tokens) {
+//                JSONObject token = (JSONObject) tkn;
+//                JSONArray reverseRelated = (JSONArray) token.get("reverseRelated");
+//                for (Object related : reverseRelated) {
+//
+//                    for (Object o : cards) {
+//                        card = (JSONObject) o;
+//                        identifiers = (JSONObject) card.get("identifiers");
+//                        JSONObject tokenIdentifiers = (JSONObject) token.get("identifiers");
+//                        primitiveCardName = (String) card.get("faceName") != null ? (String) card.get("faceName") : (String) card.get("name");
+//                        if (primitiveCardName.equals(related.toString()) && !token.get("name").equals("Copy") && !token.get("name").equals("Energy Reserve") && !token.get("name").equals("Plot") && identifiers.get("multiverseId") != null) {
+//                            CardDat.generateCSV(setCode, identifiers.get("multiverseId") + "t", (String) tokenIdentifiers.get("scryfallId"), myWriterImages, "front/");
+//                        }
+//                    }
+//                }
+//            }
             for (Object o : cards) {
-                JSONObject card = (JSONObject) o;
-                JSONArray subtypes = (JSONArray) card.get("subtypes");
 
-                JSONObject identifiers = (JSONObject) card.get("identifiers");
-                String primitiveCardName;
-                String primitiveRarity;
-                String side;
+                card = (JSONObject) o;
+                subtypes = (JSONArray) card.get("subtypes");
 
+                identifiers = (JSONObject) card.get("identifiers");
                 primitiveCardName = (String) card.get("faceName") != null ? (String) card.get("faceName") : (String) card.get("name");
-                primitiveRarity = card.get("side") != null && "b".equals(card.get("side").toString()) ? "T" : (String) card.get("rarity");
+                //primitiveRarity = card.get("side") != null && "b".equals(card.get("side").toString()) ? "T" : (String) card.get("rarity");
+                primitiveRarity = (String) card.get("rarity");
                 side = card.get("side") != null && "b".equals(card.get("side").toString()) ? "back/" : "front/";
-                if (createCardsDat && identifiers.get("multiverseId") != null) {
+                if (identifiers.get("multiverseId") != null) {
                     CardDat.generateCardDat(primitiveCardName, identifiers.get("multiverseId"), primitiveRarity, myWriter);
-                    CardDat.generateCSV((String) card.get("setCode"), identifiers.get("multiverseId"), (String) identifiers.get("scryfallId"), myWriterImages, side);
+                    //CardDat.generateCSV(setCode, identifiers.get("multiverseId"), (String) identifiers.get("scryfallId"), myWriterImages, side);
                 }
-                // If card is a reprint, skip it                
+
+                // If card is a reprint, skip it
                 if (card.get("isReprint") != null) {
                     continue;
                 }
@@ -139,14 +149,11 @@ public class JsonParserWagic {
                     System.out.println(mana);
                 }
                 if (!colorIndicator.isEmpty()) {
-                    colorIndicator = colorIndicator.replace("W", "white");
-                    colorIndicator = colorIndicator.replace("U", "blue");
-                    colorIndicator = colorIndicator.replace("B", "black");
-                    colorIndicator = colorIndicator.replace("R", "red");
-                    colorIndicator = colorIndicator.replace("G", "green");
-                    colorIndicator = colorIndicator.replace("[", "");
-                    colorIndicator = colorIndicator.replace("]", "");
-                    colorIndicator = colorIndicator.replace("\"", "");
+                    colorIndicator = colorIndicator.replace("W", "white")
+                            .replace("U", "blue").replace("B", "black")
+                            .replace("R", "red").replace("G", "green")
+                            .replace("[", "").replace("]", "")
+                            .replace("\"", "");
 
                     System.out.println(colorIndicator);
                 }
@@ -160,8 +167,6 @@ public class JsonParserWagic {
                 }
                 System.out.println("[/card]\n");
             }
-            myWriter.close();
-            myWriterImages.close();
 
         } catch (FileNotFoundException ex) {
             System.out.println("FileNotFoundException " + ex.getMessage());

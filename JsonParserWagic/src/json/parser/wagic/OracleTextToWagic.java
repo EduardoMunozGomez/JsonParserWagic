@@ -46,23 +46,23 @@ public class OracleTextToWagic {
                 autoLineExists(AutoLineGRN.Surveil(oracleBit));
                 autoLineExists(AutoLine.Prowess(oracleBit));
                 autoLineExists(AutoLine.Disguise(oracleBit));
-                //autoLineExists(AutoLine.Backup(oracleBit));
+                autoLineExists(AutoLine.Backup(oracleBit));
 
-                //autoLineExists(AutoLineGRN.Proliferate(oracleBit));
-                //autoLineExists(AutoLineGRN.Convoke(oracleBit));
+                autoLineExists(AutoLineGRN.Proliferate(oracleBit));
+                autoLineExists(AutoLineGRN.Convoke(oracleBit));
 
-//                autoLineExists(AutoLine.Unearth(oracleBit));
-//                autoLineExists(AutoLine.Prototype(oracleBit));
-//                autoLineExists(AutoLine.Blitz(oracleBit));
-//                autoLineExists(AutoLineGRN.Kicker(oracleBit, cardName));
-//                autoLineExists(AutoLine.Ninjutsu(oracleBit));
-//                autoLineExists(AutoLineGRN.Undergrowth(oracleBit));
-//                autoLineExists(AutoLineGRN.Addendum(oracleBit));
-//                autoLineExists(AutoLineGRN.Riot(oracleBit));
-//                autoLineExists(AutoLineGRN.Spectacle(oracleBit));
-//                autoLineExists(AutoLineGRN.Ascend(oracleBit));
-//                autoLineExists(AutoLineGRN.Partner(oracleBit));
-//                autoLineExists(AutoLineGRN.Amass(oracleBit));                
+                autoLineExists(AutoLine.Unearth(oracleBit));
+                autoLineExists(AutoLine.Prototype(oracleBit));
+                autoLineExists(AutoLine.Blitz(oracleBit));
+                autoLineExists(AutoLineGRN.Kicker(oracleBit, cardName));
+                autoLineExists(AutoLine.Ninjutsu(oracleBit));
+                autoLineExists(AutoLineGRN.Undergrowth(oracleBit));
+                autoLineExists(AutoLineGRN.Addendum(oracleBit));
+                autoLineExists(AutoLineGRN.Riot(oracleBit));
+                autoLineExists(AutoLineGRN.Spectacle(oracleBit));
+                autoLineExists(AutoLineGRN.Ascend(oracleBit));
+                autoLineExists(AutoLineGRN.Partner(oracleBit));
+                autoLineExists(AutoLineGRN.Amass(oracleBit));                
             }
             //INSTANT, SORCERY
             if (type.contains("Instant") || type.contains("Sorcery")) {

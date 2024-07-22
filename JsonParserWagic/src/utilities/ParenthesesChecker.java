@@ -33,7 +33,7 @@ public class ParenthesesChecker {
                     for (int i = 0; i < line.length(); i++) {
                         char c = line.charAt(i);
                         switch (c) {
-                            case '(':
+                            case '(':                                
                                 if (line.contains("this(cantargetcard(")) {
                                     // Ignore this line, it contains "cantargetcard("
                                     //System.out.println("cantargetcard line " + lineNumber + ", position " + (i + 1));
