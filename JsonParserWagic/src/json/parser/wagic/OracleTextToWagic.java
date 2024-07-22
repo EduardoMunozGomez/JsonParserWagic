@@ -26,14 +26,8 @@ public class OracleTextToWagic {
         // Auto lines
         for (String oracleBit : oracleText.split("\n")) {
             // Permanents, exclude this types
-<<<<<<< HEAD
             if (!(type.contains("Instant") || type.contains("Sorcery") || subtype.contains("Aura") || subtype.contains("Equipment"))) {
                 // Evergreen mechanics
-=======
-            if (!(type.contains("Instant") || type.contains("Sorcery") || subtype.contains("Aura") || subtype.contains("Equipment") || subtype.contains("Siege"))) {
-                // Evergreen mechanics
-//              autoLineExists(AutoLine.Corrupted(oracleBit, cardName));
->>>>>>> 4ad7065fc5e7b314f4e8a53857e551d8bfa5d7aa
                 autoLineExists(AutoEffects.DetermineActivatedAbility(oracleBit, cardName, type, subtype));
                 autoLineExists(AutoLine.ManaAbility(oracleBit, subtype));
                 autoLineExists(AutoLine.Cast(oracleBit, cardName));
@@ -44,7 +38,6 @@ public class OracleTextToWagic {
                 autoLineExists(AutoLine.TakeControl(oracleBit));
                 autoLineExists(AutoLine.CantBeBlockedBy(oracleBit));
                 autoLineExists(AutoLine.Lord(oracleBit, type));
-<<<<<<< HEAD
                 autoLineExists(AutoLine.Triggers(oracleBit, cardName, type, subtype, power));
                 autoLineExists(AutoLine.processAsLongAs(oracleBit, cardName));
                 autoLineExists(AutoLine.processForEach(oracleBit, type));
@@ -78,60 +71,12 @@ public class OracleTextToWagic {
                 //autoLineExists(AutoLine.Create(oracleBit));
                 //autoLineExists(AutoLine.PutA(oracleBit, type));
                 autoLineExists(AutoLine.ChooseOneOrBoth(oracleBit));
-=======
-                autoLineExists(Triggers.processTriggers(oracleBit, cardName, type, subtype, power));
-                autoLineExists(AutoLine.ProcessAsLongAs(oracleBit, cardName));
-                autoLineExists(AutoLine.ProcessForEach(oracleBit, type));
-                autoLineExists(AutoLine.CostReduction(oracleBit));
-                autoLineExists(AutoLineGRN.Surveil(oracleBit));
-                autoLineExists(AutoLine.Prowess(oracleBit));
-                autoLineExists(AutoLine.Disguise(oracleBit));
-                autoLineExists(AutoLine.Backup(oracleBit));
-
-                autoLineExists(AutoLineGRN.Proliferate(oracleBit));
-                autoLineExists(AutoLineGRN.Convoke(oracleBit));
-
-                autoLineExists(AutoLine.Unearth(oracleBit));
-                autoLineExists(AutoLine.Prototype(oracleBit));
-                autoLineExists(AutoLine.Blitz(oracleBit));
-                autoLineExists(AutoLineGRN.Kicker(oracleBit, cardName));
-                autoLineExists(AutoLine.Ninjutsu(oracleBit));
-                autoLineExists(AutoLineGRN.Undergrowth(oracleBit));
-                autoLineExists(AutoLineGRN.Addendum(oracleBit));
-                autoLineExists(AutoLineGRN.Riot(oracleBit));
-                autoLineExists(AutoLineGRN.Spectacle(oracleBit));
-                autoLineExists(AutoLineGRN.Ascend(oracleBit));
-                autoLineExists(AutoLineGRN.Partner(oracleBit));
-                autoLineExists(AutoLineGRN.Amass(oracleBit));                
-            }
-            //INSTANT, SORCERY
-            if (type.contains("Instant") || type.contains("Sorcery")) {
-                //autoLineExists(AutoLine.Corrupted(oracleBit, cardName));
-                autoLineExists(AutoLine.ChooseOneOrBoth(oracleBit));
-                autoLineExists(AutoLine.MyTarget(oracleBit, "InstantOrSorcery", subtype));
-                autoLineExists(AutoEffects.ProcessEffect(oracleBit, type));
-                autoLineExists(AutoLine.ExileDestroyDamage(oracleBit, type));
-                autoLineExists(AutoLine.ReplacerAuraEquipBonus(oracleBit, "InstantOrSorcery"));
-                autoLineExists(AutoLine.Create(oracleBit));
-                autoLineExists(AutoLine.PutA(oracleBit, type));
-//                autoLineExists(AutoLine.Casualty(oracleBit, cardName, manaCost));
-                autoLineExists(AutoLineGRN.Surveil(oracleBit));
-                autoLineExists(AutoLineGRN.Convoke(oracleBit));
-
->>>>>>> 4ad7065fc5e7b314f4e8a53857e551d8bfa5d7aa
                 //autoLineExists(AutoLineGRN.Kicker(oracleBit, cardName));
                 //autoLineExists(AutoLineGRN.JumpStart(oracleBit, manaCost));
             }
             // AURA
             if (subtype.contains("Aura")) {
-<<<<<<< HEAD
                 autoLineExists(AutoLine.MyTarget(oracleBit, subtype, subtype));
-=======
-                autoLineExists(AutoLine.Corrupted(oracleBit, cardName));
-                autoLineExists(AutoLine.MyTarget(oracleBit, subtype, subtype));
-                autoLineExists(AutoLineGRN.Convoke(oracleBit));
-
->>>>>>> 4ad7065fc5e7b314f4e8a53857e551d8bfa5d7aa
                 //autoLineExists(AutoLine.Triggers(oracleBit, cardName, type, subtype, power));
                 String auraEquipBonus = AutoLine.ReplacerAuraEquipBonus(oracleBit, subtype);
                 if (!auraEquipBonus.isEmpty()) {
@@ -141,10 +86,6 @@ public class OracleTextToWagic {
             // EQUIPMENT
             if (subtype.contains("Equipment")) {
                 //autoLineExists(AutoLine.Triggers(oracleBit, cardName, type, subtype, power));
-<<<<<<< HEAD
-=======
-                autoLineExists(AutoLineGRN.Convoke(oracleBit));
->>>>>>> 4ad7065fc5e7b314f4e8a53857e551d8bfa5d7aa
                 autoLineExists(AutoLine.AuraEquipBonus(oracleBit, "Equipment"));
                 autoLineExists(AutoLine.ForMirrodin(oracleBit, "Equipment"));
                 if (oracleBit.contains("Equip ")) {
@@ -152,15 +93,9 @@ public class OracleTextToWagic {
                 }
             }
             // SAGA
-<<<<<<< HEAD
 //            if (subtype.contains("Saga")) {
 //                autoLineExists(AutoLine.EpicSaga(oracleBit, subtype));
 //            }
-=======
-            //if (subtype.contains("Saga")) {
-              //  autoLineExists(AutoLine.EpicSaga(oracleBit, subtype));
-            //}
->>>>>>> 4ad7065fc5e7b314f4e8a53857e551d8bfa5d7aa
         }
     }
 
