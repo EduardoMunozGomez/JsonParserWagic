@@ -58,5 +58,3 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 /JsonParserWagic/dist/
-/WagicUtilities-master/nbproject/private/
-/JsonParserWagic_1/nbproject/private/
