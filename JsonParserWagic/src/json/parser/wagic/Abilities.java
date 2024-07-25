@@ -1,5 +1,7 @@
 package json.parser.wagic;
 
+import java.util.Map;
+import java.util.LinkedHashMap;
 import org.json.simple.JSONArray;
 
 // @author Eduardo
@@ -44,75 +46,43 @@ public class Abilities {
     }
 
     protected static String processCustomAbilities(String oracleText, String abilities) {
-
         oracleText = oracleText.toLowerCase();
 
-        if (oracleText.contains("you may look at the top card of your library any time")) {
-            abilities += "showfromtoplibrary,";
+        // Define a map of conditions and abilities
+        Map<String, String> abilityMap = new LinkedHashMap<>();
+        abilityMap.put("you may look at the top card of your library any time", "showfromtoplibrary,");
+        abilityMap.put("you have no maximum hand size", "nomaxhand,");
+        abilityMap.put("can't be countered", "nofizzle,");
+        abilityMap.put("can't be blocked.", "unblockable,");
+        abilityMap.put("can't be blocked by more than one creature", "oneblocker,");
+        abilityMap.put("toxic 1", "poisontoxic,");
+        abilityMap.put("toxic 2", "poisontwotoxic,");
+        abilityMap.put("toxic 3", "poisonthreetoxic,");
+        abilityMap.put("can't block.", "cantblock,");
+        abilityMap.put("attacks each turn if able.", "mustattack,");
+        abilityMap.put("attacks each combat if able.", "mustattack,");
+        abilityMap.put("power can't block it.", "strong,");
+        abilityMap.put("can block only creatures with flying.", "cloud,");
+        abilityMap.put("all creatures able to block ", "lure,");
+        abilityMap.put("counter on it for each color of mana spent to cast it", "sunburst,");
+        abilityMap.put("blocks each turn if able", "mustblock,");
+        abilityMap.put("blocks each combat if able", "mustblock,");
+        abilityMap.put("players can't gain life", "nolifegain,");
+        abilityMap.put("opponents can't gain life", "nolifegainopponent,");
+        abilityMap.put("doesn't untap during your untap step", "doesnotuntap,");
+        abilityMap.put("protection from", "protection from,");
+        abilityMap.put("affinity for artifacts", "affinityartifacts,");
+        abilityMap.put("choose a background", "chooseabackground,");
+        abilityMap.put("modular", "modular\nmodular=");
+
+        // Iterate over the map and add the corresponding abilities if conditions are met
+        for (Map.Entry<String, String> entry : abilityMap.entrySet()) {
+            if (oracleText.contains(entry.getKey())) {
+                abilities += entry.getValue();
+            }
         }
-        if (oracleText.contains("you have no maximum hand size")) {
-            abilities += "nomaxhand,";
-        }
-        if (oracleText.contains("can't be countered")) {
-            abilities += "nofizzle,";
-        }
-        if (oracleText.contains("can't be blocked.")) {
-            abilities += "unblockable,";
-        }
-        if (oracleText.contains("can't be blocked by more than one creature")) {
-            abilities += "oneblocker,";
-        }
-        if (oracleText.contains("toxic 1")) {
-            abilities += "poisontoxic,";
-        }
-        if (oracleText.contains("toxic 2")) {
-            abilities += "poisontwotoxic,";
-        }
-        if (oracleText.contains("toxic 3")) {
-            abilities += "poisonthreetoxic,";
-        }
-        if (oracleText.contains("can't block.")) {
-            abilities += "cantblock,";
-        }
-        if (oracleText.contains("attacks each turn if able.") || oracleText.contains("attacks each combat if able.")) {
-            abilities += "mustattack,";
-        }
-        if (oracleText.contains("power can't block it.")) {
-            abilities += "strong,";
-        }
-        if (oracleText.contains("can block only creatures with flying.")) {
-            abilities += "cloud,";
-        }
-        if (oracleText.contains("all creatures able to block ")) {
-            abilities += "lure,";
-        }
-        if (oracleText.contains("counter on it for each color of mana spent to cast it")) {
-            abilities += "sunburst,";
-        }
-        if (oracleText.contains("blocks each turn if able") || oracleText.contains("blocks each combat if able")) {
-            abilities += "mustblock,";
-        }
-        if (oracleText.contains("players can't gain life")) {
-            abilities += "nolifegain,";
-        }
-        if (oracleText.contains("opponents can't gain life")) {
-            abilities += "nolifegainopponent,";
-        }
-        if (oracleText.contains("doesn't untap during your untap step")) {
-            abilities += "doesnotuntap,";
-        }
-        if (oracleText.contains("protection from")) {
-            abilities += "protection from,";
-        }
-        if (oracleText.contains("affinity for artifacts")) {
-            abilities += "affinityartifacts,";
-        }
-        if (oracleText.contains("choose a background")) {
-            abilities += "chooseabackground,";
-        }
-        if (oracleText.contains("modular")) {
-            abilities += "modular\nmodular=";
-        }
+
+        // Remove the trailing comma if it exists
         abilities = abilities.replaceAll(",$", "");
 
         return abilities;

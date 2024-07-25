@@ -15,11 +15,11 @@ import org.json.simple.parser.ParseException;
 // @author Eduardo
 public class JsonParserWagic {
 
-    private static final String setCode = "BLB";
-    private static final String filePath = "C:\\Users\\Eduardo_\\Downloads\\MTGJSON\\" + setCode;
+    private static final String SET_CODE = "BLB";
+    private static final String FILE_PATH = "C:\\Users\\Eduardo_\\Downloads\\MTGJSON\\" + SET_CODE;
 
     public static String getFilePath() {
-        return filePath;
+        return FILE_PATH;
     }
 
     public static void main(String[] args) {
@@ -27,7 +27,7 @@ public class JsonParserWagic {
         File directorio = new File(getFilePath());
         directorio.mkdir();
 
-        try ( FileReader reader = new FileReader(getFilePath() + ".json", StandardCharsets.UTF_8);  FileWriter myWriter = new FileWriter(getFilePath() + "\\_cards.dat");  FileWriter myWriterImages = new FileWriter("C:\\Users\\Eduardo_\\Downloads\\MTGJSON\\image.cvs", true)) {
+        try (FileReader reader = new FileReader(getFilePath() + ".json", StandardCharsets.UTF_8); FileWriter myWriter = new FileWriter(getFilePath() + "\\_cards.dat"); FileWriter myWriterImages = new FileWriter("C:\\Users\\Eduardo_\\Downloads\\MTGJSON\\image.cvs", true)) {
 
             JSONObject jsonObject = (JSONObject) new JSONParser().parse(reader);
             JSONObject data = (JSONObject) jsonObject.get("data");
@@ -40,25 +40,25 @@ public class JsonParserWagic {
             String primitiveCardName;
             String primitiveRarity;
             String side;
-            // Metadata header
+            //Metadata header
             Metadata.printMetadata(data.get("name"), data.get("releaseDate"), data.get("totalSetSize"), myWriter);
 
-//            for (Object tkn : tokens) {
-//                JSONObject token = (JSONObject) tkn;
-//                JSONArray reverseRelated = (JSONArray) token.get("reverseRelated");
-//                for (Object related : reverseRelated) {
-//
-//                    for (Object o : cards) {
-//                        card = (JSONObject) o;
-//                        identifiers = (JSONObject) card.get("identifiers");
-//                        JSONObject tokenIdentifiers = (JSONObject) token.get("identifiers");
-//                        primitiveCardName = (String) card.get("faceName") != null ? (String) card.get("faceName") : (String) card.get("name");
-//                        if (primitiveCardName.equals(related.toString()) && !token.get("name").equals("Copy") && !token.get("name").equals("Energy Reserve") && !token.get("name").equals("Plot") && identifiers.get("multiverseId") != null) {
-//                            CardDat.generateCSV(setCode, identifiers.get("multiverseId") + "t", (String) tokenIdentifiers.get("scryfallId"), myWriterImages, "front/");
-//                        }
-//                    }
-//                }
-//            }
+            for (Object tkn : tokens) {
+                JSONObject token = (JSONObject) tkn;
+                JSONArray reverseRelated = (JSONArray) token.get("reverseRelated");
+                for (Object related : reverseRelated) {
+
+                    for (Object o : cards) {
+                        card = (JSONObject) o;
+                        identifiers = (JSONObject) card.get("identifiers");
+                        JSONObject tokenIdentifiers = (JSONObject) token.get("identifiers");
+                        primitiveCardName = (String) card.get("faceName") != null ? (String) card.get("faceName") : (String) card.get("name");
+                        if (primitiveCardName.equals(related.toString()) && !token.get("name").equals("Copy") && !token.get("name").equals("Energy Reserve") && !token.get("name").equals("Plot") && identifiers.get("multiverseId") != null) {
+                            CardDat.generateCSV(SET_CODE, identifiers.get("multiverseId") + "t", (String) tokenIdentifiers.get("scryfallId"), myWriterImages, "front/");
+                        }
+                    }
+                }
+            }
             for (Object o : cards) {
 
                 card = (JSONObject) o;
@@ -71,7 +71,7 @@ public class JsonParserWagic {
                 side = card.get("side") != null && "b".equals(card.get("side").toString()) ? "back/" : "front/";
                 if (identifiers.get("multiverseId") != null) {
                     CardDat.generateCardDat(primitiveCardName, identifiers.get("multiverseId"), primitiveRarity, myWriter);
-                    //CardDat.generateCSV(setCode, identifiers.get("multiverseId"), (String) identifiers.get("scryfallId"), myWriterImages, side);
+                    CardDat.generateCSV(SET_CODE, identifiers.get("multiverseId"), (String) identifiers.get("scryfallId"), myWriterImages, side);
                 }
 
                 // If card is a reprint, skip it
@@ -79,10 +79,12 @@ public class JsonParserWagic {
                     continue;
                 }
                 String nameHeader = "name=" + primitiveCardName;
-                String cardName = primitiveCardName;
                 String oracleText = null;
                 if (card.get("text") != null) {
                     oracleText = card.get("text").toString();
+                    oracleText = oracleText.replace("−", "-");
+                    oracleText = oracleText.replace("—", "-");
+                    oracleText = oracleText.replace("•", "-");
                 }
                 JSONArray keywords = (JSONArray) card.get("keywords");
                 String manaCost = (String) card.get("manaCost");
@@ -141,7 +143,7 @@ public class JsonParserWagic {
                 }
                 // ORACLE TEXT
                 if (oracleText != null) {
-                    OracleTextToWagic.parseOracleText(keywords, oracleText, cardName, type, subtype, (String) card.get("power"), manaCost);
+                    OracleTextToWagic.parseOracleText(keywords, oracleText, primitiveCardName, type, subtype, (String) card.get("power"), manaCost);
                     System.out.println("text=" + oracleText.replace("\n", " -- "));
                 }
                 if (manaCost != null) {

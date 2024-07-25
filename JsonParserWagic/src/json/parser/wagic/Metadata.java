@@ -11,7 +11,7 @@ public class Metadata {
     //  name=Limited Edition Alpha
     //  year=1993
     //  total=295
-    //  [/meta]        
+    //  [/meta]
     static void printMetadata(Object name, Object year, Object total, FileWriter myWriter) {
         try {
             myWriter.write("[meta]\n");

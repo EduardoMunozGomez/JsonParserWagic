@@ -151,20 +151,20 @@ public class AutoLineGRN {
             String incidence = "amass ";
             String amassQuant = oracleText.substring(oracleText.indexOf(incidence) + incidence.length(), oracleText.indexOf(incidence) + incidence.length() + 1);
             if (oracleText.contains(incidence)) {
-                ascend = String.format("auto=_AMASS_(%s)", amassQuant);
+                ascend = String.format("auto=_AMASS(%s)_", amassQuant);
             }
         } catch (Exception ex) {
 
         }
         return ascend;
     }
-    
+
     static String Proliferate(String oracleText) {
         String proliferate = "";
 
         try {
             oracleText = oracleText.toLowerCase();
-            String incidence = "proliferate";           
+            String incidence = "proliferate";
             if (oracleText.contains(incidence)) {
                 proliferate = String.format("auto=_PROLIFERATE_");
             }

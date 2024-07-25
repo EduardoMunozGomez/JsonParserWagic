@@ -6,6 +6,79 @@ import static json.parser.wagic.AutoEffects.ProcessEffect;
 // @author Eduardo
 public class AutoLine {
 
+    static String threshold(String oracleText, String manaCost) {
+        String autoThreshold = "";
+
+        try {
+            String incidence = "Threshold";
+            if (oracleText.contains(incidence)) {
+
+                autoThreshold += "auto=_THRESHOLD_";
+                //String ifKicked = "was kicked, ";
+                //String ifKickedEffect = oracleText.substring(oracleText.indexOf(ifKicked)+ifKicked.length());
+
+                //kicker += "\nauto=kicked" + AutoEffects.processEffect(ifKickedEffect, cardName);
+            }
+        } catch (Exception ex) {
+            ex.getMessage();
+        }
+        return autoThreshold;
+    }
+
+    static String offspring(String oracleText, String manaCost) {
+        String autoOffspring = "";
+        String offspringCost;
+
+        try {
+            String incidence = "Offspring";
+            if (oracleText.contains(incidence)) {
+                offspringCost = oracleText.substring(oracleText.indexOf(incidence) + incidence.length(), oracleText.lastIndexOf(" "));
+                autoOffspring = "other=" + manaCost + offspringCost.trim() + " name(Offspring)";
+                autoOffspring += "\nauto=if paid(alternative) then clone and!( transforms((,setpower=1,settoughness=1)) )!";
+                //String ifKicked = "was kicked, ";
+                //String ifKickedEffect = oracleText.substring(oracleText.indexOf(ifKicked)+ifKicked.length());
+
+                //kicker += "\nauto=kicked" + AutoEffects.processEffect(ifKickedEffect, cardName);
+            }
+        } catch (Exception ex) {
+            ex.getMessage();
+        }
+        return autoOffspring;
+    }
+
+    static String gift(String oracleText, String manaCost) {
+        String gift = "";
+        String giftCost;
+
+        try {
+            String incidence = "Gift";
+            if (oracleText.contains(incidence)) {
+                giftCost = oracleText.substring(oracleText.indexOf(incidence) + incidence.length(), oracleText.lastIndexOf(" ")).trim();
+                gift = "other=" + manaCost + " name(Gift " + giftCost + ")";
+                gift += "\nauto=if paid(alternative) then ";
+                gift += "\nauto=if paid(alternative) then ";
+                if (giftCost.equals("a Food")) {
+                    gift += "create(food) opponent";
+                }
+                if (giftCost.equals("a card")) {
+                    gift += "draw:1 opponent";
+                }
+                if (giftCost.equals("a tapped Fish")) {
+                    gift += "_FISHTOKEN_ and!(tap(noevent))! opponent";
+                }
+                if (giftCost.equals("a Treasure")) {
+                    gift += "create(treasure) opponent";
+                }
+                //String ifKickedEffect = oracleText.substring(oracleText.indexOf(ifKicked)+ifKicked.length());
+
+                //kicker += "\nauto=kicked" + AutoEffects.processEffect(ifKickedEffect, cardName);
+            }
+        } catch (Exception ex) {
+            ex.getMessage();
+        }
+        return gift;
+    }
+
     //Corrupted
     protected static String Corrupted(String oracleText, String cardName) {
         String corrupted = "";
@@ -68,7 +141,7 @@ public class AutoLine {
         }
         try {
             if (oracleText.contains("any target")) {
-                myTarget = "target=player,creature,planeswalker";
+                myTarget = "target=anytarget";
                 return myTarget;
             }
             if (oracleText.contains("target spell")) {
@@ -100,7 +173,7 @@ public class AutoLine {
                 }
 
                 letterS = target.endsWith("s") ? "s" : "";
-                String[] targets = {"artifact", "creature", "nonlegendary creature", "enchantment", "land", "planeswalker"};
+                String[] targets = {"artifact", "creature", "nonlegendary creature", "enchantment", "land", "planeswalker", "token"};
 
                 for (String t : targets) {
                     if (target.contains(t + letterS)) {
@@ -126,8 +199,18 @@ public class AutoLine {
                 if (target.contains("nonbasic land" + letterS)) {
                     myTarget = "land[-basic]";
                 }
-                if (target.contains("tapped creature" + letterS)) {
-                    myTarget = "creature[tapped]";
+                if (target.contains("token creature" + letterS)) {
+                    myTarget = "creature[token]";
+                }
+                if (target.contains("token" + letterS)) {
+                    myTarget = "*[token]";
+                }
+                if (target.contains("creatures")) {
+                    incidence = "up to two";
+                    String incidence2 = "one or two";
+                    if (oracleText.contains(incidence) || oracleText.contains(incidence2)) {
+                        myTarget = "<upto:2>creature";
+                    }
                 }
                 if (target.contains("creatures")) {
                     incidence = "up to two";
@@ -179,7 +262,7 @@ public class AutoLine {
 
             if (!(type.contains("Instant") || type.contains("Sorcery") || subtype.contains("Aura") || subtype.contains("Equipment")) && myTarget.contains("target")) {
                 myTarget = myTarget.replace("target=", "target(");
-                myTarget = myTarget.concat(")");
+                myTarget = myTarget.concat("");
             }
         } catch (Exception ex) {
             System.out.println("DANGER MYTGT " + oracleText + "END MYTGT");
@@ -304,42 +387,7 @@ public class AutoLine {
         return bonus;
     }
 
-    // Enters the battlefield
-    protected static String ETB(String oracleText, String name, String type, String subtype) {
-        String etb = "";
-
-        try {
-            if (oracleText.contains(name + " enters the battlefield")) {
-                etb = "auto=";
-                oracleText = oracleText.substring(oracleText.indexOf(" enters the battlefield, ") + " enters the battlefield, ".length());
-                if (oracleText.contains(name + " enters the battlefield tapped")) {
-                    etb += "tap(noevent)";
-                }
-                if (oracleText.contains(name + " enters the battlefield, you may")) {
-                    etb += "may";
-                }
-
-                String takeAction = ExileDestroyDamage(oracleText, type);
-                etb += takeAction;
-                String myTarget = MyTarget(oracleText, type, subtype);
-                etb += myTarget;
-                String effect = AutoEffects.ProcessEffect(oracleText, name);
-                etb += "EFFECT " + effect + "END EFFECT ";
-                //String effect = ActivatedAbilityEffect(oracleText, type);
-                //etb += "EFFECT " + effect + "END EFFECT ";
-                String create = Create(oracleText);
-                etb += create;
-                String etbCounters = ETBCounters(oracleText);
-                etb += etbCounters;
-            }
-        } catch (Exception ex) {
-            System.out.println("DANGER FROM ETB " + oracleText + "DANGER");
-            System.out.println(ex.getMessage());
-        }
-        return etb;
-    }
-
-    //auto=counter(1/1,X) //halfdownX 
+    //auto=counter(1/1,X) //halfdownX
     protected static String ETBCounters(String oracleText) {
         String etbCounters = "";
         String incidence = " +1/+1 counters on it";
@@ -479,7 +527,7 @@ public class AutoLine {
 
     static String ManaAbility(String oracleText, String subtype) {
         String manaAbility = "";
-        String manaProduced;
+        String manaProduced = oracleText;
         String[] basicLandTypes = {"Plains", "Island", "Swamp", "Mountain", "Forest"};
 
         for (String basicLandType : basicLandTypes) {
@@ -489,23 +537,23 @@ public class AutoLine {
             }
         }
         try {
-            String incidence = "{T}: Add {";
-            String endIncidence = ".";
+            //String incidence = "{T}: Add {";
+            //String endIncidence = ".";
 
-            if (oracleText.contains(incidence)) {
-                manaProduced = oracleText.substring(oracleText.indexOf(incidence) + incidence.length(), oracleText.indexOf(endIncidence));
-                manaProduced = manaProduced.replace(".", "");
+            //if (oracleText.contains(incidence)) {
+            //manaProduced = oracleText.substring(oracleText.indexOf(incidence) + incidence.length(), oracleText.indexOf(endIncidence));
+            manaProduced = manaProduced.replace(".", "");
 
-                if (manaProduced.contains(",") || manaProduced.contains(" or ")) {
-                    manaProduced = manaProduced.replace(" or ", "\nauto={T}:Add");
-                }
-
-                manaAbility = "auto={T}:Add{" + manaProduced;
+            if (manaProduced.contains(",") || manaProduced.contains(" or ")) {
+                manaProduced = manaProduced.replace(" or ", "\nauto={T}:Add");
             }
+
+            manaAbility = manaProduced.replace(" ", "");
+            //}
         } catch (Exception ex) {
 
         }
-        return manaAbility;
+        return manaAbility.trim();
     }
 
     static String ExileDestroyDamage(String oracleText, String type) {
@@ -628,10 +676,15 @@ public class AutoLine {
                 if (oracleText.contains("Create a token that's a copy of ")) {
                     return "clone";
                 }
-                if (oracleText.contains("treasure token")) {
-                    return "token(Treasure,Artifact Treasure) and!( transforms((,newability[{T}{S}:Add{W}])(,newability[{T}{S}:Add{R}])(,newability[{T}{S}:Add{G}])(,newability[{T}{S}:Add{U}])(,newability[{T}{S}:Add{B}])) forever )!";
+                if (oracleText.contains("clue token")) {
+                    return "create(clue)";
                 }
-
+                if (oracleText.contains("food token")) {
+                    return "create(food)";
+                }
+                if (oracleText.contains("treasure token")) {
+                    return "create(treasure)";
+                }
                 create = oracleText.substring(oracleText.indexOf(incidence) + incidence.length());
                 create = create.substring(0, create.indexOf("."));
                 tokenMultipl = create.substring(0, create.indexOf(" "));
@@ -666,6 +719,7 @@ public class AutoLine {
                 tokenMultipl = tokenMultipl.replace("eight", "*8");
 
                 tokenAbility = tokenAbility.replace("that are tapped,attacking", ":battleready");
+                tokenAbility = tokenAbility.replace("tapped and attacking", ":battleready");
 
                 create = "create(" + tokenName + ":" + tokenType + " " + tokenName + ":" + tokenPT + ":" + tokenColor + ":" + tokenAbility + ")" + tokenMultipl;
                 if (create.endsWith(":)")) {
@@ -710,7 +764,7 @@ public class AutoLine {
         return takeControl;
     }
 
-    static String Scry(String oracleText) {
+    static String scry(String oracleText) {
         String scry = "";
         String scryNumber;
         try {
@@ -720,7 +774,7 @@ public class AutoLine {
             if (oracleText.contains(incidence)) {
                 scryNumber = oracleText.substring(oracleText.indexOf(incidence) + incidence.length(), oracleText.indexOf(incidence) + incidence.length() + 1);
 
-                scry = "auto=_SCRY_(" + scryNumber + ")";
+                scry = "auto=_SCRY" + scryNumber + "_";
             }
         } catch (Exception e) {
         }
@@ -736,6 +790,7 @@ public class AutoLine {
                 type = oracleText.substring(0, oracleText.indexOf(incidence));
 
                 type = "auto=lord(" + type + "|mycastingzone) altercost(colorless,-1)";
+                type = type.replace(" and ", ",");
             }
         } catch (Exception e) {
         }
@@ -889,6 +944,7 @@ public class AutoLine {
                 }
 
                 effect = effect.replace("until end of turn", "");
+                effect = effect.replace(" and ", ",");
 
                 lord = String.format("auto=%s(%s%s%s|myBattlefield)%s", lordOrAll, onlyOther, creatureType, condition, effect);
             }
@@ -1012,101 +1068,5 @@ public class AutoLine {
         } catch (Exception e) {
         }
         return chooseOneOrBoth;
-    }
-
-    static String Triggers(String oracleText, String cardName, String type, String subtype, String power) {
-        String trigger = "";
-        String triggerEffect;
-        if (subtype.contains("Aura") || subtype.contains("Equipment")) { //
-            return "";
-        }
-        try {
-            cardName = cardName.replace(",", "");
-            // Trigger conditions
-            if ((oracleText.toLowerCase().contains("whenever ")
-                    || oracleText.contains("As " + cardName)
-                    || oracleText.contains("At the beginning")
-                    || oracleText.contains(cardName + " enters the battlefield")
-                    || oracleText.contains("When " + cardName + " dies,")
-                    || oracleText.contains("When this creature dies")
-                    || oracleText.contains(cardName + " becomes the target of a spell or ability")
-                    || oracleText.contains("becomes the target of a spell or ability an opponent controls")
-                    || oracleText.contains("Mentor")
-                    || oracleText.contains("Raid "))
-                    && !(oracleText.contains("Whenever you cast"))) {
-
-                // The comma limits the trigger
-                if (oracleText.contains(",")) {
-                    trigger = oracleText.substring(0, oracleText.indexOf(","));
-                    triggerEffect = oracleText.substring(oracleText.indexOf(",") + 1);
-                } else {
-                    triggerEffect = oracleText.replace(cardName + " enters the battlefield", "");
-                }
-
-                trigger = trigger.replace("Enrage - ", "");
-                trigger = trigger.replace("Raid - ", "");
-
-                trigger = trigger.replace(cardName + " enters the battlefield tapped", "tap(noevent)");
-                trigger = trigger.replace("When " + cardName + " enters the battlefield", "");
-                trigger = trigger.replace(cardName + " enters the battlefield", "");
-
-                trigger = trigger.replace(" you gain life ", "lifeof(player):");
-                trigger = trigger.replace("you may pay ", "pay(");
-                trigger = trigger.replace(". If you do ", "):");
-                trigger = trigger.replace("you draw a card", "drawof(player):");
-                trigger = trigger.replace(cardName + " becomes tapped", "tapped(this):");
-                // Moved to battlefield
-                trigger = trigger.replace("a creature enters the battlefield under your control", "movedTo(creature|myBattlefield):");
-                trigger = trigger.replace("another creature enters the battlefield under your control", "movedTo(other creature|myBattlefield):");
-                trigger = trigger.replace("a land enters the battlefield under your control", "movedTo(land|myBattlefield):");
-                trigger = trigger.replace("a creature enters the battlefield", "movedTo(creature|Battlefield):");
-                trigger = trigger.replace("enters the battlefield under your control", "movedTo(*[]|myBattlefield):");
-                trigger = trigger.replace("enters the battlefield under an opponent's control", "movedTo(*[]|opponentBattlefield):");
-
-                trigger = trigger.replace("Whenever " + cardName + " attacks", "_ATTACKING_");
-                trigger = trigger.replace(cardName + " and at least two other creatures attack", "_ATTACKING_restriction{type(other creature[attacking]|myBattlefield)~morethan~1}:");
-                trigger = trigger.replace("Whenever " + cardName + " deals combat damage to a player", "combatdamaged(player) from(this):");
-                trigger = trigger.replace("a Samurai or Warrior you control attacks alone", "combat(attackedalone) source(*[Samurai;Warrior]|myBattlefield):all(trigger[to])");
-
-                trigger = trigger.replace("When " + cardName + " dies", "_DIES_");
-                trigger = trigger.replace("Whenever " + cardName + " dies", "_DIES_");
-                trigger = trigger.replace("When this creature dies", "movedTo(this|graveyard) from(battlefield):");
-                trigger = trigger.replace("a creature dies", "movedTo(creature|graveyard) from(battlefield):");
-                trigger = trigger.replace("another creature dies", "movedTo(other creature|graveyard) from(battlefield):");
-                trigger = trigger.replace("another creature or planeswalker you control dies", "movedTo(other *[creature;planeswalker]|graveyard) from(myBattlefield):");
-                trigger = trigger.replace("a creature you control dies", "movedTo(creature|graveyard) from(mybattlefield):");
-                trigger = trigger.replace("a creature an opponent controls dies", "movedTo(creature|graveyard) from(opponentbattlefield):");
-                trigger = trigger.replace("a creature or planeswalker you control dies", "movedTo(creature,planeswalker|graveyard) from(mybattlefield):");
-                trigger = trigger.replace(" dies", "movedTo(|graveyard) from(battlefield):");
-                // Phases
-                trigger = trigger.replace("At the beginning of ", "@");
-                trigger = trigger.replace("your upkeep", "each my upkeep:");
-                trigger = trigger.replace("your draw step", "each my draw:");
-                trigger = trigger.replace("your precombat main phase", "each my firstmain:");
-                trigger = trigger.replace("combat on your turn", "each my combatbegins:");
-                trigger = trigger.replace("your end step", "each my endofturn:");
-                trigger = trigger.replace("each end step", "each endofturn:");
-                trigger = trigger.replace("your next end step", "my endofturn once");
-
-                trigger = trigger.replace("If you attacked with a creature this turn", "if raid then ");
-                trigger = trigger.replace("if it was kicked", "kicked ");
-
-                trigger = trigger.replace(cardName + " is dealt damage", "damaged(this):");
-                trigger = trigger.replace("you gain life", "lifeof(player):");
-
-                trigger = trigger.replace("becomes the target of a spell or ability an opponent controls", "targeted(this|mybattlefield) from(*|opponentbattlefield,opponenthand,opponentstack,opponentgraveyard,opponentexile,opponentlibrary):");
-                trigger = trigger.replace(cardName + " becomes the target of a spell or ability", "targeted(this):");
-                trigger = trigger.replace("Whenever you ", "@");
-                trigger = trigger.replace("Whenever a ", "@");
-                trigger = trigger.replace("Whenever ", "@");
-                trigger = trigger.replace("When ", "@");
-
-                triggerEffect = AutoEffects.ProcessEffect(triggerEffect, cardName);
-                trigger = "auto=" + trigger + triggerEffect;
-
-            }
-        } catch (Exception e) {
-        }
-        return trigger;
     }
 }

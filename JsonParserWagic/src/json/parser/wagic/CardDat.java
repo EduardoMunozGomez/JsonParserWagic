@@ -7,7 +7,7 @@ import java.io.IOException;
 public class CardDat {
 
     //[card]
-    //primitive=Abomination of Gudul 
+    //primitive=Abomination of Gudul
     //id=386463
     //rarity=C
     //[/card]

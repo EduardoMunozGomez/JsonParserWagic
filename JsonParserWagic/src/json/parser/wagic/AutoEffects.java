@@ -8,84 +8,6 @@ public class AutoEffects {
 
     static Map<String, Integer> numberMap = new HashMap<>();
 
-    // Determine if the card has an activated ability
-    static String DetermineActivatedAbility(String oracleBit, String cardName, String type, String subtype) {
-        String[] activatedAbililty = oracleBit.split(":");
-        if (activatedAbililty.length > 1) {
-            return ActivatedAbililtyCost(activatedAbililty, cardName, type);
-        } else {
-            return "";
-        }
-    }
-
-    // Activated ability cost
-    private static String ActivatedAbililtyCost(String[] actAbil, String cardName, String type) {
-        String actAbilCost;
-        String actAbilEffect;
-
-        numberMap.put("one", 1);
-        numberMap.put("two", 2);
-        numberMap.put("three", 3);
-        numberMap.put("four", 4);
-        numberMap.put("five", 5);
-        numberMap.put("six", 6);
-        numberMap.put("seven", 7);
-        numberMap.put("eight", 8);
-        numberMap.put("nine", 9);
-
-        actAbilCost = actAbil[0];
-
-        actAbilCost = actAbilCost.replace("{W/P}", "{p(W)}");
-        actAbilCost = actAbilCost.replace("{U/P}", "{p(U)}");
-        actAbilCost = actAbilCost.replace("{B/P}", "{p(B)}");
-        actAbilCost = actAbilCost.replace("{R/P}", "{p(R)}");
-        actAbilCost = actAbilCost.replace("{G/P}", "{p(G)}");
-        
-        actAbilCost = actAbilCost.replace("Channel ", "autohand=");
-        actAbilCost = actAbilCost.replace("discard your hand" + cardName, "reject all(*|myhand)");
-        actAbilCost = actAbilCost.replace(", Discard " + cardName, "{discard}");
-        actAbilCost = actAbilCost.replace("Discard a card", "{D(*|myhand)}");
-        actAbilCost = actAbilCost.replace("Discard a land card", "{D(land|myhand)}");
-        actAbilCost = actAbilCost.replace("Discard three cards", "{D(*|myhand)}{D(*|myhand)}{D(*|myhand)}");
-        actAbilCost = actAbilCost.replace("Discard a creature card", "{D(creature|myhand)}");
-        actAbilCost = actAbilCost.replace("Sacrifice a creature with defender", "{S(creature[defender]|myBattlefield)}");
-        actAbilCost = actAbilCost.replace("Sacrifice " + cardName, "{S}");
-        actAbilCost = actAbilCost.replace("Exile " + cardName, "{E}");
-        actAbilCost = actAbilCost.replace("Sacrifice a creature", "{S(creature|myBattlefield)}");
-        actAbilCost = actAbilCost.replace("Sacrifice two creatures", "{S(creature|myBattlefield)}{S(creature|myBattlefield)}");
-        actAbilCost = actAbilCost.replace("Sacrifice an artifact or creature", "{S(*[artifact;creature]|myBattlefield)}");
-        actAbilCost = actAbilCost.replace("Sacrifice an artifact or land", "{S(*[artifact;land]|myBattlefield)}");
-        actAbilCost = actAbilCost.replace("Sacrifice an artifact", "{S(artifact|myBattlefield)}");
-        actAbilCost = actAbilCost.replace("Sacrifice an artifact creature", "{S(creature[artifact]|myBattlefield)}");
-        actAbilCost = actAbilCost.replace("Sacrifice a land", "{S(land|myBattlefield)}");
-        actAbilCost = actAbilCost.replaceAll("Sacrifice another ([a-zA-Z]+)", "{S(other $1|mybattlefield)}");
-        actAbilCost = actAbilCost.replaceAll("Remove (an?|a) ([a-zA-Z]+) counter from " + cardName, "{C(0/0,-1,$2)}");
-        actAbilCost = actAbilCost.replace("Remove two oil counters from ", "{C(0/0,-2,oil)}");
-        actAbilCost = actAbilCost.replace("Remove three oil counters from ", "{C(0/0,-3,oil)}");
-        actAbilCost = actAbilCost.replace("Exile " + cardName + " from your graveyard", "{E}");
-        actAbilCost = actAbilCost.replace("Pay ", "{L:");
-        actAbilCost = actAbilCost.replace(" life", "}");
-        actAbilCost = actAbilCost.replace(cardName, "");
-        actAbilCost = actAbilCost.replace(", ", "");
-        actAbilCost = actAbilCost.replace(" ", "");
-        actAbilCost = actAbilCost.replace(".", "");
-        actAbilCost = actAbilCost.replace("/", "");
-
-        if (type.contains("Planeswalker")) {
-            actAbilCost = actAbilCost.replace("[", "");
-            actAbilCost = actAbilCost.replace("]", "");
-            actAbilCost = "{C(0/0," + actAbilCost + ",Loyalty)}";
-        }
-
-        actAbilCost = actAbilCost.concat(":");
-        actAbilCost = "auto=" + actAbilCost;
-
-        actAbilEffect = actAbil[1];
-        actAbilEffect = ProcessEffect(actAbilEffect, cardName);
-
-        return actAbilCost + actAbilEffect;
-    }
-
     static String ProcessEffect(String oracleBit, String cardName) {
         String effect;
         effect = oracleBit;
@@ -97,21 +19,37 @@ public class AutoEffects {
         effect = effect.toLowerCase();
         cardName = cardName.toLowerCase();
 
+        if (effect.contains("offspring ")) {
+            return "";
+        }
         if (effect.contains("create ")) {
             return AutoLine.Create(effect);
         }
         if (effect.contains("scry ")) {
-            return AutoLine.Scry(effect);
+            AutoLine.scry(effect);
+        }
+        if (effect.contains("add ")) {
+            return AutoLine.ManaAbility(oracleBit, "");
         }
 
-        effect = effect.replace("connives","_CONNIVES_");
+        effect = effect.replaceAll("other ([a-zA-Z]+) you control", "lord(other $1|myBattlefield");
+        effect = effect.replace("from your graveyard", "|mygraveyard)");
+        effect = effect.replace("from your graveyard", "|mygraveyard)");
+        effect = effect.replace("if you gained life this turn", "if compare(lifegain)~morethan~0 then ");
+        effect = effect.replace("gift a card", "");
+        effect = effect.replace("exile the top card of your library. you may play it this turn.", "_EXILETOP_");
+        effect = effect.replace("exile the top card of your library. until the end of your next turn, you may play that card.", "_EXILEUENT_");
+        effect = effect.replace("level 2", "name(Level 2) counter(0/0,1,Level) asSorcery this(variable{hascntlevel}=1)");
+        effect = effect.replace("level 3", "name(Level 3) counter(0/0,1,Level) asSorcery this(variable{hascntlevel}=2)");
+        effect = effect.replace("threshold ", "_THRESHOLD_");
+        effect = effect.replace("connives", "_CONNIVES_");
         effect = effect.replace("top of your library", "moveTo(mylibrary)");
         effect = effect.replace("transform ", "flip(backside)");
         effect = effect.replace("from your graveyard the battlefield", "moveTo(battlefield) from(myGraveyard)");
         effect = effect.replace("exile the top card of your library. you may play it this turn", "__PLAY_TOP_FROM_EXILE__");
-        effect = effect.replaceAll("ward \\{(\\d+)\\}", "_WARD_($1)");
+        effect = effect.replaceAll("ward \\{(\\d+)\\}", "_WARD$1_");
         effect = effect.replace("choose one or both -", "");
-        effect = effect.replaceAll("amass (\\d+)", "_AMASS_($1)");
+        effect = effect.replaceAll("amass (\\d+)", "_AMASS$1_");
         effect = effect.replace("until end of turn", "ueot");
         effect = effect.replace("until your next turn", "uynt");
         effect = effect.replace("activate only once each turn.", "limit:1");
@@ -126,6 +64,7 @@ public class AutoEffects {
 
         effect = effect.replace("you win the game", "wingame");
         effect = effect.replace("this ability triggers only once each turn.", "turnlimited:");
+        effect = effect.replace("only once each turn", "turnlimited:");
         effect = effect.replace("activate only during your turn", "myturnonly");
         effect = effect.replace("that was dealt damage this turn", "[damaged]");
         effect = effect.replace("+1/+1 counter", "counter(1/1)");
@@ -144,6 +83,10 @@ public class AutoEffects {
         effect = effect.replace("historic", "artifact,*[legendary],enchantment[saga]");
         effect = effect.replace("return it to the battlefield tapped under its owner's control at the beginning of the next end step", "(blink)ueot");
         effect = effect.replace("creatures", "creature");
+        effect = effect.replace("nonartifact", "-artifact");
+        effect = effect.replace("noncreature", "-creature");
+        effect = effect.replace("nonland", "-land");
+
         effect = effect.replace("activate this ability only once each turn", "limit:1");
         effect = effect.replace("sacrifice " + cardName, "{S}:");
         effect = effect.replace("sacrifice another creature", "{S(other creature|mybattlefield)}");
@@ -182,14 +125,18 @@ public class AutoEffects {
         effect = effect.replace("to the battlefield.", "moveTo(mybattlefield)");
         effect = effect.replace("creature doesn't untap during its controller's next untap step", "freeze");
 
+        effect = effect.replace("nonland permanent", "*[-land;-instant;-sorcery]");
+        effect = effect.replace("permanents", "*[-instant;-sorcery]");
+        effect = effect.replace("permanent", "*[-instant;-sorcery]");
+
         effect = effect.replace("you don't control", "|opponentBattlefield)");
-        effect = effect.replace("creature you control", "creature|myBattlefield)");
+        effect = effect.replace("creature you control ", "creature|myBattlefield");
         effect = effect.replace("each white creature", "(creature[white]");
         effect = effect.replace(" attacking creature with lesser power", "creature[attacking;power<=])");
         effect = effect.replace("nonland permanent an opponent controls", "*[-land]|opponentbattlefield)");
         effect = effect.replace("if you attacked with a creature this turn, ", "if raid then ");
         effect = effect.replace(" an opponent controls", "|opponentBattlefield)");
-        effect = effect.replace(" you control", "|myBattlefield)");
+        effect = effect.replace(" you control", "|myBattlefield");
         effect = effect.replace("loses all abilities", "loseabilities");
         effect = effect.replace("discard a card", "ability$!name(discard) reject notatarget(*|myhand)!$");
         effect = effect.replace("discards a card", "ability$!name(discard) reject notatarget(*|myhand)!$");
@@ -223,12 +170,14 @@ public class AutoEffects {
         effect = effect.replace(cardName + " gains ", "");
         effect = effect.replace(cardName + " gets ", "");
         effect = effect.replace(cardName + " has ", "");
+        effect = effect.replace(" then shuffle", "");
+        effect = effect.replace(" target creature", "target(creature)");
 
         effect = effect.replaceAll("deals ([0-9]+|x) damage", "damage:$1");
 
         effect = effect.replace("if you do, ", ":");
         effect = effect.replace("when you do, ", ":");
-        effect = effect.replace("you may pay", "may pay(");
+        effect = effect.replace("you may pay", "pay(");
         effect = effect.replace("you may", "may");
         effect = effect.replace("add one mana of any color", manaOfAnyColor);
 
@@ -238,6 +187,7 @@ public class AutoEffects {
         effect = effect.replace(" put a ", " ");
         effect = effect.replace("return ", "");
         effect = effect.replaceAll(" gains | gain | gets | get | has ", ") ");
+        effect = effect.replaceAll("gains |gain |gets |get |has ", ") ");
         effect = effect.replace(", then ", " && ");
 
         effect = effect.replace(" it) ", "");
