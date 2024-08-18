@@ -1,15 +1,27 @@
 package json.parser.wagic;
 
-import static json.parser.wagic.AutoEffects.ProcessEffect;
 import static json.parser.wagic.AutoEffects.numberMap;
+import java.util.Map;
+import java.util.LinkedHashMap;
+import static json.parser.wagic.AutoEffects.processEffect;
 
 /**
- *
+ * This class provides methods to determine and process activated abilities for Wagic cards.
+ * It includes methods to identify activated abilities and format their costs and effects.
+ * 
  * @author Eduardo_
  */
 public class ActivatedAbility {
 
-    // Determine if the card has an activated ability
+    /**
+     * Determines if the card has an activated ability based on the oracle text.
+     *
+     * @param oracleBit The oracle text segment to check for activated abilities.
+     * @param cardName  The name of the card.
+     * @param type      The type of the card (e.g., Creature, Planeswalker).
+     * @param subtype   The subtype of the card (e.g., Vehicle, Aura).
+     * @return A string representing the activated ability, or an empty string if none is found.
+     */
     static String DetermineActivatedAbility(String oracleBit, String cardName, String type, String subtype) {
         String[] activatedAbililty = oracleBit.split(":");
         if (activatedAbililty.length > 1) {
@@ -19,62 +31,65 @@ public class ActivatedAbility {
         }
     }
 
-    // Activated ability cost
+    /**
+     * Processes the cost and effect of an activated ability.
+     *
+     * @param actAbil  An array containing the cost and effect of the activated ability.
+     * @param cardName The name of the card.
+     * @param type     The type of the card (e.g., Creature, Planeswalker).
+     * @return A formatted string representing the activated ability cost and effect.
+     */
     private static String ActivatedAbililtyCost(String[] actAbil, String cardName, String type) {
-        String actAbilCost;
+        String actAbilCost = actAbil[0];
         String actAbilEffect;
 
-        numberMap.put("one", 1);
-        numberMap.put("two", 2);
-        numberMap.put("three", 3);
-        numberMap.put("four", 4);
-        numberMap.put("five", 5);
-        numberMap.put("six", 6);
-        numberMap.put("seven", 7);
-        numberMap.put("eight", 8);
-        numberMap.put("nine", 9);
-
-        actAbilCost = actAbil[0];
-
-        actAbilCost = actAbilCost.replace("{W/P}", "{p(W)}");
-        actAbilCost = actAbilCost.replace("{U/P}", "{p(U)}");
-        actAbilCost = actAbilCost.replace("{B/P}", "{p(B)}");
-        actAbilCost = actAbilCost.replace("{R/P}", "{p(R)}");
-        actAbilCost = actAbilCost.replace("{G/P}", "{p(G)}");
-
-        actAbilCost = actAbilCost.replace("Channel ", "autohand=");
-        actAbilCost = actAbilCost.replace("discard your hand" + cardName, "reject all(*|myhand)");
-        actAbilCost = actAbilCost.replace(", Discard " + cardName, "{discard}");
-        actAbilCost = actAbilCost.replace("Discard a card", "{D(*|myhand)}");
-        actAbilCost = actAbilCost.replace("Discard a land card", "{D(land|myhand)}");
-        actAbilCost = actAbilCost.replace("Discard three cards", "{D(*|myhand)}{D(*|myhand)}{D(*|myhand)}");
-        actAbilCost = actAbilCost.replace("Discard a creature card", "{D(creature|myhand)}");
-        actAbilCost = actAbilCost.replace("Exile " + cardName + " from your graveyard", "{E}");
-        actAbilCost = actAbilCost.replace("Exile " + cardName, "{E}");
-        actAbilCost = actAbilCost.replace("Forage", "{S(Food|myBattlefield)}");
-
-        actAbilCost = actAbilCost.replace("Sacrifice a creature with defender", "{S(creature[defender]|myBattlefield)}");
-        actAbilCost = actAbilCost.replace("Sacrifice " + cardName, "{S}");
-        actAbilCost = actAbilCost.replace("Sacrifice two creatures", "{S(creature|myBattlefield)}{S(creature|myBattlefield)}");
-        actAbilCost = actAbilCost.replace("Sacrifice an artifact or creature", "{S(*[artifact;creature]|myBattlefield)}");
-        actAbilCost = actAbilCost.replace("Sacrifice an artifact or land", "{S(*[artifact;land]|myBattlefield)}");
-        actAbilCost = actAbilCost.replace("Sacrifice an artifact creature", "{S(creature[artifact]|myBattlefield)}");
-        actAbilCost = actAbilCost.replaceAll("Sacrifice another ([a-zA-Z]+)", "{S(other $1|mybattlefield)}");
-        actAbilCost = actAbilCost.replaceAll("Sacrifice an ([a-zA-Z]+)", "{S($1|myBattlefield)}");
-        actAbilCost = actAbilCost.replaceAll("Sacrifice a ([a-zA-Z]+)", "{S($1|myBattlefield)}");
-
+        // Define a map for cost replacements
+        Map<String, String> costReplacements = new LinkedHashMap<>();
+        costReplacements.put("{W/P}", "{p(W)}");
+        costReplacements.put("{U/P}", "{p(U)}");
+        costReplacements.put("{B/P}", "{p(B)}");
+        costReplacements.put("{R/P}", "{p(R)}");
+        costReplacements.put("{G/P}", "{p(G)}");
+        costReplacements.put("Channel ", "autohand=");
+        costReplacements.put("discard your hand" + cardName, "reject all(*|myhand)");
+        costReplacements.put(", Discard " + cardName, "{discard}");
+        costReplacements.put("Discard a card", "{D(*|myhand)}");
+        costReplacements.put("Discard a land card", "{D(land|myhand)}");
+        costReplacements.put("Discard three cards", "{D(*|myhand)}{D(*|myhand)}{D(*|myhand)}");
+        costReplacements.put("Discard a creature card", "{D(creature|myhand)}");
+        costReplacements.put("Exile " + cardName + " from your graveyard", "{E}");
+        costReplacements.put("Exile " + cardName, "{E}");
+        costReplacements.put("Forage", "{E(*|myGraveyard)}{E(*|myGraveyard)}{E(*|myGraveyard)}:\nauto={S(Food|myBattlefield)}");
+        costReplacements.put("Sacrifice a creature with defender", "{S(creature[defender]|myBattlefield)}");
+        costReplacements.put("Sacrifice " + cardName, "{S}");
+        costReplacements.put("Sacrifice two creatures", "{S(creature|myBattlefield)}{S(creature|myBattlefield)}");
+        costReplacements.put("Sacrifice an artifact creature", "{S(creature[artifact]|myBattlefield)}");
+        costReplacements.put("Remove two oil counters from ", "{C(0/0,-2,oil)}");
+        costReplacements.put("Remove three oil counters from ", "{C(0/0,-3,oil)}");
+        costReplacements.put("Tap two untapped tokens you control", "{T(*[token]|mybattlefield)}{T(*[token]|mybattlefield)}");
+        costReplacements.put("Pay ", "{L:");
+        costReplacements.put(" life", "}");
+        
+        // Apply the replacements
+        for (Map.Entry<String, String> entry : costReplacements.entrySet()) {
+            actAbilCost = actAbilCost.replace(entry.getKey(), entry.getValue());
+        }
+        
+        // Apply replacements for sacrifices and counters
+        actAbilCost = actAbilCost.replace("/", "");
+        actAbilCost = actAbilCost.replaceAll("Tap (an?|a) untapped ([a-zA-Z]+) you control", "{T(*[$2]|myBattlefield)}");        
+        actAbilCost = actAbilCost.replaceAll("Sacrifice an ([a-zA-Z]+) or ([a-zA-Z]+)", "{S(*[$1;$2]|myBattlefield)}");        
+        actAbilCost = actAbilCost.replaceAll("Sacrifice another ([a-zA-Z]+)", "{S(other $1|mybattlefield)}");        
+        actAbilCost = actAbilCost.replaceAll("Sacrifice (an?|a) ([a-zA-Z]+)", "{S($1|myBattlefield)}");
         actAbilCost = actAbilCost.replaceAll("Remove (an?|a) ([a-zA-Z]+) counter from " + cardName, "{C(0/0,-1,$2)}");
-        actAbilCost = actAbilCost.replace("Remove two oil counters from ", "{C(0/0,-2,oil)}");
-        actAbilCost = actAbilCost.replace("Remove three oil counters from ", "{C(0/0,-3,oil)}");
-        actAbilCost = actAbilCost.replace("Exile " + cardName + " from your graveyard", "{E}");
-        actAbilCost = actAbilCost.replace("Pay ", "{L:");
-        actAbilCost = actAbilCost.replace(" life", "}");
+
+        // Remove unnecessary characters
         actAbilCost = actAbilCost.replace(cardName, "");
         actAbilCost = actAbilCost.replace(", ", "");
         actAbilCost = actAbilCost.replace(" ", "");
         actAbilCost = actAbilCost.replace(".", "");
-        actAbilCost = actAbilCost.replace("/", "");
 
+        // Special handling for Planeswalker loyalty costs
         if (type.contains("Planeswalker")) {
             actAbilCost = actAbilCost.replace("[", "");
             actAbilCost = actAbilCost.replace("]", "");
@@ -85,7 +100,7 @@ public class ActivatedAbility {
         actAbilCost = "auto=" + actAbilCost;
 
         actAbilEffect = actAbil[1];
-        actAbilEffect = ProcessEffect(actAbilEffect, cardName);
+        actAbilEffect = processEffect(actAbilEffect, cardName);
 
         return actAbilCost + actAbilEffect;
     }

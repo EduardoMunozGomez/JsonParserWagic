@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Keywords {
 
@@ -24,7 +26,7 @@ public class Keywords {
             try {
                 FileReader fileReader = new FileReader(fileName);
 
-                try ( BufferedReader bufferedReader = new BufferedReader(fileReader)) {
+                try (BufferedReader bufferedReader = new BufferedReader(fileReader)) {
                     while ((line = bufferedReader.readLine()) != null) {
                         line = line.toLowerCase();
                         lineNumber++;
@@ -68,7 +70,51 @@ public class Keywords {
                                 }
                             }
                             if (!containsTarget) {
-                                //System.out.println("Line " + lineNumber + " does not contain any of the targets: " + line);
+                                System.out.println("Line " + lineNumber + " does not contain any of the targets: " + line);
+                            }
+                        }
+//                        if (line.contains("target(")) {
+//                            Pattern pattern = Pattern.compile("target\\(([^)]+)\\)");
+//                            Matcher matcher = pattern.matcher(line);
+//
+//                            if (matcher.find()) {
+//                                String targetContent = matcher.group(1);
+//                                boolean containsTarget = false;
+//
+//                                for (String validTarget : Constants.VALID_TARGETS) {
+//                                    if (targetContent.equals(validTarget)) {
+//                                        containsTarget = true;
+//                                        break;
+//                                    }
+//                                }
+//
+//                                if (!containsTarget) {
+//                                    System.out.println("Line " + lineNumber + " does not contain any of the targets: " + targetContent);
+//                                }
+//                            }
+//                        }
+                        if (line.contains("|") && !line.startsWith("text=") && !line.contains("meld")) {
+                            boolean containsZone = false;
+                            for (String validZone : Constants.VALID_ZONES) {
+                                if (line.contains(validZone)) {
+                                    containsZone = true;
+                                    break;
+                                }
+                            }
+                            if (!containsZone) {
+                                System.out.println("Line " + lineNumber + " does not contain any valid zone: " + line);
+                            }
+                        }
+                        if (line.contains("@")) {
+                            boolean containsTrigger = false;
+                            for (String validTrigger : Constants.VALID_TRIGGERS) {
+                                if (line.contains(validTrigger)) {
+                                    containsTrigger = true;
+                                    break;
+                                }
+                            }
+                            if (!containsTrigger) {
+                                System.out.println("Line " + lineNumber + " does not contain any valid Trigger: " + line);
                             }
                         }
                         boolean startsWithKeyword = false;

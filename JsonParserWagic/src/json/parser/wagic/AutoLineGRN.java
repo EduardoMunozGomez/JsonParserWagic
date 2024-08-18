@@ -4,7 +4,7 @@ package json.parser.wagic;
 public class AutoLineGRN {
 
     // other={convoke} name(Convoke)
-    protected static String Convoke(String oracleText) {
+    protected static String convoke(String oracleText) {
         String convoke = "";
 
         try {
@@ -48,24 +48,7 @@ public class AutoLineGRN {
         return mentor;
     }
 
-    protected static String Surveil(String oracleText) {
-        String surveil = "";
 
-        try {
-            oracleText = oracleText.toLowerCase();
-            String incidence = "surveil ";
-            if (oracleText.contains(incidence)) {
-                String surveilNumber = oracleText.substring(oracleText.indexOf(incidence) + incidence.length(), oracleText.indexOf(incidence) + incidence.length() + 1);
-                surveil = String.format("aicode=name(surveil) activate name(surveil) transforms((,newability[foreach(*[zpos<=%s]|mylibrary) moverandom(*[zpos<=%s]) from(mylibrary) to(mylibrary)])) ueot\n",
-                        surveilNumber, surveilNumber);
-                surveil += String.format("auto=name(surveil) reveal:%s optionone name(put in graveyard) target(<upto:%s>*|reveal) moveto(ownergraveyard) optiononeend optiontwo name(put in library) target(<%s>*|reveal) moveto(ownerlibrary) optiontwoend revealend",
-                        surveilNumber, surveilNumber, surveilNumber);
-            }
-        } catch (Exception ex) {
-
-        }
-        return surveil;
-    }
 
     // type:creature:myGraveyard
     // auto=foreach(creature|mygraveyard) 1/0

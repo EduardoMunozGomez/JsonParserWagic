@@ -1,18 +1,25 @@
 package json.parser.wagic;
 
+// @author Eduardo
 import java.util.Map;
 import java.util.LinkedHashMap;
 import org.json.simple.JSONArray;
 
-// @author Eduardo
 public class Abilities {
 
+    /**
+     * Processes keyword abilities and custom abilities from the oracle text.
+     * 
+     * @param keywords   JSONArray of keywords.
+     * @param oracleText The oracle text of the card.
+     * @return A string of abilities separated by commas.
+     */
     protected static String processKeywordsAbilities(JSONArray keywords, String oracleText) {
-        String abilities = "";
-        for (Object keyword : keywords) {
-            String keywordString = (String) keyword;
-            keywordString = keywordString.toLowerCase();
+        StringBuilder abilities = new StringBuilder();
 
+        // Process keyword abilities
+        for (Object keyword : keywords) {
+            String keywordString = ((String) keyword).toLowerCase();
             switch (keywordString) {
                 case "flash":
                 case "defender":
@@ -35,16 +42,29 @@ public class Abilities {
                 case "forestwalk":
                 case "devoid":
                 case "cycling":
-                    abilities += keywordString + ',';
+                    abilities.append(keywordString).append(',');
                     break;
             }
         }
 
-        abilities = processCustomAbilities(oracleText, abilities);
-        abilities = abilities.replaceAll(",$", "");
-        return abilities;
+        // Process custom abilities
+        abilities = new StringBuilder(processCustomAbilities(oracleText, abilities.toString()));
+        
+        // Remove trailing comma if exists
+        if (abilities.length() > 0 && abilities.charAt(abilities.length() - 1) == ',') {
+            abilities.setLength(abilities.length() - 1);
+        }
+
+        return abilities.toString();
     }
 
+    /**
+     * Processes custom abilities based on conditions in the oracle text.
+     * 
+     * @param oracleText The oracle text of the card.
+     * @param abilities  The current string of abilities.
+     * @return A string of abilities with custom abilities added.
+     */
     protected static String processCustomAbilities(String oracleText, String abilities) {
         oracleText = oracleText.toLowerCase();
 
@@ -67,13 +87,15 @@ public class Abilities {
         abilityMap.put("counter on it for each color of mana spent to cast it", "sunburst,");
         abilityMap.put("blocks each turn if able", "mustblock,");
         abilityMap.put("blocks each combat if able", "mustblock,");
-        abilityMap.put("players can't gain life", "nolifegain,");
+        abilityMap.put("players can't gain life", "nolifegain,nolifegainopponent,");
         abilityMap.put("opponents can't gain life", "nolifegainopponent,");
         abilityMap.put("doesn't untap during your untap step", "doesnotuntap,");
         abilityMap.put("protection from", "protection from,");
         abilityMap.put("affinity for artifacts", "affinityartifacts,");
         abilityMap.put("choose a background", "chooseabackground,");
         abilityMap.put("modular", "modular\nmodular=");
+        abilityMap.put("changeling", "changeling");
+        abilityMap.put("partner", "partner");
 
         // Iterate over the map and add the corresponding abilities if conditions are met
         for (Map.Entry<String, String> entry : abilityMap.entrySet()) {
@@ -82,7 +104,7 @@ public class Abilities {
             }
         }
 
-        // Remove the trailing comma if it exists
+        // Remove trailing comma if exists
         abilities = abilities.replaceAll(",$", "");
 
         return abilities;

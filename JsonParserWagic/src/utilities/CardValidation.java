@@ -16,7 +16,7 @@ public class CardValidation {
 
             System.out.println("Processing file: " + file.getName());
 
-            try ( BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
+            try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
 
                 String line;
                 String currentCard = "";
@@ -33,8 +33,12 @@ public class CardValidation {
                     } else if (line.startsWith("auto=auto")) {
                         System.out.println("auto=auto \"" + currentCard + "\" at line " + lineNum);
                     } else if (line.startsWith("auto=")) {
-                        if (line.contains("if ") && !line.contains("then"))
-                        System.out.println("eyes without a face " + lineNum);
+                        if ((line.contains("if ") || line.contains("ifnot ")) && !line.contains("then")) {
+                            System.out.println("if without an else condition " + lineNum);
+                        }
+                        if (line.contains("@") && !line.contains(":")) {
+                            System.out.println("Trigger condition without semicolon " + lineNum);
+                        }
                     } else if (line.startsWith("name=")) {
                         currentCard = line.substring(5);
                         hasTarget = false;
@@ -63,6 +67,12 @@ public class CardValidation {
                             System.out.println("ERROR: invalid toughness value \"" + toughness + "\" for creature card \"" + currentCard + "\" at line " + lineNum + ".");
                             isValid = false;
                         }
+                    } else if (line.contains("::")) {
+                        System.out.println("ERROR: :: " + lineNum + " line.");                    
+                    } else if (line.contains(":)")) {
+                        System.out.println("ERROR: :) " + lineNum + " line.");
+                    } else if (line.contains("((new")) {
+                        System.out.println("ERROR: ((new " + lineNum + " line.");
                     }
                 }
                 reader.close();

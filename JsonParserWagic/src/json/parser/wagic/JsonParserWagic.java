@@ -7,6 +7,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.List;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -15,11 +17,17 @@ import org.json.simple.parser.ParseException;
 // @author Eduardo
 public class JsonParserWagic {
 
-    private static final String SET_CODE = "BLB";
+    private static final String SET_CODE = "LEA"; // If commander or complemmentary set, else the set code is the same on both
+    private static final String MAIN_SET_CODE = "LEA";  // only for commander expansions to obtain the tokens from the main set
     private static final String FILE_PATH = "C:\\Users\\Eduardo_\\Downloads\\MTGJSON\\" + SET_CODE;
+    private static final String MAIN_SET_PATH = "C:\\Users\\Eduardo_\\Downloads\\MTGJSON\\" + MAIN_SET_CODE;
+    private static final Boolean ALL_RESOURCES = true;
 
     public static String getFilePath() {
         return FILE_PATH;
+    }
+    public static String getMainSetPath() {
+        return MAIN_SET_PATH;
     }
 
     public static void main(String[] args) {
@@ -27,53 +35,53 @@ public class JsonParserWagic {
         File directorio = new File(getFilePath());
         directorio.mkdir();
 
-        try (FileReader reader = new FileReader(getFilePath() + ".json", StandardCharsets.UTF_8); FileWriter myWriter = new FileWriter(getFilePath() + "\\_cards.dat"); FileWriter myWriterImages = new FileWriter("C:\\Users\\Eduardo_\\Downloads\\MTGJSON\\image.cvs", true)) {
+        try (FileReader reader = new FileReader(getFilePath() + ".json", StandardCharsets.UTF_8); FileReader readerMain = new FileReader(getMainSetPath()+ ".json", StandardCharsets.UTF_8); FileWriter myWriter = new FileWriter(getFilePath() + "\\_cards.dat"); FileWriter myWriterImages = new FileWriter("C:\\Users\\Eduardo_\\Downloads\\MTGJSON\\image.cvs", true)) {
 
             JSONObject jsonObject = (JSONObject) new JSONParser().parse(reader);
+            JSONObject jsonObjectMainSet = (JSONObject) new JSONParser().parse(readerMain);
             JSONObject data = (JSONObject) jsonObject.get("data");
+            JSONObject dataMainSet = (JSONObject) jsonObjectMainSet.get("data");
             JSONArray cards = (JSONArray) data.get("cards");
             JSONArray tokens = (JSONArray) data.get("tokens");
-            JSONObject card;
+            JSONArray tokensMainSet = (JSONArray) dataMainSet.get("tokens");
+            JSONObject card = null;
             JSONArray subtypes;
 
-            JSONObject identifiers;
-            String primitiveCardName;
+            List<String> skipLayouts = Arrays.asList("adventure", "aftermath", "split");
+            JSONObject identifiers = null;
+            String primitiveCardName = null;
             String primitiveRarity;
             String side;
-            //Metadata header
-            Metadata.printMetadata(data.get("name"), data.get("releaseDate"), data.get("totalSetSize"), myWriter);
 
-            for (Object tkn : tokens) {
-                JSONObject token = (JSONObject) tkn;
-                JSONArray reverseRelated = (JSONArray) token.get("reverseRelated");
-                for (Object related : reverseRelated) {
-
-                    for (Object o : cards) {
-                        card = (JSONObject) o;
-                        identifiers = (JSONObject) card.get("identifiers");
-                        JSONObject tokenIdentifiers = (JSONObject) token.get("identifiers");
-                        primitiveCardName = (String) card.get("faceName") != null ? (String) card.get("faceName") : (String) card.get("name");
-                        if (primitiveCardName.equals(related.toString()) && !token.get("name").equals("Copy") && !token.get("name").equals("Energy Reserve") && !token.get("name").equals("Plot") && identifiers.get("multiverseId") != null) {
-                            CardDat.generateCSV(SET_CODE, identifiers.get("multiverseId") + "t", (String) tokenIdentifiers.get("scryfallId"), myWriterImages, "front/");
-                        }
-                    }
-                }
+            if (ALL_RESOURCES) {
+                //Metadata header
+                Metadata.printMetadata(data.get("name"), data.get("releaseDate"), data.get("totalSetSize"), myWriter);
+                Tokens.obtainTokens(cards, tokensMainSet, card, identifiers, primitiveCardName, SET_CODE, myWriterImages);
+                Tokens.obtainTokens(cards, tokens, card, identifiers, primitiveCardName, SET_CODE, myWriterImages);
             }
             for (Object o : cards) {
-
                 card = (JSONObject) o;
                 subtypes = (JSONArray) card.get("subtypes");
 
                 identifiers = (JSONObject) card.get("identifiers");
-                primitiveCardName = (String) card.get("faceName") != null ? (String) card.get("faceName") : (String) card.get("name");
+                String layout = card.get("layout").toString();
+                String faceName = (String) card.get("faceName");
+                String name = (String) card.get("name");
+
+                //primitiveCardName = (!card.get("layout").toString().equals("split") && !card.get("layout").toString().equals("adventure") && !card.get("layout").toString().equals("aftermath") && (String) card.get("faceName") != null) ? (String) card.get("faceName") : (String) card.get("name");
+                primitiveCardName = (!skipLayouts.contains(layout) && faceName != null) ? faceName : name;
                 //primitiveRarity = card.get("side") != null && "b".equals(card.get("side").toString()) ? "T" : (String) card.get("rarity");
                 primitiveRarity = (String) card.get("rarity");
                 side = card.get("side") != null && "b".equals(card.get("side").toString()) ? "back/" : "front/";
-                if (identifiers.get("multiverseId") != null) {
+                // Avoid split cards duplicate
+                if (skipLayouts.contains(card.get("layout").toString()) && side.equals("back/")) {
+                    continue;
+                }
+
+                if (ALL_RESOURCES && identifiers.get("multiverseId") != null) {
                     CardDat.generateCardDat(primitiveCardName, identifiers.get("multiverseId"), primitiveRarity, myWriter);
                     CardDat.generateCSV(SET_CODE, identifiers.get("multiverseId"), (String) identifiers.get("scryfallId"), myWriterImages, side);
                 }
-
                 // If card is a reprint, skip it
                 if (card.get("isReprint") != null) {
                     continue;
@@ -82,9 +90,9 @@ public class JsonParserWagic {
                 String oracleText = null;
                 if (card.get("text") != null) {
                     oracleText = card.get("text").toString();
+                    // Substitute special characters
                     oracleText = oracleText.replace("−", "-");
                     oracleText = oracleText.replace("—", "-");
-                    oracleText = oracleText.replace("•", "-");
                 }
                 JSONArray keywords = (JSONArray) card.get("keywords");
                 String manaCost = (String) card.get("manaCost");
@@ -144,6 +152,7 @@ public class JsonParserWagic {
                 // ORACLE TEXT
                 if (oracleText != null) {
                     OracleTextToWagic.parseOracleText(keywords, oracleText, primitiveCardName, type, subtype, (String) card.get("power"), manaCost);
+                    oracleText = oracleText.replace("•", "-");
                     System.out.println("text=" + oracleText.replace("\n", " -- "));
                 }
                 if (manaCost != null) {

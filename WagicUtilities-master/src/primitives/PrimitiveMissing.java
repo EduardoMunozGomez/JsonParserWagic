@@ -27,7 +27,7 @@ public class PrimitiveMissing {
         for (int y = 0; y < listOfSet.length; y++) {
             if (listOfSet[y].isDirectory() && !listOfSet[y].getName().equalsIgnoreCase("primitives")) {
                 String Set = listOfSet[y].getName() + "\\";
-                File folder = new File(baseFolder.getAbsolutePath() + "\\" + "MH3"); // AQUÍ
+                File folder = new File(baseFolder.getAbsolutePath() + "\\" + Set); // AQUÍ
                 String filePath = folder.getAbsolutePath() + "\\_cards.dat";
                 String lines = primitives.PrimitiveDatabase.readLineByLineJava8(filePath);
                 while (lines.contains("[card]")) {
