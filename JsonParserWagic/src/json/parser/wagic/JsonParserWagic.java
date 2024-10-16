@@ -17,8 +17,10 @@ import org.json.simple.parser.ParseException;
 // @author Eduardo
 public class JsonParserWagic {
 
-    private static final String SET_CODE = "LEA"; // If commander or complemmentary set, else the set code is the same on both
-    private static final String MAIN_SET_CODE = "LEA";  // only for commander expansions to obtain the tokens from the main set
+    // If commander or complemmentary set, else the set code is the same on both
+    private static final String SET_CODE = "DSC"; 
+    // For sets like commander expansions to obtain the tokens from the main set
+    private static final String MAIN_SET_CODE = "DSK";  
     private static final String FILE_PATH = "C:\\Users\\Eduardo_\\Downloads\\MTGJSON\\" + SET_CODE;
     private static final String MAIN_SET_PATH = "C:\\Users\\Eduardo_\\Downloads\\MTGJSON\\" + MAIN_SET_CODE;
     private static final Boolean ALL_RESOURCES = true;
@@ -68,16 +70,14 @@ public class JsonParserWagic {
                 String faceName = (String) card.get("faceName");
                 String name = (String) card.get("name");
 
-                //primitiveCardName = (!card.get("layout").toString().equals("split") && !card.get("layout").toString().equals("adventure") && !card.get("layout").toString().equals("aftermath") && (String) card.get("faceName") != null) ? (String) card.get("faceName") : (String) card.get("name");
                 primitiveCardName = (!skipLayouts.contains(layout) && faceName != null) ? faceName : name;
-                //primitiveRarity = card.get("side") != null && "b".equals(card.get("side").toString()) ? "T" : (String) card.get("rarity");
-                primitiveRarity = (String) card.get("rarity");
+                primitiveRarity = card.get("side") != null && "b".equals(card.get("side").toString()) ? "T" : (String) card.get("rarity");
+                //primitiveRarity = (String) card.get("rarity");
                 side = card.get("side") != null && "b".equals(card.get("side").toString()) ? "back/" : "front/";
                 // Avoid split cards duplicate
                 if (skipLayouts.contains(card.get("layout").toString()) && side.equals("back/")) {
                     continue;
                 }
-
                 if (ALL_RESOURCES && identifiers.get("multiverseId") != null) {
                     CardDat.generateCardDat(primitiveCardName, identifiers.get("multiverseId"), primitiveRarity, myWriter);
                     CardDat.generateCSV(SET_CODE, identifiers.get("multiverseId"), (String) identifiers.get("scryfallId"), myWriterImages, side);

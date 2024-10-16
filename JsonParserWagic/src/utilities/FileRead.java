@@ -3,6 +3,7 @@ package utilities;
 import java.io.*;
 
 public class FileRead {
+
     public static void main(String[] args) {
         try {
             File file = new File("C:\\Users\\Eduardo_\\Documents\\Wagic\\Res\\sets\\primitives\\new.txt");
@@ -15,7 +16,7 @@ public class FileRead {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("Error CardValidation: " + e.getMessage());
         }
     }
 }

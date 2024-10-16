@@ -1,6 +1,5 @@
 package json.parser.wagic;
 
-import static json.parser.wagic.AutoEffects.numberMap;
 import java.util.Map;
 import java.util.LinkedHashMap;
 import static json.parser.wagic.AutoEffects.processEffect;
@@ -22,10 +21,10 @@ public class ActivatedAbility {
      * @param subtype   The subtype of the card (e.g., Vehicle, Aura).
      * @return A string representing the activated ability, or an empty string if none is found.
      */
-    static String DetermineActivatedAbility(String oracleBit, String cardName, String type, String subtype) {
+    static String determineActivatedAbility(String oracleBit, String cardName, String type, String subtype) {
         String[] activatedAbililty = oracleBit.split(":");
         if (activatedAbililty.length > 1) {
-            return ActivatedAbililtyCost(activatedAbililty, cardName, type);
+            return activatedAbililtyCost(activatedAbililty, cardName, type);
         } else {
             return "";
         }
@@ -39,7 +38,7 @@ public class ActivatedAbility {
      * @param type     The type of the card (e.g., Creature, Planeswalker).
      * @return A formatted string representing the activated ability cost and effect.
      */
-    private static String ActivatedAbililtyCost(String[] actAbil, String cardName, String type) {
+    private static String activatedAbililtyCost(String[] actAbil, String cardName, String type) {
         String actAbilCost = actAbil[0];
         String actAbilEffect;
 
@@ -78,9 +77,10 @@ public class ActivatedAbility {
         // Apply replacements for sacrifices and counters
         actAbilCost = actAbilCost.replace("/", "");
         actAbilCost = actAbilCost.replaceAll("Tap (an?|a) untapped ([a-zA-Z]+) you control", "{T(*[$2]|myBattlefield)}");        
-        actAbilCost = actAbilCost.replaceAll("Sacrifice an ([a-zA-Z]+) or ([a-zA-Z]+)", "{S(*[$1;$2]|myBattlefield)}");        
+        actAbilCost = actAbilCost.replaceAll("Tap another untapped ([a-zA-Z]+) you control", "{T(other *[$1]|myBattlefield)}");        
+        actAbilCost = actAbilCost.replaceAll("Sacrifice (an?|a) ([a-zA-Z]+) or ([a-zA-Z]+)", "{S(*[$2;$3]|myBattlefield)}");        
         actAbilCost = actAbilCost.replaceAll("Sacrifice another ([a-zA-Z]+)", "{S(other $1|mybattlefield)}");        
-        actAbilCost = actAbilCost.replaceAll("Sacrifice (an?|a) ([a-zA-Z]+)", "{S($1|myBattlefield)}");
+        actAbilCost = actAbilCost.replaceAll("Sacrifice (an?|a) ([a-zA-Z]+)", "{S($2|myBattlefield)}");
         actAbilCost = actAbilCost.replaceAll("Remove (an?|a) ([a-zA-Z]+) counter from " + cardName, "{C(0/0,-1,$2)}");
 
         // Remove unnecessary characters

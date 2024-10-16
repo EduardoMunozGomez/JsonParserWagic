@@ -9,18 +9,19 @@ public class OracleTextToWagic {
         String abilities = "";
         // Remove remainder text
         oracleText = oracleText.replaceAll("\\(.*?\\)", "");
-        oracleText = oracleText.replace("•", "choice");
         // Remove comma from Legendaries
         oracleText = oracleText.replace(cardName, cardName.replace(",", ""));
         cardName = cardName.replace(",", "");
+        
+        oracleText = oracleText.replace("•", "choice");
 
         // Keywords present in the dataset to populate abilities=
         if (keywords != null) {
             abilities = Abilities.processKeywordsAbilities(keywords, oracleText);
         }
         // Special abilities for creatures and vehicles
-        if (keywords == null && (type.contains("Creature") || subtype.contains("Vehicle"))) {
-            abilities = Abilities.processCustomAbilities(oracleText, "");
+        if (keywords == null && (type.contains("Creature") || subtype.contains("Vehicle") || type.contains("Enchantment"))) {
+            abilities = Abilities.processCustomAbilities(oracleText, "", cardName);
         }
         // abilities=
         if (abilities.length() > 0) {
@@ -32,7 +33,7 @@ public class OracleTextToWagic {
             // Permanents, exclude Aura and Equipment
             if (!(type.contains("Instant") || type.contains("Sorcery") || subtype.contains("Aura") || subtype.contains("Equipment") || subtype.contains("Siege"))) {
 
-                String hasActivatedAbility = ActivatedAbility.DetermineActivatedAbility(oracleBit, cardName, type, subtype);
+                String hasActivatedAbility = ActivatedAbility.determineActivatedAbility(oracleBit, cardName, type, subtype);
                 String hasTriggers = Triggers.processTriggers(oracleBit, cardName, type, subtype, power);
 
                 autoLineExists(hasActivatedAbility);
@@ -46,6 +47,7 @@ public class OracleTextToWagic {
                 }
 
                 //autoLineExists(AutoLine.threshold(oracleBit, manaCost));
+                autoLineExists(AutoLine.impending(oracleBit, manaCost));
                 autoLineExists(AutoLine.offspring(oracleBit, manaCost));
                 autoLineExists(AutoLine.gift(oracleBit, manaCost));
 
@@ -154,7 +156,7 @@ public class OracleTextToWagic {
             "flash", "defender", "flying", "intimidate", "first strike", "double strike",
             "deathtouch", "hexproof", "menace", "indestructible", "vigilance", "reach",
             "trample", "lifelink", "haste", "islandwalk", "swampwalk", "mountainwalk",
-            "forestwalk", "devoid", "cycling", "partner"};
+            "forestwalk", "devoid", "partner" };
 
         if (oracleBit.contains("rowess")) {
             oracleBit = "@movedTo(*[-creature]|mystack):1/1 ueot";
@@ -168,7 +170,7 @@ public class OracleTextToWagic {
         return oracleBit;
     }
 }
-/*          "you may look at the top card of your library any time",
+/*          "you may look at the top card of your library any time", "cycling",
             "you have no maximum hand size", "can't be countered", "can't be blocked.",
             "can't be blocked by more than one creature", "toxic 1", "toxic 2", "toxic 3",
             "can't block.", "attacks each turn if able.", "attacks each combat if able.",

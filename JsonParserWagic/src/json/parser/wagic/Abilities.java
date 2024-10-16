@@ -9,8 +9,8 @@ public class Abilities {
 
     /**
      * Processes keyword abilities and custom abilities from the oracle text.
-     * 
-     * @param keywords   JSONArray of keywords.
+     *
+     * @param keywords JSONArray of keywords.
      * @param oracleText The oracle text of the card.
      * @return A string of abilities separated by commas.
      */
@@ -48,8 +48,8 @@ public class Abilities {
         }
 
         // Process custom abilities
-        abilities = new StringBuilder(processCustomAbilities(oracleText, abilities.toString()));
-        
+        abilities = new StringBuilder(processCustomAbilities(oracleText, abilities.toString(), ""));
+
         // Remove trailing comma if exists
         if (abilities.length() > 0 && abilities.charAt(abilities.length() - 1) == ',') {
             abilities.setLength(abilities.length() - 1);
@@ -60,16 +60,17 @@ public class Abilities {
 
     /**
      * Processes custom abilities based on conditions in the oracle text.
-     * 
+     *
      * @param oracleText The oracle text of the card.
-     * @param abilities  The current string of abilities.
+     * @param abilities The current string of abilities.
      * @return A string of abilities with custom abilities added.
      */
-    protected static String processCustomAbilities(String oracleText, String abilities) {
+    protected static String processCustomAbilities(String oracleText, String abilities, String cardName) {
         oracleText = oracleText.toLowerCase();
 
         // Define a map of conditions and abilities
         Map<String, String> abilityMap = new LinkedHashMap<>();
+        abilityMap.put("if " + cardName.toLowerCase() + " is in your opening hand, you may begin the game with it on the battlefield.", "leyline,");
         abilityMap.put("you may look at the top card of your library any time", "showfromtoplibrary,");
         abilityMap.put("you have no maximum hand size", "nomaxhand,");
         abilityMap.put("can't be countered", "nofizzle,");

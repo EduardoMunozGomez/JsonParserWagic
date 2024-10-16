@@ -68,7 +68,7 @@ public class CardValidation {
                             isValid = false;
                         }
                     } else if (line.contains("::")) {
-                        System.out.println("ERROR: :: " + lineNum + " line.");                    
+                        System.out.println("ERROR: :: " + lineNum + " line.");
                     } else if (line.contains(":)")) {
                         System.out.println("ERROR: :) " + lineNum + " line.");
                     } else if (line.contains("((new")) {
@@ -80,7 +80,7 @@ public class CardValidation {
                     System.out.println("All cards are valid!");
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                System.err.println("Error SyntaxCheck: " + e.getMessage());
             }
         }
     }

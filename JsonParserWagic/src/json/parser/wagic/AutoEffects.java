@@ -25,7 +25,7 @@ public class AutoEffects {
         numberMap.put("eight", 8);
         numberMap.put("nine", 9);
 
-        if (effect.contains("offspring") || effect.contains("flashback") || effect.contains("plot")) {
+        if (((effect.contains("offspring") || effect.contains("flashback")) || effect.contains("plot")) || effect.contains("impending")) {
             return "";
         }
         if (effect.contains("create")) {
@@ -40,7 +40,18 @@ public class AutoEffects {
         effect = effect.replaceAll("you may cast ([a-zA-Z]+) spells as though they had", "lord(*[$1]|myHand) asflash");
         effect = effect.replaceAll("target ([a-zA-Z]+) ", "target($1");
         effect = effect.replaceAll("target ([a-zA-Z]+).", "target($1)");
-        
+        effect = effect.replaceAll("\\b(plains|island|mountain|forest|swamp)cycling\\s*\\{(\\d+)\\}",
+                "autohand={$2}{cycle}:name(Search $1) target($1|mylibrary) moveto(hand)");
+        effect = effect.replace("if " + cardName + " is tapped, ", "sourceTapped:");
+        effect = effect.replace("manifest dread", "_MANIFEST_DREAD_");
+        effect = effect.replace("manifests dread", "_MANIFEST_DREAD_");
+
+        effect = effect.replace("exile the top card of your library. you may play it until the end of your next turn.", "_IMPULSEUENT_");
+        effect = effect.replace("if it was a creature, return it to the battlefield under its owner's control. it's an enchantment.", "all(trigger[to]) moveto(battlefield) and!(transforms((removetypes,newability[becomes(Enchantment)])) forever)! ");
+        effect = effect.replace("if you would gain life, you gain that much life plus 1 instead.", "@lifeof(player) from(*[-lifefaker]|*):life:1 controller");
+        effect = effect.replace("as long as", "aslongas(");
+        effect = effect.replace("is in your opening hand, may begin the game withon the battlefield", "leyline");
+        effect = effect.replace("if it was a creature, return it to the battlefield under its owner's control. It's an enchantment.", "");
         effect = effect.replace("during your turn", "this(variable{controllerturn}>0)");
         effect = effect.replace("search your library for a basic land card, put it onto the battlefield tapped, then shuffle", "target(land[basic]|mylibrary) moveto(mybattlefield) && tap(noevent)");
         effect = effect.replace("return a creature card from your graveyard to the battlefield", "target(creature|mygraveyard) moveTo(battlefield)");
@@ -62,7 +73,7 @@ public class AutoEffects {
         effect = effect.replace("if the gift was promised,", "");
         effect = effect.replace(" if you cast it,", "if casted(this) then ");
         effect = effect.replace(" from among them and", "]|reveal)");
-        effect = effect.replace("put it into your hand", "moveto(ownerhand)");
+        effect = effect.replace("put it into your hand", "moveto(hand)");
         effect = effect.replaceAll("search your library for a ([a-zA-Z]+) card, reveal it", "target($1|myLibrary)");
         effect = effect.replaceAll("scry ([0-9]+)", "_SCRY$1_");
         effect = effect.replaceAll("surveil ([0-9]+)", "_SURVEIL$1_");
@@ -113,8 +124,8 @@ public class AutoEffects {
         effect = effect.replaceAll("with mana value ([0-9]+) or less", "[manacost<=$1]");
         effect = effect.replaceAll("with mana value ([0-9]+)", "[manacost=$1]");
 
-        effect = effect.replace("return target nonland permanent you don't control to its owner's hand", "target(-land|opponentBattlefield) moveTo(ownerHand)");
-        effect = effect.replace("to its owner's hand", "moveto(ownerhand)");
+        effect = effect.replace("return target nonland permanent you don't control to its owner's hand", "target(-land|opponentBattlefield) moveTo(hand)");
+        effect = effect.replace("to its owner's hand", "moveto(hand)");
         effect = effect.replace("historic", "artifact,*[legendary],enchantment[saga]");
         effect = effect.replace("return it to the battlefield tapped under its owner's control at the beginning of the next end step", "(blink)ueot");
         effect = effect.replace("creatures", "creature");
@@ -131,19 +142,19 @@ public class AutoEffects {
         effect = effect.replace("if you do, ", "");
 
         effect = effect.replaceAll("target creature with ([a-zA-Z]+)", "target(creature[$1]");
-        effect = effect.replace("return target creature an opponent controls to its owner's hand", "moveto(ownerHand) target(creature|opponentBattlefield)");
-        effect = effect.replace("return target creature to its owner's hand", "moveto(ownerHand) target(creature)");
+        effect = effect.replace("return target creature an opponent controls to its owner's hand", "moveto(hand) target(creature|opponentBattlefield)");
+        effect = effect.replace("return target creature to its owner's hand", "moveto(hand) target(creature)");
         effect = effect.replace("exile target nonland permanent an opponent controls until " + cardName + " leaves the battlefield.", "(blink)forsrc target(*[-land]|opponentbattlefield)");
         effect = effect.replace("you may have it fight target creature you don't control", "may target(creature|opponentbattlefield) dynamicability<!powerstrike eachother!>");
         effect = effect.replace("activate this ability only any time you could cast a sorcery", "asSorcery");
-        effect = effect.replace(cardName + " from your graveyard to your hand", "moveto(myhand) all(this)");
+        effect = effect.replace(cardName + " from your graveyard to your hand", "moveto(hand) all(this)");
         effect = effect.replace("you may cast an instant or sorcery card from your hand without paying its mana cost", "may castcard(normal) notatarget(instant,sorcery|myhand)");
         effect = effect.replace(cardName + " enters the battlefield with a +1/+1 counter on it for each color of mana spent to cast it.", "counter(1/1,sunburst)");
-        effect = effect.replace("as long as you've cast an instant or sorcery spell this turn, " + cardName, "auto=aslongas(instant,sorcery|mystack) >1");
+        effect = effect.replace("as long as you've cast an instant or sorcery spell this turn, " + cardName, "aslongas(instant,sorcery|mystack) >1");
         effect = effect.replace("legendary permanent that's an artifact, creature, or enchantment.", "artifact[legendary], creature[legendary], enchantment[legendary])");
         effect = effect.replace("each opponent discards a card", "ability$!name(discard) reject notatarget(*|myhand)!$ opponent");
         effect = effect.replace("each opponent loses 1 life", "life:-1 opponent");
-        effect = effect.replace("to your hand", "moveto(ownerhand)");
+        effect = effect.replace("to your hand", "moveto(hand)");
         effect = effect.replace("whenever this creature attacks, ", "_ATTACKING_");
         effect = effect.replace("with an oil counter on it", "counter(0/0,1,oil)");
         effect = effect.replace("put a +1/+1 counter on it", "counter(1/1)");
@@ -212,6 +223,8 @@ public class AutoEffects {
 
         // Draw Monsta Cardo!
         effect = effect.replace("draw a card", "draw:1");
+        effect = effect.replace("draw that many cards", "draw:thatmuch");
+
         effect = effect.replace("for each creature ", "type:creature:");
         effect = effect.replace("each ", "all(");
         effect = effect.replace(cardName + " enters the battlefield tapped.", "auto=tap(noevent)");
@@ -239,9 +252,11 @@ public class AutoEffects {
         effect = effect.replace(", then ", " && ");
         effect = effect.replace(" cards", "");
         effect = effect.replace(" card", "");
+        effect = effect.replace("card ", "");
 
         effect = effect.replace("it) ", "");
         effect = effect.replace(" it ", "");
+        effect = effect.replace("it ", "");
         effect = effect.replace(" on ", " ");
         effect = effect.replace(" or ", ",");
         effect = effect.replace(" to ", " ");
@@ -249,6 +264,7 @@ public class AutoEffects {
         effect = effect.replace("} {", "}{");
         effect = effect.replace(":|", ":");
         effect = effect.replace("+", "");
+        effect = effect.replace("-", "");
         effect = effect.replace(".", "");
         effect = effect.replace(cardName, "");
 

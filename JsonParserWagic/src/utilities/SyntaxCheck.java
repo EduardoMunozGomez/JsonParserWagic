@@ -36,7 +36,7 @@ public class SyntaxCheck {
                         // Close the file
                     }
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    System.err.println("Error SyntaxCheck: " + e.getMessage());
                 }
             }
         }

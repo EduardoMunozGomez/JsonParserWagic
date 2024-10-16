@@ -5,7 +5,26 @@ import static json.parser.wagic.AutoEffects.processEffect;
 
 // @author Eduardo
 public class AutoLine {
+    
+    static String impending(String oracleText, String manaCost) {
+        String autoImpending = "";
+        String impendingCost;
 
+        try {
+            String incidence = "Impending 4-";
+            if (oracleText.contains(incidence)) {
+                impendingCost = oracleText.substring(oracleText.indexOf(incidence) + incidence.length(), oracleText.lastIndexOf(" "));
+                autoImpending = "other=" + impendingCost.trim() + " name(Impending)";
+                autoImpending += "\nauto=if paid(alternative) then transforms((removetypes,newability[counter(0/0.4.Impending)],newability[becomes(Enchantment)]))";
+                autoImpending += "\nauto=@each my end:counter(0/0,-1,Impending)";
+                autoImpending += "\nauto=this(counter{0/0.1.Impending}<=0) becomes(Creature)";
+            }
+        } catch (Exception ex) {
+            ex.getMessage();
+        }
+        return autoImpending;
+    }
+        
     protected static String surveil(String oracleText) {
         String surveil = "";
 
@@ -664,7 +683,7 @@ public class AutoLine {
                 return auto + action;
             }
             if (oracleText.contains("return ")) {
-                action = "moveTo(ownerHand)";
+                action = "moveTo(hand)";
                 if (oracleText.contains("return all ")) {
                     action += " all";
                 }

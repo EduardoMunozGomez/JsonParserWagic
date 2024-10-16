@@ -26,6 +26,7 @@ public class Triggers {
                 if (oracleText.contains("you cast")) {
                     return AutoLine.cast(oracleText, cardName);
                 }
+                trigger = trigger.replace("your second main phase, if " + cardName + " is tapped", "each my secondmain sourceUntapped:");
 
                 // The comma limits the trigger
                 if (oracleText.contains(",")) {
@@ -39,7 +40,10 @@ public class Triggers {
                 trigger = trigger.replace("Raid - ", "");
                 trigger = trigger.replace("Valiant - ", "");
                 trigger = trigger.replace("Threshold - ", "_THRESHOLD_");
+                trigger = trigger.replace("Eerie - ", "_CONSTELLATION_\nauto=_EERIE_");
 
+                trigger = trigger.replace("a creature you control deals combat damage to a player", "combatdamagefoeof(player) from(creature|mybattlefield):");
+                trigger = trigger.replace("Whenever an enchantment you control enters and whenever you fully unlock a Room", "");
                 trigger = trigger.replace("one or more +1/+1 counters are put on", "totalcounteradded(1/1) from(this):");
                 trigger = trigger.replace("a creature you control enters", "movedto(creature|myBattlefield):");
                 trigger = trigger.replace("a land you control enters", "_LANDFALL_");
@@ -59,14 +63,12 @@ public class Triggers {
                 trigger = trigger.replace("you put one or more +1/+1 counters on a creature you control", "totalcounteradded(1/1) from(creature|mybattlefield):");
                 trigger = trigger.replace("as long as it is your turn", "this(variable{controllerturn}>0)");
                 trigger = trigger.replace("As long as you've lost life this turn", "aslongas(variable{oplifelost}>0) ");
-                trigger = trigger.replace(cardName + " enters the battlefield tapped", "tap(noevent)");
-                trigger = trigger.replace("When " + cardName + " enters the battlefield", "");
+                trigger = trigger.replace(cardName + " enters tapped", "tap(noevent)");
                 trigger = trigger.replace("When " + cardName + " enters", "");
                 trigger = trigger.replace("When this creature enters", "");
-                trigger = trigger.replace("Whenever " + cardName + " enters the battlefield", "");
+                trigger = trigger.replace("Whenever " + cardName + " enters ", "");
                 trigger = trigger.replace("Whenever " + cardName + " attacks", "_ATTACKING_");
                 trigger = trigger.replace("Whenever " + cardName, "");
-                trigger = trigger.replace(cardName + " enters the battlefield", "");
                 trigger = trigger.replace(cardName + " enters", "");
                 trigger = trigger.replace("and when you sacrifice it", "\nauto=@sacrificed(this):");
                 trigger = trigger.replace("a player casts their second spell each turn", "movedto(*|mystack) restriction{thisturn(*|mystack)~equalto~1}:\nauto=@movedto(*|opponentStack) restriction{thisturn(*|opponentStack)~equalto~1}:\"");
@@ -112,6 +114,7 @@ public class Triggers {
                 trigger = trigger.replace("your upkeep", "each my upkeep:");
                 trigger = trigger.replace("your draw step", "each my draw:");
                 trigger = trigger.replace("your firt main phase", "each my firstmain:");
+                trigger = trigger.replace("Survival - ", "");
                 trigger = trigger.replace("your second main phase", "each my secondmain:");
                 trigger = trigger.replace("combat on your turn", "each my combatbegins:");
                 trigger = trigger.replace("your end step", "each my endofturn:");

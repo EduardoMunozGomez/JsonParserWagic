@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package json.parser.wagic;
 
 import java.io.FileWriter;
@@ -25,7 +21,7 @@ public class Tokens {
 
                     JSONObject tokenIdentifiers = (JSONObject) token.get("identifiers");
                     primitiveCardName = (String) card.get("faceName") != null ? (String) card.get("faceName") : (String) card.get("name");
-                    if (primitiveCardName.equals(related.toString()) && !token.get("name").equals("Copy") && !token.get("name").equals("Energy Reserve") && !token.get("name").equals("Plot") && !token.get("name").equals("Poison Counter") && !token.get("name").equals("City's Blessing") && !token.get("name").equals("The Monarch") && identifiers.get("multiverseId") != null) {
+                    if (primitiveCardName.equals(related.toString()) && !token.get("name").equals("Experience") && !token.get("name").equals("Copy") && !token.get("name").equals("Energy Reserve") && !token.get("name").equals("Plot") && !token.get("name").equals("Poison Counter") && !token.get("name").equals("City's Blessing") && !token.get("name").equals("The Monarch") && !token.get("name").equals("Wrenn and Seven") && identifiers.get("multiverseId") != null) {
                         CardDat.generateCSV(SET_CODE, identifiers.get("multiverseId") + "t", (String) tokenIdentifiers.get("scryfallId"), myWriterImages, "front/");
                     }
                 }
