@@ -64,10 +64,10 @@ public class CardDat {
         return false;
     }
 
-    public static void generateCSV(String primitive, Object id, String scryfallId, FileWriter myWriterImages, String side) {
+    public static void generateCSV(String setCode, Object id, String scryfallId, FileWriter myWriterImages, String side) {
         try {
             String url = SCRYFALL_URL + side + scryfallId.substring(0, 1) + "/" + scryfallId.substring(1, 2) + "/" + scryfallId + ".jpg";
-            myWriterImages.write(primitive + ";" + id + ";" + url + "\n");
+            myWriterImages.write(setCode + ";" + id + ";" + url + "\n");
         } catch (IOException e) {
             System.err.println("Error in generateCSV: " + e.getMessage());
         }

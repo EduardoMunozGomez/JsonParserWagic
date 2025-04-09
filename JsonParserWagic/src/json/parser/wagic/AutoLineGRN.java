@@ -48,8 +48,6 @@ public class AutoLineGRN {
         return mentor;
     }
 
-
-
     // type:creature:myGraveyard
     // auto=foreach(creature|mygraveyard) 1/0
     // text=Target creature gets +X/+0 until end of turn, where X is the number of creature cards in your graveyard.

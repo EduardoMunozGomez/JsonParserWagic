@@ -18,9 +18,9 @@ import org.json.simple.parser.ParseException;
 public class JsonParserWagic {
 
     // If commander or complemmentary set, else the set code is the same on both
-    private static final String SET_CODE = "DSC"; 
+    private static final String SET_CODE = "TDM";
     // For sets like commander expansions to obtain the tokens from the main set
-    private static final String MAIN_SET_CODE = "DSK";  
+    private static final String MAIN_SET_CODE = "TDM";
     private static final String FILE_PATH = "C:\\Users\\Eduardo_\\Downloads\\MTGJSON\\" + SET_CODE;
     private static final String MAIN_SET_PATH = "C:\\Users\\Eduardo_\\Downloads\\MTGJSON\\" + MAIN_SET_CODE;
     private static final Boolean ALL_RESOURCES = true;
@@ -28,6 +28,7 @@ public class JsonParserWagic {
     public static String getFilePath() {
         return FILE_PATH;
     }
+
     public static String getMainSetPath() {
         return MAIN_SET_PATH;
     }
@@ -37,7 +38,7 @@ public class JsonParserWagic {
         File directorio = new File(getFilePath());
         directorio.mkdir();
 
-        try (FileReader reader = new FileReader(getFilePath() + ".json", StandardCharsets.UTF_8); FileReader readerMain = new FileReader(getMainSetPath()+ ".json", StandardCharsets.UTF_8); FileWriter myWriter = new FileWriter(getFilePath() + "\\_cards.dat"); FileWriter myWriterImages = new FileWriter("C:\\Users\\Eduardo_\\Downloads\\MTGJSON\\image.cvs", true)) {
+        try (FileReader reader = new FileReader(getFilePath() + ".json", StandardCharsets.UTF_8); FileReader readerMain = new FileReader(getMainSetPath() + ".json", StandardCharsets.UTF_8); FileWriter myWriter = new FileWriter(getFilePath() + "\\_cards.dat"); FileWriter myWriterImages = new FileWriter("C:\\Users\\Eduardo_\\Downloads\\MTGJSON\\image.cvs", true)) {
 
             JSONObject jsonObject = (JSONObject) new JSONParser().parse(reader);
             JSONObject jsonObjectMainSet = (JSONObject) new JSONParser().parse(readerMain);
@@ -51,6 +52,7 @@ public class JsonParserWagic {
 
             List<String> skipLayouts = Arrays.asList("adventure", "aftermath", "split");
             JSONObject identifiers = null;
+            int multiverseId;
             String primitiveCardName = null;
             String primitiveRarity;
             String side;
@@ -66,6 +68,7 @@ public class JsonParserWagic {
                 subtypes = (JSONArray) card.get("subtypes");
 
                 identifiers = (JSONObject) card.get("identifiers");
+
                 String layout = card.get("layout").toString();
                 String faceName = (String) card.get("faceName");
                 String name = (String) card.get("name");
@@ -79,8 +82,12 @@ public class JsonParserWagic {
                     continue;
                 }
                 if (ALL_RESOURCES && identifiers.get("multiverseId") != null) {
-                    CardDat.generateCardDat(primitiveCardName, identifiers.get("multiverseId"), primitiveRarity, myWriter);
-                    CardDat.generateCSV(SET_CODE, identifiers.get("multiverseId"), (String) identifiers.get("scryfallId"), myWriterImages, side);
+                    multiverseId = Integer.parseInt(identifiers.get("multiverseId").toString());
+                    if (side.equals("back/")) {
+                        multiverseId = ++multiverseId;
+                    }
+                    CardDat.generateCardDat(primitiveCardName, (Object) multiverseId, primitiveRarity, myWriter);
+                    CardDat.generateCSV(SET_CODE, (Object) multiverseId, (String) identifiers.get("scryfallId"), myWriterImages, side);
                 }
                 // If card is a reprint, skip it
                 if (card.get("isReprint") != null) {

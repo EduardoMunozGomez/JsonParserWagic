@@ -21,15 +21,19 @@ public class SyntaxCheck {
                         String line;
                         int lineNumber = 1;
                         while ((line = br.readLine()) != null) {
-                            if (line.startsWith("text=")) {
+                            if (line.startsWith("text=")||line.startsWith("name=")) {
                                 // Ignore this line, it starts with the prefix "text="
                                 lineNumber++;
                                 continue;
                             }
                             // Check if the line contains a comma between square brackets
-                            //if (line.matches(".*\\[[^\\[\\]\\(\\)]*\\,[^\\[\\]\\(\\)]*\\].*")) {
                             if (line.matches("^(?!.*phaseaction\\[[^\\[\\]]*\\,[^\\[\\]]*\\])[^\\[\\]]*\\[[^\\[\\]\\(\\)]*\\,[^\\[\\]\\(\\)]*\\].*$")) {
                                 System.out.println("Error in " + file.getName() + " line " + lineNumber + ": " + line);
+                            }
+
+                            // Check for a space before a parenthesis, excluding '(blink)'
+                            if (line.matches(".* \\((?!blink).*")) {
+                                System.out.println("Error: Space before parenthesis in " + file.getName() + " line " + lineNumber + ": " + line);
                             }
                             lineNumber++;
                         }

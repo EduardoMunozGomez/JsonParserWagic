@@ -1,87 +1,216 @@
 package utilities;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 
 public class CardValidation {
 
     public static void main(String[] args) {
+        if (args.length == 0) {
+            System.err.println("Error: You must provide the folder name as an argument.");
+            return;
+        }
+
         String folderName = args[0];
         File folder = new File(folderName);
 
+        if (!folder.exists() || !folder.isDirectory()) {
+            System.err.println("Error: The provided folder does not exist or is not a valid directory.");
+            return;
+        }
+
         for (File file : folder.listFiles()) {
-            String fileName = file.getAbsolutePath();
-
-            System.out.println("Processing file: " + file.getName());
-
-            try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
-
-                String line;
-                String currentCard = "";
-                int lineNum = 0;
-                boolean isValid = true;
-                boolean hasTarget = false;
-                boolean isCreature = false;
-
-                while ((line = reader.readLine()) != null) {
-                    lineNum++;
-                    line = line.trim();
-                    if (line.startsWith("[card]")) {
-                        currentCard = "";
-                    } else if (line.startsWith("auto=auto")) {
-                        System.out.println("auto=auto \"" + currentCard + "\" at line " + lineNum);
-                    } else if (line.startsWith("auto=")) {
-                        if ((line.contains("if ") || line.contains("ifnot ")) && !line.contains("then")) {
-                            System.out.println("if without an else condition " + lineNum);
-                        }
-                        if (line.contains("@") && !line.contains(":")) {
-                            System.out.println("Trigger condition without semicolon " + lineNum);
-                        }
-                    } else if (line.startsWith("name=")) {
-                        currentCard = line.substring(5);
-                        hasTarget = false;
-                    } else if (line.startsWith("target=")) {
-                        hasTarget = true;
-                    } else if (line.startsWith("subtype=Aura") && !currentCard.isEmpty() && !currentCard.endsWith("*")) {
-                        if (!hasTarget) {
-                            System.out.println("ERROR: Aura card \"" + currentCard + "\" at line " + lineNum + " is missing a target line.");
-                            isValid = false;
-                        }
-                    } else if (line.startsWith("type=") && (line.contains("Creature") || line.contains("Artifact") || line.contains("Planeswalker") || line.contains("Land") || line.contains("Battle")) && !currentCard.isEmpty() && !currentCard.endsWith("*")) {
-                        if (hasTarget) {
-                            System.out.println("ERROR: card \"" + currentCard + "\" at line " + lineNum + " is a target line.");
-                            isValid = false;
-                        }
-                        isCreature = line.contains("Creature");
-                    } else if (isCreature && line.startsWith("power=")) {
-                        String power = line.substring(6).trim();
-                        if (!power.matches("\\*|[-+]?\\d+\\+?\\*?")) {
-                            System.out.println("ERROR: invalid power value \"" + power + "\" for creature card \"" + currentCard + "\" at line " + lineNum + ".");
-                            isValid = false;
-                        }
-                    } else if (isCreature && line.startsWith("toughness=")) {
-                        String toughness = line.substring(10).trim();
-                        if (!toughness.matches("\\*|[-+]?\\d+[-+]?\\*?|\\*\\+\\d+")) {
-                            System.out.println("ERROR: invalid toughness value \"" + toughness + "\" for creature card \"" + currentCard + "\" at line " + lineNum + ".");
-                            isValid = false;
-                        }
-                    } else if (line.contains("::")) {
-                        System.out.println("ERROR: :: " + lineNum + " line.");
-                    } else if (line.contains(":)")) {
-                        System.out.println("ERROR: :) " + lineNum + " line.");
-                    } else if (line.contains("((new")) {
-                        System.out.println("ERROR: ((new " + lineNum + " line.");
-                    }
-                }
-                reader.close();
-                if (isValid) {
-                    System.out.println("All cards are valid!");
-                }
-            } catch (IOException e) {
-                System.err.println("Error SyntaxCheck: " + e.getMessage());
+            if (!file.isFile()) {
+                continue;
             }
+            System.out.println("Processing file: " + file.getName());
+            validateFile(file);
         }
     }
+
+    private static void validateFile(File file) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            String currentCard = "";
+            int lineNum = 0;
+            boolean isValid = true;
+            boolean hasTarget = false;
+            boolean isCreature = false;
+            boolean insideCard = false;
+            boolean hasName = false;
+            boolean hasType = false;
+
+            while ((line = reader.readLine()) != null) {
+                lineNum++;
+                line = line.trim();
+
+                if (line.startsWith("[card]")) {
+                    if (insideCard) {
+                        System.err.println("ERROR: Missing [/card] before new [card] at line " + lineNum);
+                        isValid = false;
+                    }
+                    insideCard = true;
+                    currentCard = "";
+                    hasTarget = false;
+                    isCreature = false;
+                    hasName = false;
+                    hasType = false;
+                } else if (line.startsWith("[/card]")) {
+                    if (!insideCard) {
+                        System.err.println("ERROR: Unmatched [/card] at line " + lineNum);
+                        isValid = false;
+                    }
+                    if (!hasName) {
+                        System.err.println("ERROR: Missing name= for card ending at line " + lineNum);
+                        isValid = false;
+                    }
+                    if (!hasType) {
+                        System.err.println("ERROR: Missing type= for card ending at line " + lineNum);
+                        isValid = false;
+                    }
+                    insideCard = false;
+                } else if (line.startsWith("name=")) {
+                    currentCard = line.substring(5);
+                    hasName = true;
+                } else if (line.startsWith("type=")) {
+                    hasType = true;
+                } else if (startsWithAny(line, "mana=", "other=", "kicker=", "flashback=", "buyback=", "retrace=", "bestow=")) {
+                    isValid &= validateMana(line, currentCard, lineNum);
+                } else {
+                    isValid &= validateLine(line, currentCard, lineNum);
+                    if (line.startsWith("target=")) {
+                        hasTarget = true;
+                    }
+                    if (line.startsWith("type=") && line.matches(".*(Creature).*")) {
+                        isCreature = true;
+                    }
+                    if (isCreature) {
+                        isValid &= validateStats(line, currentCard, lineNum);
+                    }
+                }
+
+                if (line.startsWith("subtype=Aura") && !currentCard.isEmpty() && !currentCard.endsWith("*")) {
+                    if (!hasTarget) {
+                        System.err.println("ERROR: Aura \"" + currentCard + "\" at line " + lineNum + " is missing target=.");
+                        isValid = false;
+                    }
+                }
+            }
+
+            if (insideCard) {
+                System.err.println("ERROR: Missing closing [/card] tag at end of file " + file.getName());
+                isValid = false;
+            }
+
+            if (isValid) {
+                System.out.println("All cards are valid in " + file.getName());
+            }
+        } catch (IOException e) {
+            System.err.println("Validation error in " + file.getName() + ": " + e.getMessage());
+        }
+    }
+
+    private static boolean startsWithAny(String line, String... prefixes) {
+        for (String prefix : prefixes) {
+            if (line.startsWith(prefix)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean validateLine(String line, String currentCard, int lineNum) {
+        boolean isValid = true;
+
+        if (line.startsWith("auto=auto")) {
+            System.out.println("auto=auto in \"" + currentCard + "\" at line " + lineNum);
+        }
+        if (line.startsWith("auto=") && (line.contains("if ") || line.contains("ifnot ")) && !line.contains("then")) {
+            System.err.println("ERROR: if without else at line " + lineNum);
+            isValid = false;
+        }
+        if (line.startsWith("auto=") && line.contains("@") && !line.contains(":")) {
+            System.err.println("ERROR: Trigger condition missing semicolon at line " + lineNum);
+            isValid = false;
+        }
+        if (line.contains("::")) {
+            System.err.println("ERROR: :: at line " + lineNum);
+            isValid = false;
+        }
+        if (line.contains(":)")) {
+            System.err.println("ERROR: :) at line " + lineNum);
+            isValid = false;
+        }
+        if (line.contains("((new")) {
+            System.err.println("ERROR: ((new at line " + lineNum);
+            isValid = false;
+        }
+
+        return isValid;
+    }
+
+    private static boolean validateStats(String line, String currentCard, int lineNum) {
+        boolean isValid = true;
+
+        if (line.startsWith("power=")) {
+            String power = line.substring("power=".length()).trim();
+            if (!power.matches("\\*|[-+]?\\d+\\+?\\*?")) {
+                System.err.printf("ERROR: Invalid power value \"%s\" for \"%s\" at line %d%n", power, currentCard, lineNum);
+                isValid = false;
+            }
+        }
+
+        if (line.startsWith("toughness=")) {
+            String toughness = line.substring("toughness=".length()).trim();
+            if (!toughness.matches("\\*|[-+]?\\d+[-+]?\\*?|\\*\\+\\d+")) {
+                System.err.printf("ERROR: Invalid toughness value \"%s\" for \"%s\" at line %d%n", toughness, currentCard, lineNum);
+                isValid = false;
+            }
+        }
+
+        return isValid;
+    }
+
+    private static boolean validateMana(String line, String currentCard, int lineNum) {
+        int equalsIndex = line.indexOf('=');
+        if (equalsIndex < 0) {
+            System.err.println("ERROR: No '=' found in mana line for \"" + currentCard + "\" at line " + lineNum);
+            return false;
+        }
+
+        String mana = line.substring(equalsIndex + 1).trim();
+
+        // Separar un posible name(...) al final
+        String baseMana = mana;
+        String nameSuffixPattern = "( name\\(.*\\))$";
+        if (mana.matches(".*" + nameSuffixPattern)) {
+            baseMana = mana.replaceFirst(nameSuffixPattern, "");
+        }
+
+        // Expresión regular con todos los componentes permitidos
+        if (!baseMana.matches("^("
+                + "(\\{[0-9CWUBRGXEDi]+\\})*"
+                + // básicos
+                "(\\{L:\\d+\\})*"
+                + // pago de vida
+                "(\\{p\\([CWUBRG]\\)\\})*"
+                + // phyrexiano
+                "(\\{(S|E|D|T|H|X|s2g)\\(.*?\\)\\})*"
+                + // efectos especiales
+                "(\\{(convoke|delve|improvise|emerge)\\})*"
+                + // keywords
+                "(\\{k[a-zA-Z0-9]+\\})*"
+                + // k-prefixed
+                "(\\{X:[a-z]+\\})*"
+                + // etiquetas X
+                ")*"
+                + "(multi(\\{[0-9CWUBRGXEDi]+\\})+)*"
+                + // multi{...}{...}
+                "$")) {
+            System.err.println("ERROR: Invalid mana value \"" + mana + "\" for \"" + currentCard + "\" at line " + lineNum);
+            return false;
+        }
+
+        return true;
+    }
+
 }

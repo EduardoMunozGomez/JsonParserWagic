@@ -94,17 +94,65 @@ public class Keywords {
 //                            }
 //                        }
                         if (line.contains("|") && !line.startsWith("text=") && !line.contains("meld")) {
-                            boolean containsZone = false;
-                            for (String validZone : Constants.VALID_ZONES) {
-                                if (line.contains(validZone)) {
-                                    containsZone = true;
-                                    break;
+                            int pipeIndex = line.indexOf('|');
+                            if (pipeIndex != -1) {
+                                int closeParenIndex = line.indexOf(')', pipeIndex);
+                                int closeBracketIndex = line.indexOf(']', pipeIndex);
+                                int closeBraceIndex = line.indexOf('}', pipeIndex);
+
+                                int endIndex = -1;
+                                if (closeParenIndex != -1) {
+                                    endIndex = closeParenIndex;
+                                }
+                                if (closeBracketIndex != -1 && (endIndex == -1 || closeBracketIndex < endIndex)) {
+                                    endIndex = closeBracketIndex;
+                                }
+                                if (closeBraceIndex != -1 && (endIndex == -1 || closeBraceIndex < endIndex)) {
+                                    endIndex = closeBraceIndex;
+                                }
+
+                                if (endIndex != -1) {
+                                    String zonePart = line.substring(pipeIndex + 1, endIndex).trim();
+                                    String[] zones = zonePart.split("[,^]");
+                                    for (String zone : zones) {
+                                        zone = zone.trim();
+                                        boolean isValid = false;
+                                        for (String validZone : Constants.VALID_ZONES) {
+                                            if (zone.equals(validZone)) {
+                                                isValid = true;
+                                                break;
+                                            }
+                                        }
+                                        if (!isValid) {
+                                            System.out.println("Line " + lineNumber + " contains invalid zone (after |): '" + zone + "' in line: " + line);
+                                        }
+                                    }
                                 }
                             }
-                            if (!containsZone) {
-                                System.out.println("Line " + lineNumber + " does not contain any valid zone: " + line);
+                        }
+
+                        if (line.contains("moveto(")) {
+                            Pattern moveToPattern = Pattern.compile("moveto\\(([^)]+)\\)");
+                            Matcher matcher = moveToPattern.matcher(line);
+
+                            while (matcher.find()) {
+                                String zone = matcher.group(1).trim();
+
+                                boolean isValid = false;
+                                for (String validZone : Constants.VALID_ZONES) {
+                                    // Puedes usar equalsIgnoreCase si la comparación debe ser insensible a mayúsculas/minúsculas:
+                                    // if (zone.equalsIgnoreCase(validZone)) {
+                                    if (zone.equals(validZone)) {
+                                        isValid = true;
+                                        break;
+                                    }
+                                }
+                                if (!isValid) {
+                                    System.out.println("Line " + lineNumber + " contains invalid moveTo zone: '" + zone + "' in line: " + line);
+                                }
                             }
                         }
+
                         if (line.contains("@")) {
                             boolean containsTrigger = false;
                             for (String validTrigger : Constants.VALID_TRIGGERS) {

@@ -5,7 +5,7 @@ import static json.parser.wagic.AutoEffects.processEffect;
 
 // @author Eduardo
 public class AutoLine {
-    
+
     static String impending(String oracleText, String manaCost) {
         String autoImpending = "";
         String impendingCost;
@@ -24,7 +24,7 @@ public class AutoLine {
         }
         return autoImpending;
     }
-        
+
     protected static String surveil(String oracleText) {
         String surveil = "";
 
@@ -239,7 +239,7 @@ public class AutoLine {
                     target = oracleText.substring(oracleText.indexOf(incidence) + incidence.length());
                     //target = target.substring(0, target.indexOf(incidenceEnd));
                 }
-                if (target.contains("permanent" + letterS)) {
+                if (target.contains("permanent" + letterS) || target.contains("card")) {
                     myTarget = "*";
                 }
                 if (target.contains("permanent" + letterS + " you control")) {
@@ -501,6 +501,7 @@ public class AutoLine {
         String occurrenceEnd = "spell";
         String occurrenceCondition;
         String occurrenceSubString;
+        String effect = "";
 
         if (oracleText.contains(occurrence)) {
             occurrenceSubString = oracleText.substring(oracleText.indexOf(occurrence) + occurrence.length(), oracleText.lastIndexOf(","));
@@ -518,9 +519,12 @@ public class AutoLine {
             if (occurrenceCondition.contains("permanent")) {
                 occurrenceCondition = "*[-instant;-sorcery]";
             }
-            if (occurrenceCondition.contains("")) {
-                occurrenceCondition = "*";
+            if (occurrenceCondition.contains("colorless")) {
+                occurrenceCondition = "*[colorless]";
             }
+//            if (occurrenceCondition.contains("")) {
+//                occurrenceCondition = "*";
+//            }
             occurrenceCondition = occurrenceCondition.replace(" white ", "*[white]");
             occurrenceCondition = occurrenceCondition.replace(" blue ", "*[blue]");
             occurrenceCondition = occurrenceCondition.replace(" black ", "*[black]");
@@ -528,12 +532,23 @@ public class AutoLine {
             occurrenceCondition = occurrenceCondition.replace(" green ", "*[green]");
             cast = "auto=@movedTo(" + occurrenceCondition + "|mystack):";
 
-            String effect = oracleText.substring(oracleText.indexOf(",") + 2);
+            effect = oracleText.substring(oracleText.indexOf(",") + 2);
             effect = AutoEffects.processEffect(effect, cardName);
             if (effect.length() > 0) {
                 cast += effect;
             }
         }
+
+        if (oracleText.contains("When you cast this spell")) {
+            effect = oracleText.substring(oracleText.indexOf(",") + 2);
+            effect = AutoEffects.processEffect(effect, cardName);
+            cast = oracleText.replace("When you cast this spell, ", "autostack=if casted(this) then ");
+
+            if (effect.length() > 0) {
+                cast += effect;
+            }
+        }
+
         cast = cast.replace("multicolored", "multicolor");
         return cast;
     }
@@ -628,7 +643,8 @@ public class AutoLine {
             if (manaProduced.contains(",") || manaProduced.contains(" or ")) {
                 manaProduced = manaProduced.replace(" or ", "\nauto={T}:Add");
             }
-            manaProduced = manaProduced.replace("Add one mana of any color", "ability$! choice Add{W} _ choice Add{U} _ choice Add{B} _ choice Add{R} _ choice Add{G} !$ controller");
+            manaProduced = manaProduced.replace("Add one mana of any color", "_MANAOFANYCOLOR_");
+            manaProduced = manaProduced.replace("Activate only once each turn", "limit:1");
 
             manaAbility = manaProduced.replace(" ", "");
             //}
@@ -638,6 +654,16 @@ public class AutoLine {
         return manaAbility.trim();
     }
 
+    static String additionalCost(String oracleText, String type) {
+        String additionalCost = "";
+        if (oracleText.contains("an additional cost to cast this spell")){
+            String[] addCost = oracleText.split(",");
+            addCost[0] = addCost[1];
+            additionalCost = ActivatedAbility.activatedAbililtyCost(addCost, type , type);
+        }
+        return additionalCost;
+    }
+    
     static String exileDestroyDamage(String oracleText, String type) {
         String action = "";
         String auto = "";
@@ -767,6 +793,7 @@ public class AutoLine {
                 if (oracleText.contains("treasure token")) {
                     return "_TREASURE_";
                 }
+
                 create = oracleText.substring(oracleText.indexOf(incidence) + incidence.length());
                 create = create.substring(0, create.indexOf("."));
                 tokenMultipl = create.substring(0, create.indexOf(" "));
@@ -807,6 +834,9 @@ public class AutoLine {
                 if (create.endsWith(":)")) {
                     create = create.replace(":)", ")");
                 }
+            }
+            if (oracleText.contains("if one or more tokens would be created under your control, twice that many of those tokens are created instead")) {
+                return "@tokencreated(*|myBattlefield):name(Double the token) all(trigger) clone options(notrigger)";
             }
         } catch (Exception e) {
             e.getMessage();
@@ -1031,6 +1061,7 @@ public class AutoLine {
 
                 effect = effect.replace("until end of turn", "");
                 effect = effect.replace(" and ", ",");
+                effect = effect.replace("+", "");
 
                 lord = String.format("auto=%s(%s%s%s|myBattlefield)%s", lordOrAll, onlyOther, creatureType, condition, effect);
             }

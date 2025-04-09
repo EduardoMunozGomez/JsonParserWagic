@@ -23,7 +23,7 @@ public class Triggers {
                     || oracleText.contains("Raid ")
                     || oracleText.toLowerCase().contains("ward "))) {
 
-                if (oracleText.contains("you cast")) {
+                if (oracleText.contains("you cast a")) {
                     return AutoLine.cast(oracleText, cardName);
                 }
                 trigger = trigger.replace("your second main phase, if " + cardName + " is tapped", "each my secondmain sourceUntapped:");
@@ -45,10 +45,12 @@ public class Triggers {
                 trigger = trigger.replace("a creature you control deals combat damage to a player", "combatdamagefoeof(player) from(creature|mybattlefield):");
                 trigger = trigger.replace("Whenever an enchantment you control enters and whenever you fully unlock a Room", "");
                 trigger = trigger.replace("one or more +1/+1 counters are put on", "totalcounteradded(1/1) from(this):");
-                trigger = trigger.replace("a creature you control enters", "movedto(creature|myBattlefield):");
-                trigger = trigger.replace("a land you control enters", "_LANDFALL_");
+                trigger = trigger.replace("Landfall - Whenever a land you control enters", "_LANDFALL_");
+                trigger = trigger.replaceAll("a ([a-zA-Z]+) you control enters", "movedTo($1|myBattlefield):");
+                trigger = trigger.replaceAll("this ([a-zA-Z]+) becomes tapped", "tapped(this):");
                 trigger = trigger.replace("a creature you control becomes blocked", "combat(blocked) source(creature|mybattlefield):");
-                trigger = trigger.replace("you cast your second spell each turn", "@movedto(*|mystack) restriction{thisturn(*|mystack)~equalto~1}:");
+                trigger = trigger.replace("Flurry - Whenever you cast your second spell each turn", "_FLURRY_");
+                trigger = trigger.replace("you cast your second spell each turn", "movedto(*|mystack) restriction{thisturn(*|mystack)~equalto~1}:");
                 trigger = trigger.replace("As long as seven or more cards are in your graveyard", "");
                 trigger = trigger.replaceAll(" attacks while you control a ([a-zA-Z]+)", "@combat(attacking) source(this) restriction{type($1|myBattlefield)~morethan~0}:");
                 trigger = trigger.replaceAll("When this Class becomes level ([0-9]+)", "@counteradded(0/0.1.Level) from(this) restriction{compare(hascntlevel)~equalto~$1}:");
@@ -65,7 +67,9 @@ public class Triggers {
                 trigger = trigger.replace("As long as you've lost life this turn", "aslongas(variable{oplifelost}>0) ");
                 trigger = trigger.replace(cardName + " enters tapped", "tap(noevent)");
                 trigger = trigger.replace("When " + cardName + " enters", "");
-                trigger = trigger.replace("When this creature enters", "");
+                trigger = trigger.replace("When you cast this spell", "stack=if casted(this) then ");
+                trigger = trigger.replaceAll("When this ([a-zA-Z]+) enters", "");
+                trigger = trigger.replaceAll("Whenever this ([a-zA-Z]+) enters", "");
                 trigger = trigger.replace("Whenever " + cardName + " enters ", "");
                 trigger = trigger.replace("Whenever " + cardName + " attacks", "_ATTACKING_");
                 trigger = trigger.replace("Whenever " + cardName, "");
@@ -104,9 +108,11 @@ public class Triggers {
                 trigger = trigger.replaceAll("([a-zA-Z]+) is put into a graveyard from the battlefield", "movedto($1|graveyard) from(battlefield):");
                 trigger = trigger.replace("a creature dies", "movedTo(creature|graveyard) from(battlefield):");
                 trigger = trigger.replace("another creature dies", "movedTo(other creature|graveyard) from(battlefield):");
+                trigger = trigger.replace("another nontoken creature you control dies", "movedTo(other creature[-token]|graveyard) from(myBattlefield):");
                 trigger = trigger.replace("another creature or planeswalker you control dies", "movedTo(other *[creature;planeswalker]|graveyard) from(myBattlefield):");
+                trigger = trigger.replace("this creature or another creature you control dies", "movedTo(creature|graveyard) from(myBattlefield):");
                 trigger = trigger.replace("a creature you control dies", "movedTo(creature|graveyard) from(mybattlefield):");
-                trigger = trigger.replace("a creature an opponent controls dies", "movedTo(creature|graveyard) from(opponentbattlefield):");
+                trigger = trigger.replace("a creature an opponent controls dies", "movedTo(creature|graveyard) from(opponentBattlefield):");
                 trigger = trigger.replace("a creature or planeswalker you control dies", "movedTo(creature,planeswalker|graveyard) from(mybattlefield):");
                 trigger = trigger.replace(" dies", "movedTo(|graveyard) from(battlefield):");
                 // Phases

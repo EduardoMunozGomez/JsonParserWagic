@@ -97,6 +97,7 @@ public class Abilities {
         abilityMap.put("modular", "modular\nmodular=");
         abilityMap.put("changeling", "changeling");
         abilityMap.put("partner", "partner");
+        abilityMap.put("storm", "storm");
 
         // Iterate over the map and add the corresponding abilities if conditions are met
         for (Map.Entry<String, String> entry : abilityMap.entrySet()) {

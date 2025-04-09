@@ -5,9 +5,10 @@ import java.util.LinkedHashMap;
 import static json.parser.wagic.AutoEffects.processEffect;
 
 /**
- * This class provides methods to determine and process activated abilities for Wagic cards.
- * It includes methods to identify activated abilities and format their costs and effects.
- * 
+ * This class provides methods to determine and process activated abilities for
+ * Wagic cards. It includes methods to identify activated abilities and format
+ * their costs and effects.
+ *
  * @author Eduardo_
  */
 public class ActivatedAbility {
@@ -15,11 +16,13 @@ public class ActivatedAbility {
     /**
      * Determines if the card has an activated ability based on the oracle text.
      *
-     * @param oracleBit The oracle text segment to check for activated abilities.
-     * @param cardName  The name of the card.
-     * @param type      The type of the card (e.g., Creature, Planeswalker).
-     * @param subtype   The subtype of the card (e.g., Vehicle, Aura).
-     * @return A string representing the activated ability, or an empty string if none is found.
+     * @param oracleBit The oracle text segment to check for activated
+     * abilities.
+     * @param cardName The name of the card.
+     * @param type The type of the card (e.g., Creature, Planeswalker).
+     * @param subtype The subtype of the card (e.g., Vehicle, Aura).
+     * @return A string representing the activated ability, or an empty string
+     * if none is found.
      */
     static String determineActivatedAbility(String oracleBit, String cardName, String type, String subtype) {
         String[] activatedAbililty = oracleBit.split(":");
@@ -33,12 +36,14 @@ public class ActivatedAbility {
     /**
      * Processes the cost and effect of an activated ability.
      *
-     * @param actAbil  An array containing the cost and effect of the activated ability.
+     * @param actAbil An array containing the cost and effect of the activated
+     * ability.
      * @param cardName The name of the card.
-     * @param type     The type of the card (e.g., Creature, Planeswalker).
-     * @return A formatted string representing the activated ability cost and effect.
+     * @param type The type of the card (e.g., Creature, Planeswalker).
+     * @return A formatted string representing the activated ability cost and
+     * effect.
      */
-    private static String activatedAbililtyCost(String[] actAbil, String cardName, String type) {
+    public static String activatedAbililtyCost(String[] actAbil, String cardName, String type) {
         String actAbilCost = actAbil[0];
         String actAbilEffect;
 
@@ -56,8 +61,10 @@ public class ActivatedAbility {
         costReplacements.put("Discard a land card", "{D(land|myhand)}");
         costReplacements.put("Discard three cards", "{D(*|myhand)}{D(*|myhand)}{D(*|myhand)}");
         costReplacements.put("Discard a creature card", "{D(creature|myhand)}");
+        costReplacements.put("Exile a card from your graveyard", "{E(*|mygraveyard)}");
         costReplacements.put("Exile " + cardName + " from your graveyard", "{E}");
         costReplacements.put("Exile " + cardName, "{E}");
+        costReplacements.put("Exile this card from your graveyard", "{E}");
         costReplacements.put("Forage", "{E(*|myGraveyard)}{E(*|myGraveyard)}{E(*|myGraveyard)}:\nauto={S(Food|myBattlefield)}");
         costReplacements.put("Sacrifice a creature with defender", "{S(creature[defender]|myBattlefield)}");
         costReplacements.put("Sacrifice " + cardName, "{S}");
@@ -68,25 +75,28 @@ public class ActivatedAbility {
         costReplacements.put("Tap two untapped tokens you control", "{T(*[token]|mybattlefield)}{T(*[token]|mybattlefield)}");
         costReplacements.put("Pay ", "{L:");
         costReplacements.put(" life", "}");
-        
+
         // Apply the replacements
         for (Map.Entry<String, String> entry : costReplacements.entrySet()) {
             actAbilCost = actAbilCost.replace(entry.getKey(), entry.getValue());
         }
-        
+
         // Apply replacements for sacrifices and counters
         actAbilCost = actAbilCost.replace("/", "");
-        actAbilCost = actAbilCost.replaceAll("Tap (an?|a) untapped ([a-zA-Z]+) you control", "{T(*[$2]|myBattlefield)}");        
-        actAbilCost = actAbilCost.replaceAll("Tap another untapped ([a-zA-Z]+) you control", "{T(other *[$1]|myBattlefield)}");        
-        actAbilCost = actAbilCost.replaceAll("Sacrifice (an?|a) ([a-zA-Z]+) or ([a-zA-Z]+)", "{S(*[$2;$3]|myBattlefield)}");        
-        actAbilCost = actAbilCost.replaceAll("Sacrifice another ([a-zA-Z]+)", "{S(other $1|mybattlefield)}");        
-        actAbilCost = actAbilCost.replaceAll("Sacrifice (an?|a) ([a-zA-Z]+)", "{S($2|myBattlefield)}");
+
+        actAbilCost = actAbilCost.replaceAll("Renew -.*?(\\{.*\\})", "$1:name(Renew) ");
+        actAbilCost = actAbilCost.replaceAll("Exile a ([a-zA-Z]+) card from your graveyard", "{E(*[$1]|mygraveyard)}");
+        actAbilCost = actAbilCost.replaceAll("Tap (an?|a) untapped ([a-zA-Z]+) you control", "{T(*[$2]|myBattlefield)}");
+        actAbilCost = actAbilCost.replaceAll("Tap another untapped ([a-zA-Z]+) you control", "{T(other *[$1]|myBattlefield)}");
+        actAbilCost = actAbilCost.replaceAll("Sacrifice (an?|a) ([a-zA-Z]+) or ([a-zA-Z]+)", "{S(*[$2;$3]|myBattlefield)}");
+        actAbilCost = actAbilCost.replaceAll("Sacrifice another ([a-zA-Z]+)", "{S(other $1|mybattlefield)}");
+        actAbilCost = actAbilCost.replaceAll("(?i)Sacrifice (an?|a) ([a-zA-Z]+)", "{S($2|myBattlefield)}");
+        actAbilCost = actAbilCost.replaceAll("Sacrifice this ([a-zA-Z]+)", "{S}");
         actAbilCost = actAbilCost.replaceAll("Remove (an?|a) ([a-zA-Z]+) counter from " + cardName, "{C(0/0,-1,$2)}");
 
         // Remove unnecessary characters
         actAbilCost = actAbilCost.replace(cardName, "");
         actAbilCost = actAbilCost.replace(", ", "");
-        actAbilCost = actAbilCost.replace(" ", "");
         actAbilCost = actAbilCost.replace(".", "");
 
         // Special handling for Planeswalker loyalty costs
