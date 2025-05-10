@@ -656,14 +656,14 @@ public class AutoLine {
 
     static String additionalCost(String oracleText, String type) {
         String additionalCost = "";
-        if (oracleText.contains("an additional cost to cast this spell")){
+        if (oracleText.contains("an additional cost to cast this spell")) {
             String[] addCost = oracleText.split(",");
             addCost[0] = addCost[1];
-            additionalCost = ActivatedAbility.activatedAbililtyCost(addCost, type , type);
+            additionalCost = ActivatedAbility.activatedAbililtyCost(addCost, type, type);
         }
         return additionalCost;
     }
-    
+
     static String exileDestroyDamage(String oracleText, String type) {
         String action = "";
         String auto = "";
@@ -1157,13 +1157,13 @@ public class AutoLine {
             epicSaga = " " + oracleText.substring(0, oracleText.indexOf("I ") + 2);
             epicSagaEffect = oracleText.substring(oracleText.indexOf("I ") + 4);
 
-            epicSagaEffect = AutoEffects.processEffect(epicSagaEffect, "EpicSaga");
-
             epicSaga = epicSaga.replace(" I, II ", "auto=counter(0/0,1,Lore)\nauto=@each my firstmain:counter(0/0,1,Lore)\nauto=");
             epicSaga = epicSaga.replace(" I ", "auto=counter(0/0,1,Lore)\nauto=@each my firstmain:counter(0/0,1,Lore)\nauto=");
             epicSaga = epicSaga.replace(" II ", "auto=@counteradded(0/0,1,Lore) from(this):this(counter{0/0.2.Lore}<=2)");
-            epicSaga = epicSaga.replace(" III ", "auto=@counteradded(0/0,1,Lore) from(this):this(counter{0/0.3.Lore}) sacrifice(this)"
-                    + "\nauto=@counteradded(0/0,1,Lore) from(this):this(counter{0/0.3.Lore}) ");
+            epicSaga = epicSaga.replace(" III ", "auto=@counteradded(0/0,1,Lore) from(this):this(counter{0/0.3.Lore}) "
+                    + "\nauto=@counteradded(0/0,1,Lore) from(this):this(counter{0/0.3.Lore}) sacrifice(this)");
+
+            epicSagaEffect = AutoEffects.processEffect(epicSagaEffect, "EpicSaga");
 
             epicSaga += epicSagaEffect;
         }

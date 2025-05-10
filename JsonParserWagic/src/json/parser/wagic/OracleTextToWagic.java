@@ -121,7 +121,7 @@ public class OracleTextToWagic {
                 if (!auraEquipBonus.isEmpty()) {
                     autoLineExists(auraEquipBonus);
                 }
-                autoLineExists(AutoLine.gift(oracleBit, manaCost));
+                //autoLineExists(AutoLine.gift(oracleBit, manaCost));
 
             }
             // EQUIPMENT

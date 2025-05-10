@@ -21,7 +21,7 @@ public class SyntaxCheck {
                         String line;
                         int lineNumber = 1;
                         while ((line = br.readLine()) != null) {
-                            if (line.startsWith("text=")||line.startsWith("name=")) {
+                            if (line.startsWith("text=") || line.startsWith("name=")) {
                                 // Ignore this line, it starts with the prefix "text="
                                 lineNumber++;
                                 continue;

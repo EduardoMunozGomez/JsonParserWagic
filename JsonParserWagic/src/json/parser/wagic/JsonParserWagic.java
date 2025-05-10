@@ -18,9 +18,9 @@ import org.json.simple.parser.ParseException;
 public class JsonParserWagic {
 
     // If commander or complemmentary set, else the set code is the same on both
-    private static final String SET_CODE = "TDM";
+    private static final String SET_CODE = "AKR";
     // For sets like commander expansions to obtain the tokens from the main set
-    private static final String MAIN_SET_CODE = "TDM";
+    private static final String MAIN_SET_CODE = "AKH";
     private static final String FILE_PATH = "C:\\Users\\Eduardo_\\Downloads\\MTGJSON\\" + SET_CODE;
     private static final String MAIN_SET_PATH = "C:\\Users\\Eduardo_\\Downloads\\MTGJSON\\" + MAIN_SET_CODE;
     private static final Boolean ALL_RESOURCES = true;
@@ -71,7 +71,7 @@ public class JsonParserWagic {
 
                 String layout = card.get("layout").toString();
                 String faceName = (String) card.get("faceName");
-                String name = (String) card.get("name");
+                String name = (String) card.get("name");                
 
                 primitiveCardName = (!skipLayouts.contains(layout) && faceName != null) ? faceName : name;
                 primitiveRarity = card.get("side") != null && "b".equals(card.get("side").toString()) ? "T" : (String) card.get("rarity");
@@ -90,9 +90,9 @@ public class JsonParserWagic {
                     CardDat.generateCSV(SET_CODE, (Object) multiverseId, (String) identifiers.get("scryfallId"), myWriterImages, side);
                 }
                 // If card is a reprint, skip it
-                if (card.get("isReprint") != null) {
-                    continue;
-                }
+//                if (card.get("isReprint") != null) {
+//                    continue;
+//                }
                 String nameHeader = "name=" + primitiveCardName;
                 String oracleText = null;
                 if (card.get("text") != null) {

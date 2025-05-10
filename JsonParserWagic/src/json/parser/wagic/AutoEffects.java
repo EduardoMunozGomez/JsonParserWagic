@@ -35,6 +35,12 @@ public class AutoEffects {
             return AutoLine.ManaAbility(oracleBit, "");
         }
 
+        effect = effect.replace("you may play an additional land on each of your turns", "maxPlay(land)+1");
+        effect = effect.replace("you may play lands from your graveyard", "lord(land|mygraveyard) canPlayFromGraveyard");
+        effect = effect.replace("each creature you control assigns combat damage equal to its toughness rather than its power", "lord(creature|mybattlefield) combattoughness");
+        effect = effect.replace("if you cast it", "if casted(this) then ");
+        effect = effect.replace("crew 2", "_CREW2_\nauto=_CREW2COMPLEMENT_ ");
+
         effect = effect.replaceAll("target creature with ([a-zA-Z]+)", "target(creature[$1]");
         effect = effect.replaceAll("loses all abilities", "loseabilities");
 
@@ -144,7 +150,7 @@ public class AutoEffects {
         effect = effect.replace("only once each turn", "turnlimited");
         effect = effect.replace("activate only during your turn", "myturnonly");
         effect = effect.replace("that was dealt damage this turn", "[damaged]");
-        //effect = effect.replace("+1/+1 counter", "counter(1/1)");
+        effect = effect.replace("number of +1/+1 counters on", "counter(1/1.)");
         effect = effect.replace("loyalty counter", "counter(0/0,1,Loyalty)");
         effect = effect.replace("on the bottom of its owner's library", "bottomoflibrary");
         effect = effect.replaceAll("with power ([0-9]+|x) or greater", "creature[power>=$1]");
@@ -287,6 +293,7 @@ public class AutoEffects {
         effect = effect.replace(" cards", "");
         effect = effect.replace(" card", "");
         effect = effect.replace("card ", "");
+        effect = effect.replace("you ", "");
 
         effect = effect.replace("it) ", "");
         effect = effect.replace(" it ", "");
@@ -297,6 +304,7 @@ public class AutoEffects {
 
         effect = effect.replace("} {", "}{");
         effect = effect.replace(":|", ":");
+        effect = effect.replace(":)", ")");
         effect = effect.replace("+", "");
         //effect = effect.replace("-", "");
         effect = effect.replace(".", "");

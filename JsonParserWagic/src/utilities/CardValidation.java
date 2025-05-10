@@ -121,8 +121,11 @@ public class CardValidation {
     private static boolean validateLine(String line, String currentCard, int lineNum) {
         boolean isValid = true;
 
-        if (line.startsWith("auto=auto")) {
-            System.out.println("auto=auto in \"" + currentCard + "\" at line " + lineNum);
+        for (String keyword : Constants.STARTING_KEYWORDS) {
+            String duplicate = keyword + "=" + keyword;
+            if (line.startsWith(duplicate)  && !duplicate.equals("dredge=dredge")) {
+                System.out.println("⚠️ Duplicado \"" + duplicate + "\" en la carta \"" + currentCard + "\" en la línea " + lineNum);
+            }
         }
         if (line.startsWith("auto=") && (line.contains("if ") || line.contains("ifnot ")) && !line.contains("then")) {
             System.err.println("ERROR: if without else at line " + lineNum);

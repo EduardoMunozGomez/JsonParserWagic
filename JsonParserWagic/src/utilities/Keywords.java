@@ -20,7 +20,6 @@ public class Keywords {
             System.out.println("Processing file: " + file.getName());
 
             String line;
-
             int lineNumber = 0;
 
             try {
@@ -30,37 +29,44 @@ public class Keywords {
                     while ((line = bufferedReader.readLine()) != null) {
                         line = line.toLowerCase();
                         lineNumber++;
-                        if (line.isEmpty()) {
+                        if (line.isEmpty() || line.startsWith("#")) {
                             continue;
                         }
+
                         if (line.startsWith("abilities=")) {
-                            String subline = line.substring(10); // exclude "abilities=" from the string
+                            String subline = line.substring(10);
                             String[] lineKeywords = subline.split("[,]");
-                            boolean containsOnlyKeywords = false; // initialize to false
+                            boolean containsOnlyKeywords = true;
+
                             for (String keyword : lineKeywords) {
                                 if (!Arrays.asList(Constants.KEYWORDS).contains(keyword.trim())) {
                                     containsOnlyKeywords = false;
                                     break;
-                                } else {
-                                    containsOnlyKeywords = true; // set to true if keyword is found
                                 }
                             }
+
                             if (!containsOnlyKeywords) {
                                 System.out.println("Line " + lineNumber + " does not contain valid keywords: " + subline);
                             }
                         }
+
                         if (line.startsWith("type=")) {
-                            boolean containsType = false;
-                            for (String type : Constants.VALID_TYPES) {
-                                if (line.contains(type)) {
-                                    containsType = true;
+                            String typesPart = line.substring("type=".length()).trim();
+                            String[] types = typesPart.split("\\s+"); // separa por espacios
+                            boolean allValid = true;
+
+                            for (String type : types) {
+                                if (!Arrays.asList(Constants.VALID_TYPES).contains(type)) {
+                                    allValid = false;
                                     break;
                                 }
                             }
-                            if (!containsType) {
-                                System.out.println("Line " + lineNumber + " does not contain any of the types: " + line);
+
+                            if (!allValid) {
+                                System.out.println("Line " + lineNumber + " contains invalid types: " + line);
                             }
                         }
+
                         if (line.startsWith("target=")) {
                             boolean containsTarget = false;
                             for (String validTarget : Constants.VALID_TARGETS) {
@@ -73,26 +79,7 @@ public class Keywords {
                                 System.out.println("Line " + lineNumber + " does not contain any of the targets: " + line);
                             }
                         }
-//                        if (line.contains("target(")) {
-//                            Pattern pattern = Pattern.compile("target\\(([^)]+)\\)");
-//                            Matcher matcher = pattern.matcher(line);
-//
-//                            if (matcher.find()) {
-//                                String targetContent = matcher.group(1);
-//                                boolean containsTarget = false;
-//
-//                                for (String validTarget : Constants.VALID_TARGETS) {
-//                                    if (targetContent.equals(validTarget)) {
-//                                        containsTarget = true;
-//                                        break;
-//                                    }
-//                                }
-//
-//                                if (!containsTarget) {
-//                                    System.out.println("Line " + lineNumber + " does not contain any of the targets: " + targetContent);
-//                                }
-//                            }
-//                        }
+
                         if (line.contains("|") && !line.startsWith("text=") && !line.contains("meld")) {
                             int pipeIndex = line.indexOf('|');
                             if (pipeIndex != -1) {
@@ -140,8 +127,6 @@ public class Keywords {
 
                                 boolean isValid = false;
                                 for (String validZone : Constants.VALID_ZONES) {
-                                    // Puedes usar equalsIgnoreCase si la comparación debe ser insensible a mayúsculas/minúsculas:
-                                    // if (zone.equalsIgnoreCase(validZone)) {
                                     if (zone.equals(validZone)) {
                                         isValid = true;
                                         break;
@@ -165,9 +150,13 @@ public class Keywords {
                                 System.out.println("Line " + lineNumber + " does not contain any valid Trigger: " + line);
                             }
                         }
+
+                        // ✅ Validación corregida: detectar keywords= fuera del inicio
+                        //validateKeywordPosition(line, lineNumber);
+                        // Validación original: debe iniciar con una keyword conocida
                         boolean startsWithKeyword = false;
-                        for (String startingkeyword : Constants.STARTING_KEYWORDS) {
-                            if (line.startsWith(startingkeyword)) {
+                        for (String startingKeyword : Constants.STARTING_KEYWORDS) {
+                            if (line.startsWith(startingKeyword)) {
                                 startsWithKeyword = true;
                                 break;
                             }
@@ -182,4 +171,26 @@ public class Keywords {
             }
         }
     }
+
+    private static void validateKeywordPosition(String line, int lineNumber) {
+        if (line.startsWith("#")) {
+            return; // ignorar comentarios
+        }
+        for (String startingKeyword : Constants.STARTING_KEYWORDS) {
+            if (startingKeyword.equals("power") || startingKeyword.equals("toughness")) {
+                continue; // excepción
+            }
+
+            String keywordWithEqual = startingKeyword.endsWith("=") ? startingKeyword : startingKeyword + "=";
+            Pattern keywordPattern = Pattern.compile("\\b" + Pattern.quote(keywordWithEqual));
+            Matcher matcher = keywordPattern.matcher(line);
+
+            while (matcher.find()) {
+                if (matcher.start() != 0) {
+                    System.out.println("Line " + lineNumber + " has misplaced keyword '" + keywordWithEqual + "' not at the start: " + line);
+                }
+            }
+        }
+    }
+
 }

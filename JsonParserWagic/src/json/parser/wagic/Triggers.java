@@ -46,6 +46,7 @@ public class Triggers {
                 trigger = trigger.replace("Whenever an enchantment you control enters and whenever you fully unlock a Room", "");
                 trigger = trigger.replace("one or more +1/+1 counters are put on", "totalcounteradded(1/1) from(this):");
                 trigger = trigger.replace("Landfall - Whenever a land you control enters", "_LANDFALL_");
+                trigger = trigger.replaceAll("as this ([a-zA-Z]+) enters", "");
                 trigger = trigger.replaceAll("a ([a-zA-Z]+) you control enters", "movedTo($1|myBattlefield):");
                 trigger = trigger.replaceAll("this ([a-zA-Z]+) becomes tapped", "tapped(this):");
                 trigger = trigger.replace("a creature you control becomes blocked", "combat(blocked) source(creature|mybattlefield):");
